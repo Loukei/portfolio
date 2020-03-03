@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file alias="icon_NewFile">Images/Action_newFile-icon.png</file>
+        <file alias="icon_OpenFile">Images/Action_openFile-icon.png</file>
+        <file alias="icon_SaveFile">Images/Action_saveFile-icon.png</file>
+        <file alias="icon_SaveAsFile">Images/Action_saveAsFile-icon.png</file>
+        <file alias="icon_notepad">Images/notepad-icon.png</file>
+        <file alias="icon_Redo">Images/Action-Redo-icon.png</file>
+        <file alias="icon_Undo">Images/Action-Undo-icon.png</file>
+        <file alias="icon_Find_CaseSensitive">Images/SearchWidget/icon_CaseSensitive_PNG64.png</file>
+        <file alias="icon_Find_BackWard">Images/SearchWidget/icon_left_arrow_PNG.png</file>
+        <file alias="icon_Find_MatchWholeWord">Images/SearchWidget/icon_MatchWholeWord_PNG64.png</file>
+        <file alias="icon_Find_RegularExpression">Images/SearchWidget/icon_RegularExpression_PNG64.png</file>
+        <file alias="icon_Find_Next">Images/SearchWidget/icon_right_arrow_PNG.png</file>
+        <file alias="icon_Close">Images/SearchWidget/icon-close-round_PNG.png</file>
+    </qresource>
+    <qresource prefix="/Settings"/>
+</RCC>

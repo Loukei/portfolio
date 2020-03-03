@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>630</width>
+    <height>495</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Account:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="plainTextEdit"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>630</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAcount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+    <addaction name="actionLogin_account"/>
+    <addaction name="action_Logout_Account"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuUpload_file">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Upload file</string>
+     </property>
+     <addaction name="actionSimple_Upload"/>
+     <addaction name="actionMultipart_Upload"/>
+     <addaction name="actionResumable_Upload"/>
+    </widget>
+    <addaction name="menuUpload_file"/>
+    <addaction name="actionDownload_file"/>
+   </widget>
+   <addaction name="menuAcount"/>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionLogin_account">
+   <property name="text">
+    <string>Login account</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>About...</string>
+   </property>
+  </action>
+  <action name="actionDownload_file">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Download file</string>
+   </property>
+  </action>
+  <action name="actionSimple_Upload">
+   <property name="text">
+    <string>Simple Upload</string>
+   </property>
+  </action>
+  <action name="actionMultipart_Upload">
+   <property name="text">
+    <string>Multipart Upload</string>
+   </property>
+  </action>
+  <action name="actionResumable_Upload">
+   <property name="text">
+    <string>Resumable Upload</string>
+   </property>
+  </action>
+  <action name="action_Logout_Account">
+   <property name="text">
+    <string>&amp;Logout Account</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
