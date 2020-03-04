@@ -23,8 +23,13 @@ public:
     ~MainWindow() override; //
 
 private slots:
+    /// Click menu login
     void on_actionLogin_account_triggered();
-
+    /// when m_Drive grant succeed, show info and allow other operation
+    void on_google_granted();
+    /// Click menu Logout
+    void on_action_Logout_Account_triggered();
+    /// Click menu Account About
     void on_actionAbout_triggered();
 
     void on_actionDownload_file_triggered();
@@ -35,7 +40,8 @@ private slots:
 
     void on_actionResumable_Upload_triggered();
 
-    void on_action_Logout_Account_triggered();
+
+
 
 private:
     Ui::MainWindow *ui;

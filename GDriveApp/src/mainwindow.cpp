@@ -20,11 +20,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     /// setup download dialog
     downloadDialog = new UIDownloadDialog(this,
-                                                  key_DownloadFilePath,
-                                                  key_DownloadFileID);
+                                          key_DownloadFilePath,
+                                          key_DownloadFileID);
     downloadDialog->setWindowTitle(tr("Download File"));
     ///
     m_Drive = new GDriveService(this);
+    connect(m_Drive,&GDriveService::granted,
+            this,&MainWindow::on_google_granted);
 }
 
 MainWindow::~MainWindow()
@@ -35,14 +37,7 @@ MainWindow::~MainWindow()
 void MainWindow::accountLogin()
 {
     m_Drive->start();
-    connect(m_Drive,&GDriveService::granted,
-            ui->plainTextEdit,[this](){
-        ui->plainTextEdit->appendPlainText(m_Drive->showInfo());
-        //!Open other UI menu
-        ui->actionAbout->setEnabled(true);
-        ui->menuUpload_file->setEnabled(true);
-        ui->actionDownload_file->setEnabled(true);
-    });
+    //! see MainWindow::on_google_granted after granted emit
 }
 
 void MainWindow::accountLogout()
@@ -132,6 +127,26 @@ void MainWindow::on_actionLogin_account_triggered()
     accountLogin();
 }
 
+void MainWindow::on_google_granted()
+{
+    ui->plainTextEdit->appendPlainText(m_Drive->showInfo());
+    //!Open other UI menu
+    ui->actionAbout->setEnabled(true);
+    ui->menuUpload_file->setEnabled(true);
+    ui->actionDownload_file->setEnabled(true);
+}
+
+void MainWindow::on_action_Logout_Account_triggered()
+{
+    qInfo() << "MainWindow::on_action_Logout_Account_triggered()";
+    accountLogout();
+    ui->label->clear();
+    ui->plainTextEdit->appendPlainText("Account logout\n");
+    ui->actionAbout->setEnabled(false);
+    ui->menuUpload_file->setEnabled(false);
+    ui->actionDownload_file->setEnabled(false);
+}
+
 void MainWindow::on_actionAbout_triggered()
 {
     accountAbout();
@@ -140,9 +155,6 @@ void MainWindow::on_actionAbout_triggered()
 void MainWindow::on_actionDownload_file_triggered()
 {
     qInfo() << "MainWindow::on_actionDownload_file_triggered()";
-//    QString saveFile = QFileDialog::getSaveFileName(this,
-//                                                     tr("Save File"),
-//                                                     key_DownloadFilePath);
     if(downloadDialog->exec() == QDialog::Accepted){
         fileDownload(downloadDialog->getDownloadFilePath(),
                      downloadDialog->getFileId());
@@ -153,7 +165,7 @@ void MainWindow::on_actionDownload_file_triggered()
 
 void MainWindow::on_actionSimple_Upload_triggered()
 {
-    qInfo() << "void MainWindow::on_actionSimple_Upload_triggered()";
+    qInfo() << "MainWindow::on_actionSimple_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
                                  key_UploadFilePath);
@@ -162,7 +174,7 @@ void MainWindow::on_actionSimple_Upload_triggered()
 
 void MainWindow::on_actionMultipart_Upload_triggered()
 {
-    qInfo() << "void MainWindow::on_actionMultipart_Upload_triggered()";
+    qInfo() << "MainWindow::on_actionMultipart_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
                                  key_UploadFilePath);
@@ -171,14 +183,9 @@ void MainWindow::on_actionMultipart_Upload_triggered()
 
 void MainWindow::on_actionResumable_Upload_triggered()
 {
-    qInfo() << "void MainWindow::on_actionResumable_Upload_triggered()";
+    qInfo() << "MainWindow::on_actionResumable_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
                                  key_UploadFilePath);
     fileResumableUpload(uploadFile);
-}
-
-void MainWindow::on_action_Logout_Account_triggered()
-{
-    accountLogout();
 }

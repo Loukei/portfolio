@@ -1,0 +1,193 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "googledriveservice.h"
+#include "uidownloaddialog.h"
+#include <QDebug>
+#include <QFile>
+#include <QMessageBox>
+#include <QFileDialog>
+
+const QString key_DownloadFilePath = "D:/Qfile test.txt";
+const QString key_DownloadFileID = "1J3NUmpMdFSMduVDyUBov-8vbJSIO6Hf9";
+const QString key_UploadFilePath = "D:/TestData/test File.txt";
+
+using namespace GDrive;
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    /// setup download dialog
+    downloadDialog = new UIDownloadDialog(this,
+                                          key_DownloadFilePath,
+                                          key_DownloadFileID);
+    downloadDialog->setWindowTitle(tr("Download File"));
+    ///
+    m_Drive = new GDriveService(this);
+    connect(m_Drive,&GDriveService::granted,
+            this,&MainWindow::on_google_granted);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::accountLogin()
+{
+    m_Drive->start();
+    //! see MainWindow::on_google_granted after granted emit
+}
+
+void MainWindow::accountLogout()
+{
+    m_Drive->logout();
+}
+
+void MainWindow::accountAbout()
+{
+    auto userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
+    connect(userAbout,&GDriveAbout::received,
+            [userAbout,this](bool success){
+        if(success){
+            GDriveAboutResource resource = userAbout->getResource();
+            ui->label->setText("Account: " + resource.displayName());
+        }else {
+            ui->label->setText("Unknown");
+            ui->plainTextEdit->appendPlainText("About message Error.\n");
+        }
+        userAbout->deleteLater();
+    });
+}
+
+void MainWindow::fileSimpleUpload(const QString &filepath)
+{
+    auto task = m_Drive->fileSimpleCreate(filepath);
+    auto onUploadreceive = [task](){
+        if(task->isComplete() && !task->isFailed()){ //! 上傳任務成功必須(1)完成且(2)沒有失敗
+            qInfo() << "Simple Upload Success";
+        }else {
+            qWarning() << "Upload error:" << task->errorString();
+        }
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
+}
+
+void MainWindow::fileMultipartUpload(const QString &filepath)
+{
+    auto task = m_Drive->fileMultipartCreate(filepath);
+    auto onUploadreceive = [task](){
+        if(task->isComplete() && !task->isFailed()){
+            qInfo() << "Multipart Upload Success";
+        }else {
+            qWarning() << "Upload error:" << task->errorString();
+        }
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
+}
+
+void MainWindow::fileResumableUpload(const QString &filepath)
+{
+    auto task = m_Drive->fileResumableCreate(filepath);
+    auto onUploadreceive = [task](){
+        if(task->isComplete() && !task->isFailed()){
+            qInfo() << "Resumable Upload Success";
+        }else {
+            qWarning() << "Upload error:" << task->errorString();
+        }
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
+}
+
+void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fileId)
+{
+    QSharedPointer<QFile> writeFile(new QFile(downloadFilePath,this),&QFile::deleteLater);
+    auto task = m_Drive->fileDownload(fileId,"id,name",writeFile);
+    connect(task,&GDriveFileTask::finished,
+            this,[task](){
+        if(task->isComplete() && !task->isFailed()){
+            qInfo() << "Download complete.";
+        }else {
+            qWarning() << "Download error:" << task->errorString();
+        }
+        task->deleteLater();
+    });
+}
+
+void MainWindow::on_actionLogin_account_triggered()
+{
+    qInfo() << "MainWindow::on_actionLogin_account_triggered()";
+    accountLogin();
+}
+
+void MainWindow::on_google_granted()
+{
+    ui->plainTextEdit->appendPlainText(m_Drive->showInfo());
+    //!Open other UI menu
+    ui->actionAbout->setEnabled(true);
+    ui->menuUpload_file->setEnabled(true);
+    ui->actionDownload_file->setEnabled(true);
+}
+
+void MainWindow::on_action_Logout_Account_triggered()
+{
+    qInfo() << "MainWindow::on_action_Logout_Account_triggered()";
+    accountLogout();
+    ui->plainTextEdit->appendPlainText("Account logout\n");
+    ui->actionAbout->setEnabled(false);
+    ui->menuUpload_file->setEnabled(false);
+    ui->actionDownload_file->setEnabled(false);
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    accountAbout();
+}
+
+void MainWindow::on_actionDownload_file_triggered()
+{
+    qInfo() << "MainWindow::on_actionDownload_file_triggered()";
+    if(downloadDialog->exec() == QDialog::Accepted){
+        fileDownload(downloadDialog->getDownloadFilePath(),
+                     downloadDialog->getFileId());
+    }else { //! QDialog::Rejected
+        ui->plainTextEdit->appendPlainText("Download cancled.\n");
+    }
+}
+
+void MainWindow::on_actionSimple_Upload_triggered()
+{
+    qInfo() << "MainWindow::on_actionSimple_Upload_triggered()";
+    QString uploadFile = QFileDialog::getOpenFileName(this,
+                                 tr("Seclct upload file"),
+                                 key_UploadFilePath);
+    fileSimpleUpload(uploadFile);
+}
+
+void MainWindow::on_actionMultipart_Upload_triggered()
+{
+    qInfo() << "MainWindow::on_actionMultipart_Upload_triggered()";
+    QString uploadFile = QFileDialog::getOpenFileName(this,
+                                 tr("Seclct upload file"),
+                                 key_UploadFilePath);
+    fileMultipartUpload(uploadFile);
+}
+
+void MainWindow::on_actionResumable_Upload_triggered()
+{
+    qInfo() << "MainWindow::on_actionResumable_Upload_triggered()";
+    QString uploadFile = QFileDialog::getOpenFileName(this,
+                                 tr("Seclct upload file"),
+                                 key_UploadFilePath);
+    fileResumableUpload(uploadFile);
+}
+
+
+
