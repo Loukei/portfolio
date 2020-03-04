@@ -27,7 +27,6 @@ CONFIG += c++11
 SOURCES += \
         gdriveabout.cpp \
         gdriveaboutresource.cpp \
-        gdrivefiledownloaddialog.cpp \
         gdrivefiledownloader.cpp \
         gdrivefilemultipartcreate.cpp \
         gdrivefileresource.cpp \
@@ -36,12 +35,12 @@ SOURCES += \
         gdrivefiletask.cpp \
         googledriveservice.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        uidownloaddialog.cpp
 
 HEADERS += \
         gdriveabout.h \
         gdriveaboutresource.h \
-        gdrivefiledownloaddialog.h \
         gdrivefiledownloader.h \
         gdrivefilemultipartcreate.h \
         gdrivefileresource.h \
@@ -50,11 +49,12 @@ HEADERS += \
         gdrivefiletask.h \
         googledriveservice.h \
         mainwindow.h \
-        oauthglobal.h
+        oauthglobal.h \
+        uidownloaddialog.h
 
 FORMS += \
-        gdrivefiledownloaddialog.ui \
-        mainwindow.ui
+        mainwindow.ui \
+        uidownloaddialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

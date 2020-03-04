@@ -4,18 +4,18 @@
 #include <QDialog>
 
 namespace Ui {
-class GDriveFileDownloadDialog;
+class UIDownloadDialog;
 }
 
-class GDriveFileDownloadDialog : public QDialog
+class UIDownloadDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit GDriveFileDownloadDialog(QWidget *parent = nullptr,
+    explicit UIDownloadDialog(QWidget *parent = nullptr,
                                       const QString &downloadPath = "",
                                       const QString &fileID = "");
-    ~GDriveFileDownloadDialog() override;
+    ~UIDownloadDialog() override;
     /// return Download path form lineEdit_DownloadPath
     QString getDownloadFilePath();
     /// return fileID form lineEdit_FileID
@@ -31,7 +31,7 @@ private slots:
     void on_pushButton_DownloadPath_clicked();
 
 private:
-    Ui::GDriveFileDownloadDialog *ui;
+    Ui::UIDownloadDialog *ui;
 };
 
 #endif // GDRIVEFILEDOWNLOADDIALOG_H

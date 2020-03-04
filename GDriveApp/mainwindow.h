@@ -13,7 +13,7 @@ namespace GDrive {
     class GDriveService;
 }
 
-class GDriveFileDownloadDialog;
+class UIDownloadDialog;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -39,7 +39,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    GDriveFileDownloadDialog *downloadDialog;
+    UIDownloadDialog *downloadDialog;
     GDrive::GDriveService *m_Drive;
 //    GDrive::GDriveFileResource m_fileResource;
     void accountLogin();

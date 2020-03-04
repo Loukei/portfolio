@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "googledriveservice.h"
-#include "gdrivefiledownloaddialog.h"
+#include "uidownloaddialog.h"
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     /// setup download dialog
-    downloadDialog = new GDriveFileDownloadDialog(this,
+    downloadDialog = new UIDownloadDialog(this,
                                                   key_DownloadFilePath,
                                                   key_DownloadFileID);
     downloadDialog->setWindowTitle(tr("Download File"));

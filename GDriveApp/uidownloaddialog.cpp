@@ -1,40 +1,40 @@
-#include "gdrivefiledownloaddialog.h"
-#include "ui_gdrivefiledownloaddialog.h"
+#include "uidownloaddialog.h"
+#include "ui_uidownloaddialog.h"
 #include <QFileDialog>
 
-GDriveFileDownloadDialog::GDriveFileDownloadDialog(QWidget *parent,
-                                                   const QString &downloadPath,
-                                                   const QString &fileID) :
+UIDownloadDialog::UIDownloadDialog(QWidget *parent,
+                                   const QString &downloadPath,
+                                   const QString &fileID) :
     QDialog(parent),
-    ui(new Ui::GDriveFileDownloadDialog)
+    ui(new Ui::UIDownloadDialog)
 {
     ui->setupUi(this);
     ui->lineEdit_DownloadPath->setText(downloadPath);
     ui->lineEdit_FileID->setText(fileID);
 }
 
-GDriveFileDownloadDialog::~GDriveFileDownloadDialog()
+UIDownloadDialog::~UIDownloadDialog()
 {
     delete ui;
 }
 
-QString GDriveFileDownloadDialog::getDownloadFilePath()
+QString UIDownloadDialog::getDownloadFilePath()
 {
     return ui->lineEdit_DownloadPath->text();
 }
 
-QString GDriveFileDownloadDialog::getFileId()
+QString UIDownloadDialog::getFileId()
 {
     return ui->lineEdit_FileID->text();
 }
 
-void GDriveFileDownloadDialog::accept()
+void UIDownloadDialog::accept()
 {
     emit downloadParam(ui->lineEdit_DownloadPath->text(),ui->lineEdit_FileID->text());
     QDialog::accept();
 }
 
-void GDriveFileDownloadDialog::on_pushButton_DownloadPath_clicked()
+void UIDownloadDialog::on_pushButton_DownloadPath_clicked()
 {
     QString save = QFileDialog::getSaveFileName(this,
                                                 tr("Save file"),
