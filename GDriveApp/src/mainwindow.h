@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "gdrivefileresource.h"
-#include "gdriveaboutresource.h"
+#include "GDriveLib/gdrivefileresource.h"
+#include "GDriveLib/gdriveaboutresource.h"
 
 namespace Ui {
 class MainWindow;

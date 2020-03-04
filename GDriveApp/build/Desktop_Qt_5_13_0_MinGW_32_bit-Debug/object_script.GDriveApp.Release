@@ -4,6 +4,7 @@ release/gdrivefiledownloader.o
 release/gdrivefilemultipartcreate.o
 release/gdrivefileresource.o
 release/gdrivefileresumablecreate.o
+release/gdrivefiles.o
 release/gdrivefilesimplecreate.o
 release/gdrivefiletask.o
 release/googledriveservice.o
@@ -13,6 +14,7 @@ release/uidownloaddialog.o
 release/moc_gdriveabout.o
 release/moc_gdrivefiledownloader.o
 release/moc_gdrivefileresumablecreate.o
+release/moc_gdrivefiles.o
 release/moc_gdrivefilesimplecreate.o
 release/moc_gdrivefiletask.o
 release/moc_googledriveservice.o

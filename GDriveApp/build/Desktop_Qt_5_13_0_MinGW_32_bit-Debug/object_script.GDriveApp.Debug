@@ -4,6 +4,7 @@ debug/gdrivefiledownloader.o
 debug/gdrivefilemultipartcreate.o
 debug/gdrivefileresource.o
 debug/gdrivefileresumablecreate.o
+debug/gdrivefiles.o
 debug/gdrivefilesimplecreate.o
 debug/gdrivefiletask.o
 debug/googledriveservice.o
@@ -13,6 +14,7 @@ debug/uidownloaddialog.o
 debug/moc_gdriveabout.o
 debug/moc_gdrivefiledownloader.o
 debug/moc_gdrivefileresumablecreate.o
+debug/moc_gdrivefiles.o
 debug/moc_gdrivefilesimplecreate.o
 debug/moc_gdrivefiletask.o
 debug/moc_googledriveservice.o

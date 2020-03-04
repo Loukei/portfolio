@@ -35,6 +35,7 @@ SOURCES += \
         GDriveLib/gdrivefilesimplecreate.cpp \
         GDriveLib/gdrivefiletask.cpp \
         GDriveLib/googledriveservice.cpp \
+        gdrivefiledownloader.cpp \
         main.cpp \
         mainwindow.cpp \
         uidownloaddialog.cpp

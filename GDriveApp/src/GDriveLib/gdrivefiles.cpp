@@ -13,9 +13,9 @@ GDriveFiles::~GDriveFiles()
 
 }
 
-GDriveUploader *GDriveFiles::create()
+void GDriveFiles::create()
 {
-    return new GDriveSimpleUpload(m_google,"D:/TestData/test測試文件");
+
 }
 
 void GDriveFiles::update()

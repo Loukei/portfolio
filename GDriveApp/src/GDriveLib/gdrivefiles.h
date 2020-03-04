@@ -2,7 +2,7 @@
 #define GDRIVEFILES_H
 
 #include <QObject>
-#include "gdriveuploader.h" // upload new file
+#include "gdrivefiletask.h" // upload new file
 
 namespace GDrive {
 class GDriveFiles : public QObject
@@ -13,7 +13,7 @@ public:
     virtual ~GDriveFiles();
 
     /// upload new file
-    GDriveUploader* create();
+    void create();
     /// upload to update file
     void update();
     /// delete file
