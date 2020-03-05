@@ -38,10 +38,11 @@ public:
     QString showInfo() const;
     /// send request to get About message, use deletelater to delete GDriveAbout
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
-    /// create new file on drive
-//    GDriveUploader* fileCreate(const QString &filepath,UploadType type);
+    /// simple upload create file
     GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath);
+    /// multipart upload create file
     GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath);
+    /// Resumable upload create file
     GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
     /// Gets a file's metadata by ID.
 //    GDriveFileTask* fileGet(const QString &fileId,const QString &fields);

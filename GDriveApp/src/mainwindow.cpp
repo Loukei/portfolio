@@ -2,14 +2,11 @@
 #include "ui_mainwindow.h"
 #include "uidownloaddialog.h"
 #include "GDriveLib/googledriveservice.h"
+#include "Secret/debugparameter.h" // Debug參數，減少上傳/下載操作時間
 #include <QDebug>
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
-
-const QString key_DownloadFilePath = "D:/Qfile test.txt";
-const QString key_DownloadFileID = "1J3NUmpMdFSMduVDyUBov-8vbJSIO6Hf9";
-const QString key_UploadFilePath = "D:/TestData/test File.txt";
 
 using namespace GDrive;
 
@@ -20,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     /// setup download dialog
     downloadDialog = new UIDownloadDialog(this,
-                                          key_DownloadFilePath,
-                                          key_DownloadFileID);
+                                          MyDebug::key_DownloadFilePath,
+                                          MyDebug::key_DownloadFileID);
     downloadDialog->setWindowTitle(tr("Download File"));
     ///
     m_Drive = new GDriveService(this);
@@ -168,7 +165,7 @@ void MainWindow::on_actionSimple_Upload_triggered()
     qInfo() << "MainWindow::on_actionSimple_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
-                                 key_UploadFilePath);
+                                 MyDebug::key_UploadFilePath);
     fileSimpleUpload(uploadFile);
 }
 
@@ -177,7 +174,7 @@ void MainWindow::on_actionMultipart_Upload_triggered()
     qInfo() << "MainWindow::on_actionMultipart_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
-                                 key_UploadFilePath);
+                                 MyDebug::key_UploadFilePath);
     fileMultipartUpload(uploadFile);
 }
 
@@ -186,6 +183,6 @@ void MainWindow::on_actionResumable_Upload_triggered()
     qInfo() << "MainWindow::on_actionResumable_Upload_triggered()";
     QString uploadFile = QFileDialog::getOpenFileName(this,
                                  tr("Seclct upload file"),
-                                 key_UploadFilePath);
+                                 MyDebug::key_UploadFilePath);
     fileResumableUpload(uploadFile);
 }

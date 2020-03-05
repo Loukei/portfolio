@@ -4,8 +4,8 @@
 #include <QNetworkAccessManager>
 #include <QDesktopServices>
 #include <QDebug>
-#include "oauthglobal.h"
-//#include "gdriveuploader.h"
+#include "Secret/oauthglobal.h"
+
 using namespace GDrive;
 
 GDriveService::GDriveService(QObject *parent)
@@ -71,23 +71,6 @@ GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &fil
 {
     return new GDriveFileResumableCreate(m_google,filepath);
 }
-
-//GDriveUploader *GDriveService::fileCreate(const QString &filepath, UploadType type)
-//{
-//    GDriveUploader *uploader = nullptr;
-//    switch (type) {
-//    case SimpleUpload:
-//        uploader = new GDriveSimpleUpload(m_google,filepath);
-//        break;
-//    case MultipartUpload:
-//        uploader = new GDriveMultipartUpload(m_google,filepath);
-//        break;
-//    case ResumableUpload:
-//        uploader = new GDriveResumableUpload(m_google,filepath);
-//        break;
-//    }
-//    return uploader;
-//}
 
 //GDriveFileTask *GDriveService::fileGet(const QString &fileId, const QString &fields)
 //{

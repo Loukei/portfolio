@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include <QApplication>
-//#include "testoauth.h"
 #include <QPlainTextEdit>
 
 int main(int argc, char *argv[])
