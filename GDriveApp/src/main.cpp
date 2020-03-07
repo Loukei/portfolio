@@ -1,10 +1,10 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <QPlainTextEdit>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    //! set debug message pattern
     qSetMessagePattern("[%{type}] %{appname} (%{file}:%{line}) - %{message}");
     MainWindow w;
     w.show();

@@ -43,6 +43,7 @@ private:
     Ui::MainWindow *ui;
     UIDownloadDialog *downloadDialog;
     GDrive::GDriveService *m_Drive;
+
 //    GDrive::GDriveFileResource m_fileResource;
     void accountLogin();
     void accountLogout();
