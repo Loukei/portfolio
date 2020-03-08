@@ -1,15 +1,10 @@
 
 Notepad/Build/
 
-GDriveApp/build-GDriveApp-Desktop_Qt_5_13_0_MinGW_32_bit-Debug/
-
-GDriveApp/build/Desktop_Qt_5_13_0_MinGW_32_bit-Debug/debug/
-
 GDriveApp/build/Desktop_Qt_5_13_0_MinGW_32_bit-Debug/
-
 GDriveApp/src/oauthglobal.h
 GDriveApp/src/Secret/
-
+GDriveApp/src/GDriveApp.pro.user
 
 # C++ objects and libs
 *.slo
@@ -44,3 +39,4 @@ Makefile*
 *build-*
 *.qm
 *.prl
+*.stg
