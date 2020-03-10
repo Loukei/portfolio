@@ -50,7 +50,6 @@ HEADERS += \
         GDriveLib/gdrivefilesimplecreate.h \
         GDriveLib/gdrivefiletask.h \
         GDriveLib/googledriveservice.h \
-        Secret/debugparameter.h \
         Secret/oauthglobal.h \
         mainwindow.h \
         uidownloaddialog.h

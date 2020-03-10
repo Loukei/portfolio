@@ -3,12 +3,14 @@
 #include <QFileDialog>
 
 UIDownloadDialog::UIDownloadDialog(QWidget *parent,
+                                   const QString &caption,
                                    const QString &downloadPath,
                                    const QString &fileID) :
     QDialog(parent),
     ui(new Ui::UIDownloadDialog)
 {
     ui->setupUi(this);
+    setWindowTitle(caption);
     ui->lineEdit_DownloadPath->setText(downloadPath);
     ui->lineEdit_FileID->setText(fileID);
 }

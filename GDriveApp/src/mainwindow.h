@@ -2,8 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "GDriveLib/gdrivefileresource.h"
-#include "GDriveLib/gdriveaboutresource.h"
 
 namespace Ui {
 class MainWindow;
@@ -14,6 +12,7 @@ namespace GDrive {
 }
 
 class UIDownloadDialog;
+class QSettings;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -26,7 +25,7 @@ private slots:
     /// Click menu login
     void on_actionLogin_account_triggered();
     /// when m_Drive grant succeed, show info and allow other operation
-    void on_google_granted();
+    void onGDrive_granted();
     /// Click menu Logout
     void on_action_Logout_Account_triggered();
     /// Click menu Account About
@@ -42,9 +41,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
     UIDownloadDialog *downloadDialog;
+    QString m_currentUploadFilePath;
+    QSettings *m_settings;
     GDrive::GDriveService *m_Drive;
 
-//    GDrive::GDriveFileResource m_fileResource;
     void accountLogin();
     void accountLogout();
     void accountAbout();
@@ -52,6 +52,12 @@ private:
     void fileMultipartUpload(const QString &filepath);
     void fileResumableUpload(const QString &filepath);
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
+    ///
+    inline QRect readGeometry(QSettings *settings);
+    inline QString readUploadFilePath(QSettings *settings);
+    inline QString readDownloadFilePath(QSettings *settings);
+    inline QString readDownloadFileID(QSettings *settings);
+    void writeSettings();
 };
 
 #endif // MAINWINDOW_H

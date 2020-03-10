@@ -13,8 +13,9 @@ class UIDownloadDialog : public QDialog
 
 public:
     explicit UIDownloadDialog(QWidget *parent = nullptr,
-                                      const QString &downloadPath = "",
-                                      const QString &fileID = "");
+                              const QString &caption = QString(),
+                              const QString &downloadPath = QString(),
+                              const QString &fileID = QString());
     ~UIDownloadDialog() override;
     /// return Download path form lineEdit_DownloadPath
     QString getDownloadFilePath();

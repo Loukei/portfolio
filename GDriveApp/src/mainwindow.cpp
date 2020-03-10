@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "uidownloaddialog.h"
 #include "GDriveLib/googledriveservice.h"
-#include "Secret/debugparameter.h" // Debug參數，減少上傳/下載操作時間
+#include <QSettings>
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
@@ -14,26 +14,32 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    /// Read Settings
+    m_settings = new QSettings("GDriveApp_Settings.ini",QSettings::IniFormat,this);
+    m_settings->setIniCodec("UTF-8");
+    this->setGeometry(readGeometry(m_settings));
+    m_currentUploadFilePath = readUploadFilePath(m_settings);
     /// Setup download dialog
     downloadDialog = new UIDownloadDialog(this,
-                                          MyDebug::key_DownloadFilePath,
-                                          MyDebug::key_DownloadFileID);
-    downloadDialog->setWindowTitle(tr("Download File"));
-    /// Start a Google Drive Serviece
+                                          tr("Download File"),
+                                          readDownloadFilePath(m_settings),
+                                          readDownloadFileID(m_settings));
+    /// Create Google Drive Serviece instance
     m_Drive = new GDriveService(this);
     connect(m_Drive,&GDriveService::granted,
-            this,&MainWindow::on_google_granted);
+            this,&MainWindow::onGDrive_granted);
 }
 
 MainWindow::~MainWindow()
 {
+    writeSettings();
     delete ui;
 }
 
 void MainWindow::accountLogin()
 {
     m_Drive->start();
-    //! see MainWindow::on_google_granted after granted emit
+    //! see MainWindow::onGDrive_granted after granted emit
 }
 
 void MainWindow::accountLogout()
@@ -64,7 +70,7 @@ void MainWindow::fileSimpleUpload(const QString &filepath)
         if(task->isComplete() && !task->isFailed()){ //! 上傳任務成功必須(1)完成且(2)沒有失敗
             ui->plainTextEdit->appendPlainText(filepath + " Simple Upload Success.\n");
         }else {
-            ui->plainTextEdit->appendPlainText(filepath + "Simple Upload error:" + task->errorString());
+            ui->plainTextEdit->appendPlainText(filepath + " Simple Upload error:" + task->errorString());
         }
         task->deleteLater();
     };
@@ -117,13 +123,43 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
     });
 }
 
+QRect MainWindow::readGeometry(QSettings *settings)
+{
+    return settings->value("MainWindow/Geometry",QRect(0,0,630,495)).toRect();
+}
+
+QString MainWindow::readUploadFilePath(QSettings *settings)
+{
+    return settings->value("MainWindow/UploadFilePath","/home").toString();
+}
+
+QString MainWindow::readDownloadFilePath(QSettings *settings)
+{
+    return settings->value("MainWindow/DownloadFilePath","/home").toString();
+}
+
+QString MainWindow::readDownloadFileID(QSettings *settings)
+{
+    return settings->value("MainWindow/DownloadFileID","YOUR_FILE_ID").toString();
+}
+
+void MainWindow::writeSettings()
+{
+    m_settings->beginGroup("MainWindow");
+    m_settings->setValue("Geometry",this->geometry());
+    m_settings->setValue("DownloadFileID",downloadDialog->getFileId());
+    m_settings->setValue("DownloadFilePath",downloadDialog->getDownloadFilePath());
+    m_settings->setValue("UploadFilePath",m_currentUploadFilePath);
+    m_settings->endGroup();
+}
+
 void MainWindow::on_actionLogin_account_triggered()
 {
     qInfo() << "MainWindow::on_actionLogin_account_triggered()";
     accountLogin();
 }
 
-void MainWindow::on_google_granted()
+void MainWindow::onGDrive_granted()
 {
     ui->plainTextEdit->appendPlainText(m_Drive->showInfo());
     //!Open other UI menu
@@ -162,26 +198,41 @@ void MainWindow::on_actionDownload_file_triggered()
 void MainWindow::on_actionSimple_Upload_triggered()
 {
     qInfo() << "MainWindow::on_actionSimple_Upload_triggered()";
-    QString uploadFile = QFileDialog::getOpenFileName(this,
-                                                      tr("Seclct upload file"),
-                                                      MyDebug::key_UploadFilePath);
-    fileSimpleUpload(uploadFile);
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Upload File"),
+                                                    m_currentUploadFilePath);
+    if (!fileName.isEmpty()) {
+        m_currentUploadFilePath = fileName;
+        fileSimpleUpload(fileName);
+    }else {
+        qDebug() << "upload cancled.";
+    }
 }
 
 void MainWindow::on_actionMultipart_Upload_triggered()
 {
     qInfo() << "MainWindow::on_actionMultipart_Upload_triggered()";
-    QString uploadFile = QFileDialog::getOpenFileName(this,
-                                                      tr("Seclct upload file"),
-                                                      MyDebug::key_UploadFilePath);
-    fileMultipartUpload(uploadFile);
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Upload File"),
+                                                    m_currentUploadFilePath);
+    if (!fileName.isEmpty()) {
+        m_currentUploadFilePath = fileName;
+        fileMultipartUpload(fileName);
+    }else {
+        qDebug() << "upload cancled.";
+    }
 }
 
 void MainWindow::on_actionResumable_Upload_triggered()
 {
     qInfo() << "MainWindow::on_actionResumable_Upload_triggered()";
-    QString uploadFile = QFileDialog::getOpenFileName(this,
-                                                      tr("Seclct upload file"),
-                                                      MyDebug::key_UploadFilePath);
-    fileResumableUpload(uploadFile);
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Upload File"),
+                                                    m_currentUploadFilePath);
+    if (!fileName.isEmpty()) {
+        m_currentUploadFilePath = fileName;
+        fileResumableUpload(fileName);
+    }else {
+        qDebug() << "upload cancled.";
+    }
 }
