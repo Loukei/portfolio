@@ -65,3 +65,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 ## add Oauth network
 QT += network networkauth
+
+RESOURCES += \
+    resources.qrc
