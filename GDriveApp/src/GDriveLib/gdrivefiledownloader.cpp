@@ -74,7 +74,6 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
     qInfo() << "GDrive::GDriveFileDownloader::on_Download_ReplyFinished()";
     auto reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error() != QNetworkReply::NoError){
-//        qWarning() << "[Error]GDriveDownloader error:" << reply->errorString();
         m_errStr += "Network reply error:" + reply->errorString();
         return;
     }

@@ -11,7 +11,8 @@ class GDriveFileResumableCreate : public GDriveFileTask
 {
     Q_OBJECT
 public:
-    explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,const QString& filepath);
+    explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,
+                                       const QString& filepath);
     ~GDriveFileResumableCreate() override;
     GDriveFileResource getResource() const;
 private:
