@@ -14,16 +14,6 @@ GDrive::GDriveAboutResource::GDriveAboutResource(const QByteArray &data)
     qDebug() << "GDriveAboutResource(const QByteArray &data):" << this;
 }
 
-//GDrive::GDriveAboutResource::GDriveAboutResource(const GDrive::GDriveAboutResource &resource)
-//    :m_data(resource.m_data),m_errorString(resource.m_errorString)
-//{
-//}
-
-//GDrive::GDriveAboutResource::GDriveAboutResource(GDrive::GDriveAboutResource &&resource)
-//    :m_data(resource.m_data),m_errorString(resource.m_errorString)
-//{
-//}
-
 GDrive::GDriveAboutResource::~GDriveAboutResource()
 {
     qInfo() << "GDrive::GDriveAboutResource::~GDriveAboutResource():" << this;

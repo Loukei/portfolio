@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="notepad.qrc">
+    <normaloff>:/Images/icon_notepad</normaloff>:/Images/icon_notepad</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="8,2">
+    <item>
+     <widget class="TabWidget" name="tabWidget"/>
+    </item>
+    <item>
+     <widget class="SearchWidget" name="searchWidget" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menu_File_Open_Recent">
+     <property name="title">
+      <string>&amp;Open Recent</string>
+     </property>
+     <addaction name="action_Clear_Items"/>
+     <addaction name="separator"/>
+    </widget>
+    <widget class="QMenu" name="menu_Reopen_encoding">
+     <property name="title">
+      <string>&amp;Reopen with Encoding</string>
+     </property>
+     <addaction name="action_Code_Unicode"/>
+     <addaction name="separator"/>
+     <addaction name="action_Code_Big5"/>
+     <addaction name="separator"/>
+     <addaction name="action_Code_EUC_JP"/>
+     <addaction name="action_Code_ISO_2022_JP"/>
+     <addaction name="action_Code_Shift_JIS"/>
+     <addaction name="separator"/>
+     <addaction name="action_Code_GB18030"/>
+    </widget>
+    <widget class="QMenu" name="menu_Save_with_Encoding">
+     <property name="title">
+      <string>&amp;Save with Encoding</string>
+     </property>
+     <addaction name="action_SaveCode_Big5"/>
+     <addaction name="separator"/>
+     <addaction name="action_SaveCode_EUC_JP"/>
+     <addaction name="action_SaveCode_ISO_2022_JP"/>
+     <addaction name="action_SaveCode_Shift_JIS"/>
+     <addaction name="separator"/>
+     <addaction name="action_SaveCode_GB18030"/>
+    </widget>
+    <addaction name="action_New_File"/>
+    <addaction name="action_Open_File"/>
+    <addaction name="menu_File_Open_Recent"/>
+    <addaction name="action_Save_File"/>
+    <addaction name="action_Save_As"/>
+    <addaction name="menu_Reopen_encoding"/>
+    <addaction name="menu_Save_with_Encoding"/>
+    <addaction name="action_Save_All"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Undo"/>
+    <addaction name="action_Redo"/>
+    <addaction name="separator"/>
+    <addaction name="action_Cut"/>
+    <addaction name="action_Copy"/>
+    <addaction name="action_Paste"/>
+    <addaction name="action_Delete"/>
+    <addaction name="separator"/>
+    <addaction name="action_Select_All"/>
+    <addaction name="separator"/>
+    <addaction name="action_FindOrReplace"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_About"/>
+   </widget>
+   <widget class="QMenu" name="menuOption">
+    <property name="title">
+     <string>&amp;Option</string>
+    </property>
+    <addaction name="action_Settings"/>
+    <addaction name="action_Font"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuOption"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_New_File"/>
+   <addaction name="action_Open_File"/>
+   <addaction name="action_Save_File"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_New_File">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_NewFile</normaloff>:/Images/icon_NewFile</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New File</string>
+   </property>
+  </action>
+  <action name="action_Open_File">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_OpenFile</normaloff>:/Images/icon_OpenFile</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open File ...</string>
+   </property>
+  </action>
+  <action name="action_Clear_Items">
+   <property name="text">
+    <string>&amp;Clear Items</string>
+   </property>
+  </action>
+  <action name="action_Save_File">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_SaveFile</normaloff>:/Images/icon_SaveFile</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save File</string>
+   </property>
+  </action>
+  <action name="action_Save_As">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_SaveAsFile</normaloff>:/Images/icon_SaveAsFile</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save As ...</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_Undo</normaloff>:/Images/icon_Undo</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="action_Redo">
+   <property name="icon">
+    <iconset resource="notepad.qrc">
+     <normaloff>:/Images/icon_Redo</normaloff>:/Images/icon_Redo</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="action_Cut">
+   <property name="text">
+    <string>&amp;Cut</string>
+   </property>
+  </action>
+  <action name="action_Copy">
+   <property name="text">
+    <string>&amp;Copy</string>
+   </property>
+  </action>
+  <action name="action_Paste">
+   <property name="text">
+    <string>&amp;Paste</string>
+   </property>
+  </action>
+  <action name="action_FindOrReplace">
+   <property name="text">
+    <string>&amp;Find/Replace</string>
+   </property>
+  </action>
+  <action name="action_Delete">
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="action_Select_All">
+   <property name="text">
+    <string>&amp;Select All</string>
+   </property>
+  </action>
+  <action name="action_Settings">
+   <property name="text">
+    <string>&amp;Settings</string>
+   </property>
+  </action>
+  <action name="action_Save_All">
+   <property name="text">
+    <string>Save All</string>
+   </property>
+  </action>
+  <action name="action_Font">
+   <property name="text">
+    <string>&amp;Font</string>
+   </property>
+  </action>
+  <action name="action_Code_Unicode">
+   <property name="text">
+    <string>Unicode</string>
+   </property>
+  </action>
+  <action name="action_Code_Big5">
+   <property name="text">
+    <string>Big5</string>
+   </property>
+  </action>
+  <action name="action_Code_EUC_JP">
+   <property name="text">
+    <string>EUC-JP</string>
+   </property>
+  </action>
+  <action name="action_Code_ISO_2022_JP">
+   <property name="text">
+    <string>ISO 2022-JP</string>
+   </property>
+  </action>
+  <action name="action_Code_Shift_JIS">
+   <property name="text">
+    <string>Shift-JIS</string>
+   </property>
+  </action>
+  <action name="action_Code_GB18030">
+   <property name="text">
+    <string>GB18030</string>
+   </property>
+  </action>
+  <action name="action_SaveCode_Big5">
+   <property name="text">
+    <string>Big5</string>
+   </property>
+  </action>
+  <action name="action_SaveCode_EUC_JP">
+   <property name="text">
+    <string>EUC-JP</string>
+   </property>
+  </action>
+  <action name="action_SaveCode_ISO_2022_JP">
+   <property name="text">
+    <string>ISO 2022-JP</string>
+   </property>
+  </action>
+  <action name="action_SaveCode_Shift_JIS">
+   <property name="text">
+    <string>Shift-JIS</string>
+   </property>
+  </action>
+  <action name="action_SaveCode_GB18030">
+   <property name="text">
+    <string>GB18030</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SearchWidget</class>
+   <extends>QWidget</extends>
+   <header>searchwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>tabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="notepad.qrc"/>
+ </resources>
+ <connections/>
+</ui>

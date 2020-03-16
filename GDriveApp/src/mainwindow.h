@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override; //
+    ~MainWindow() override;
 
 private slots:
     /// Click menu login
@@ -40,23 +40,37 @@ private slots:
     void on_actionResumable_Upload_triggered();
 private:
     Ui::MainWindow *ui;
+    /// Download Dialog
     UIDownloadDialog *downloadDialog;
+    /// Save recent upload file
     QString m_currentUploadFilePath;
+    /// Save settings
     QSettings *m_settings;
+    /// Google Drive Api
     GDrive::GDriveService *m_Drive;
-
+    /// GDriveService Account Login
     void accountLogin();
+    /// GDriveService Account Logout
     void accountLogout();
+    /// GDriveService Account get About message
     void accountAbout();
+    /// GDriveService upload(Create) file Simple method
     void fileSimpleUpload(const QString &filepath);
+    /// GDriveService upload(Create) file Multipart method
     void fileMultipartUpload(const QString &filepath);
+    /// GDriveService upload(Create) file Resumable method
     void fileResumableUpload(const QString &filepath);
+    /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
-    ///
+    ///read Settings to Window geometry
     inline QRect readGeometry(QSettings *settings);
+    ///read Settings(UploadFilePath) to m_currentUploadFilePath
     inline QString readUploadFilePath(QSettings *settings);
+    ///read Settings(DownloadFilePath) to downloadDialog
     inline QString readDownloadFilePath(QSettings *settings);
+    ///read Settings(DownloadFileID) to downloadDialog
     inline QString readDownloadFileID(QSettings *settings);
+    ///write settings to ini file
     void writeSettings();
 };
 

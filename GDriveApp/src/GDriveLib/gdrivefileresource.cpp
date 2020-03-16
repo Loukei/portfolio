@@ -15,11 +15,6 @@ GDrive::GDriveFileResource::GDriveFileResource(const QByteArray &data)
     }
 }
 
-//GDrive::GDriveFileResource::GDriveFileResource(GDrive::GDriveFileResource &&resource)
-//    :m_data(resource.m_data),m_errorString(resource.m_errorString)
-//{
-//}
-
 GDrive::GDriveFileResource::~GDriveFileResource()
 {
 }

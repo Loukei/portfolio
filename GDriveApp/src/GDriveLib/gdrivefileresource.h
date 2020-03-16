@@ -8,8 +8,6 @@ class GDriveFileResource
 public:
     ///construct by QBytearray data
     explicit GDriveFileResource(const QByteArray &data);
-//    ///Move-constructs form other resource
-//    explicit GDriveFileResource(GDriveFileResource&& resource);
     ~GDriveFileResource();
     /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
     QString kind() const;
@@ -20,8 +18,7 @@ public:
     QStringList parents() const;
 
     long size() const;
-    /// returns true if receive document is null.
-    /// This happen when constructor parse failed
+    /// returns true if receive document in constructor is null.
     bool isNull() const;
     /// return current error string
     QString errorString() const;

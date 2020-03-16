@@ -38,8 +38,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::accountLogin()
 {
-    m_Drive->start();
-    //! see MainWindow::onGDrive_granted after granted emit
+    m_Drive->start();   //! see MainWindow::onGDrive_granted after granted emit
 }
 
 void MainWindow::accountLogout()
@@ -205,7 +204,7 @@ void MainWindow::on_actionSimple_Upload_triggered()
         m_currentUploadFilePath = fileName;
         fileSimpleUpload(fileName);
     }else {
-        qDebug() << "upload cancled.";
+        ui->plainTextEdit->appendPlainText("upload cancled.\n");
     }
 }
 
@@ -219,7 +218,7 @@ void MainWindow::on_actionMultipart_Upload_triggered()
         m_currentUploadFilePath = fileName;
         fileMultipartUpload(fileName);
     }else {
-        qDebug() << "upload cancled.";
+        ui->plainTextEdit->appendPlainText("upload cancled.\n");
     }
 }
 
@@ -233,6 +232,6 @@ void MainWindow::on_actionResumable_Upload_triggered()
         m_currentUploadFilePath = fileName;
         fileResumableUpload(fileName);
     }else {
-        qDebug() << "upload cancled.";
+        ui->plainTextEdit->appendPlainText("upload cancled.\n");
     }
 }

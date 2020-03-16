@@ -4,7 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QDesktopServices>
 #include <QDebug>
-#include "Secret/oauthglobal.h"
+#include "Secret/oauthglobal.h" // OAuth parameter
 
 using namespace GDrive;
 

@@ -11,12 +11,11 @@
 #include "gdrivefileresumablecreate.h"
 
 class QOAuth2AuthorizationCodeFlow;
-class QOAuthHttpServerReplyHandler;
+//class QOAuthHttpServerReplyHandler;
 class QNetworkAccessManager;
 class QFile;
 
 namespace GDrive {
-//class GDriveUploader;
 class GDriveService : public QObject
 {
     Q_OBJECT
@@ -34,7 +33,7 @@ public:
     void start();
     /// logout
     void logout();
-    /// show Object Info
+    /// show OAuth 2.0 token
     QString showInfo() const;
     /// send request to get About message, use deletelater to delete GDriveAbout
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
