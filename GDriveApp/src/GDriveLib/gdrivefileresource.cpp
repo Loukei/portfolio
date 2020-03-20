@@ -15,6 +15,20 @@ GDrive::GDriveFileResource::GDriveFileResource(const QByteArray &data)
     }
 }
 
+GDrive::GDriveFileResource::GDriveFileResource(const QJsonValue &value)
+{
+    if(value.isUndefined() | value.isNull()){
+        m_data = QJsonDocument(); //! Constructs an empty document
+        return;
+    }
+    m_data = QJsonDocument(value.toObject());
+}
+
+GDrive::GDriveFileResource::GDriveFileResource()
+{
+    m_data = QJsonDocument();
+}
+
 GDrive::GDriveFileResource::~GDriveFileResource()
 {
 }

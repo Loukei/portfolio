@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "uidownloaddialog.h"
+#include "searchdialog.h"
 #include "GDriveLib/googledriveservice.h"
 #include <QSettings>
 #include <QDebug>
@@ -20,10 +21,14 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setGeometry(readGeometry(m_settings));
     m_currentUploadFilePath = readUploadFilePath(m_settings);
     /// Setup download dialog
-    downloadDialog = new UIDownloadDialog(this,
+    m_dialogDownload = new UIDownloadDialog(this,
                                           tr("Download File"),
                                           readDownloadFilePath(m_settings),
                                           readDownloadFileID(m_settings));
+    /// Setup search dialog
+    m_dialogSearch = new SearchDialog(this);
+    connect(m_dialogSearch,&SearchDialog::query,
+            this,&MainWindow::onSearchDialog_query);
     /// Create Google Drive Serviece instance
     m_Drive = new GDriveService(this);
     connect(m_Drive,&GDriveService::granted,
@@ -146,15 +151,15 @@ void MainWindow::writeSettings()
 {
     m_settings->beginGroup("MainWindow");
     m_settings->setValue("Geometry",this->geometry());
-    m_settings->setValue("DownloadFileID",downloadDialog->getFileId());
-    m_settings->setValue("DownloadFilePath",downloadDialog->getDownloadFilePath());
+    m_settings->setValue("DownloadFileID",m_dialogDownload->getFileId());
+    m_settings->setValue("DownloadFilePath",m_dialogDownload->getDownloadFilePath());
     m_settings->setValue("UploadFilePath",m_currentUploadFilePath);
     m_settings->endGroup();
 }
 
 void MainWindow::on_actionLogin_account_triggered()
 {
-    qInfo() << "MainWindow::on_actionLogin_account_triggered()";
+    qInfo() << Q_FUNC_INFO;
     accountLogin();
 }
 
@@ -165,17 +170,19 @@ void MainWindow::onGDrive_granted()
     ui->actionAbout->setEnabled(true);
     ui->menuUpload_file->setEnabled(true);
     ui->actionDownload_file->setEnabled(true);
+    ui->action_Search_file_folder->setEnabled(true);
 }
 
 void MainWindow::on_action_Logout_Account_triggered()
 {
-    qInfo() << "MainWindow::on_action_Logout_Account_triggered()";
+    qInfo() << Q_FUNC_INFO;
     accountLogout();
     ui->label->clear();
     ui->plainTextEdit->appendPlainText("Account logout.\n");
     ui->actionAbout->setEnabled(false);
     ui->menuUpload_file->setEnabled(false);
     ui->actionDownload_file->setEnabled(false);
+    ui->action_Search_file_folder->setEnabled(false);
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -185,10 +192,10 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionDownload_file_triggered()
 {
-    qInfo() << "MainWindow::on_actionDownload_file_triggered()";
-    if(downloadDialog->exec() == QDialog::Accepted){
-        fileDownload(downloadDialog->getDownloadFilePath(),
-                     downloadDialog->getFileId());
+    qInfo() << Q_FUNC_INFO;
+    if(m_dialogDownload->exec() == QDialog::Accepted){
+        fileDownload(m_dialogDownload->getDownloadFilePath(),
+                     m_dialogDownload->getFileId());
     }else { //! QDialog::Rejected
         ui->plainTextEdit->appendPlainText("Download cancled.\n");
     }
@@ -196,7 +203,7 @@ void MainWindow::on_actionDownload_file_triggered()
 
 void MainWindow::on_actionSimple_Upload_triggered()
 {
-    qInfo() << "MainWindow::on_actionSimple_Upload_triggered()";
+    qInfo() << Q_FUNC_INFO;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
@@ -210,7 +217,7 @@ void MainWindow::on_actionSimple_Upload_triggered()
 
 void MainWindow::on_actionMultipart_Upload_triggered()
 {
-    qInfo() << "MainWindow::on_actionMultipart_Upload_triggered()";
+    qInfo() << Q_FUNC_INFO;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
@@ -224,7 +231,7 @@ void MainWindow::on_actionMultipart_Upload_triggered()
 
 void MainWindow::on_actionResumable_Upload_triggered()
 {
-    qInfo() << "MainWindow::on_actionResumable_Upload_triggered()";
+    qInfo() << Q_FUNC_INFO;
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
@@ -234,4 +241,18 @@ void MainWindow::on_actionResumable_Upload_triggered()
     }else {
         ui->plainTextEdit->appendPlainText("upload cancled.\n");
     }
+}
+
+void MainWindow::on_action_Search_file_folder_triggered()
+{
+    qInfo() << Q_FUNC_INFO;
+    m_dialogSearch->exec();
+}
+
+void MainWindow::onSearchDialog_query(const QString &q, const QString &spaces, const QString &fields, const QString &pageToken)
+{
+    qInfo() << Q_FUNC_INFO;
+    auto task = m_Drive->fileList(q,spaces,fields,pageToken);
+    connect(task,&GDriveFileSearch::finished,
+            m_dialogSearch,&SearchDialog::onFileSearch_finished);
 }

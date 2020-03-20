@@ -5,13 +5,14 @@
 #include "gdriveabout.h"
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
+#include "gdrivefilelist.h"
 #include "gdrivefiledownloader.h"
 #include "gdrivefilesimplecreate.h"
 #include "gdrivefilemultipartcreate.h"
 #include "gdrivefileresumablecreate.h"
+#include "gdrivefilesearch.h"
 
 class QOAuth2AuthorizationCodeFlow;
-//class QOAuthHttpServerReplyHandler;
 class QNetworkAccessManager;
 class QFile;
 
@@ -45,6 +46,11 @@ public:
     GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
     /// Gets a file's metadata by ID.
 //    GDriveFileTask* fileGet(const QString &fileId,const QString &fields);
+    /// Search Files in drive
+    GDriveFileSearch* fileList(const QString &q,
+                               const QString &spaces,
+                               const QString &fields,
+                               const QString &pageToken);
     /// Get File download by fileID
     GDriveFileDownloader* fileDownload(const QString &fileId,
                                  const QString &fields,

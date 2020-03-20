@@ -6,8 +6,13 @@ namespace GDrive {
 class GDriveFileResource
 {
 public:
-    ///construct by QBytearray data
+    /// construct by QBytearray data
     explicit GDriveFileResource(const QByteArray &data);
+    /// construct by QJsonValue
+    explicit GDriveFileResource(const QJsonValue &value);
+    /// construct empty FileResource
+    explicit GDriveFileResource();
+    /// destructor
     ~GDriveFileResource();
     /// Identifies what kind of resource this is. Value: the fixed string "drive#file".
     QString kind() const;

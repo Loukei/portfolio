@@ -11,6 +11,7 @@ namespace GDrive {
     class GDriveService;
 }
 
+class SearchDialog;
 class UIDownloadDialog;
 class QSettings;
 class MainWindow : public QMainWindow
@@ -20,6 +21,19 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+    /// Download Dialog
+    UIDownloadDialog *m_dialogDownload;
+    /// A dialog to provide search drive files
+    SearchDialog *m_dialogSearch;
+    /// Save recent upload file
+    QString m_currentUploadFilePath;
+    /// Save settings
+    QSettings *m_settings;
+    /// Google Drive Api
+    GDrive::GDriveService *m_Drive;
 
 private slots:
     /// Click menu login
@@ -38,16 +52,14 @@ private slots:
     void on_actionMultipart_Upload_triggered();
 
     void on_actionResumable_Upload_triggered();
+    /// Click menu Search file&folder
+    void on_action_Search_file_folder_triggered();
+    /// Receive m_DialogSearch::query, then return search result to m_DialogSearch
+    void onSearchDialog_query(const QString &q,
+                              const QString &spaces,
+                              const QString &fields,
+                              const QString &pageToken);
 private:
-    Ui::MainWindow *ui;
-    /// Download Dialog
-    UIDownloadDialog *downloadDialog;
-    /// Save recent upload file
-    QString m_currentUploadFilePath;
-    /// Save settings
-    QSettings *m_settings;
-    /// Google Drive Api
-    GDrive::GDriveService *m_Drive;
     /// GDriveService Account Login
     void accountLogin();
     /// GDriveService Account Logout
@@ -62,15 +74,15 @@ private:
     void fileResumableUpload(const QString &filepath);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
-    ///read Settings to Window geometry
+    /// read Settings to Window geometry
     inline QRect readGeometry(QSettings *settings);
-    ///read Settings(UploadFilePath) to m_currentUploadFilePath
+    /// read Settings(UploadFilePath) to m_currentUploadFilePath
     inline QString readUploadFilePath(QSettings *settings);
-    ///read Settings(DownloadFilePath) to downloadDialog
+    /// read Settings(DownloadFilePath) to downloadDialog
     inline QString readDownloadFilePath(QSettings *settings);
-    ///read Settings(DownloadFileID) to downloadDialog
+    /// read Settings(DownloadFileID) to downloadDialog
     inline QString readDownloadFileID(QSettings *settings);
-    ///write settings to ini file
+    /// write settings to ini file
     void writeSettings();
 };
 

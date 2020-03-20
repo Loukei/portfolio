@@ -72,6 +72,11 @@ GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &fil
     return new GDriveFileResumableCreate(m_google,filepath);
 }
 
+GDriveFileSearch *GDriveService::fileList(const QString &q, const QString &spaces, const QString &fields, const QString &pageToken)
+{
+    return new GDriveFileSearch(m_google,q,spaces,fields,pageToken);
+}
+
 //GDriveFileTask *GDriveService::fileGet(const QString &fileId, const QString &fields)
 //{
 //}

@@ -72,6 +72,7 @@
     </widget>
     <addaction name="menuUpload_file"/>
     <addaction name="actionDownload_file"/>
+    <addaction name="action_Search_file_folder"/>
    </widget>
    <addaction name="menuAcount"/>
    <addaction name="menuFile"/>
@@ -124,6 +125,14 @@
   <action name="action_Logout_Account">
    <property name="text">
     <string>&amp;Logout Account</string>
+   </property>
+  </action>
+  <action name="action_Search_file_folder">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Search file&amp;folder</string>
    </property>
   </action>
  </widget>

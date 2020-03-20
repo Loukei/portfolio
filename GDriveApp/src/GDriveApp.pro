@@ -28,34 +28,43 @@ SOURCES += \
         GDriveLib/gdriveabout.cpp \
         GDriveLib/gdriveaboutresource.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
+        GDriveLib/gdrivefilelist.cpp \
         GDriveLib/gdrivefilemultipartcreate.cpp \
         GDriveLib/gdrivefileresource.cpp \
         GDriveLib/gdrivefileresumablecreate.cpp \
         GDriveLib/gdrivefiles.cpp \
+        GDriveLib/gdrivefilesearch.cpp \
         GDriveLib/gdrivefilesimplecreate.cpp \
         GDriveLib/gdrivefiletask.cpp \
         GDriveLib/googledriveservice.cpp \
+        QJsonModel/qjsonmodel.cpp \
         main.cpp \
         mainwindow.cpp \
+        searchdialog.cpp \
         uidownloaddialog.cpp
 
 HEADERS += \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
         GDriveLib/gdrivefiledownloader.h \
+        GDriveLib/gdrivefilelist.h \
         GDriveLib/gdrivefilemultipartcreate.h \
         GDriveLib/gdrivefileresource.h \
         GDriveLib/gdrivefileresumablecreate.h \
         GDriveLib/gdrivefiles.h \
+        GDriveLib/gdrivefilesearch.h \
         GDriveLib/gdrivefilesimplecreate.h \
         GDriveLib/gdrivefiletask.h \
         GDriveLib/googledriveservice.h \
+        QJsonModel/qjsonmodel.h \
         Secret/oauthglobal.h \
         mainwindow.h \
+        searchdialog.h \
         uidownloaddialog.h
 
 FORMS += \
         mainwindow.ui \
+        searchdialog.ui \
         uidownloaddialog.ui
 
 # Default rules for deployment.
