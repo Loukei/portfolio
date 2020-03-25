@@ -31,7 +31,7 @@ GDriveService::GDriveService(QObject *parent)
 
 GDriveService::~GDriveService()
 {
-  //delete none parent pointer here...
+  /// delete none parent pointer here...
 }
 
 void GDriveService::start()
@@ -43,6 +43,17 @@ void GDriveService::logout()
 {
     m_google->setToken(QString());
     m_google->setRefreshToken(QString());
+    /*
+    void O2::unlink() {
+    qDebug() << "O2::unlink";
+    setLinked(false);
+    setToken(QString());
+    setRefreshToken(QString());
+    setExpires(0);
+    setExtraTokens(QVariantMap());
+    Q_EMIT linkingSucceeded();
+    }
+    */
 }
 
 QString GDriveService::showInfo() const
@@ -72,9 +83,9 @@ GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &fil
     return new GDriveFileResumableCreate(m_google,filepath);
 }
 
-GDriveFileSearch *GDriveService::fileList(const QString &q, const QString &spaces, const QString &fields, const QString &pageToken)
+GDriveFileSearch *GDriveService::fileList(const QString &q, const QString &pageToken)
 {
-    return new GDriveFileSearch(m_google,q,spaces,fields,pageToken);
+     return new GDriveFileSearch(m_google,q,pageToken);
 }
 
 //GDriveFileTask *GDriveService::fileGet(const QString &fileId, const QString &fields)

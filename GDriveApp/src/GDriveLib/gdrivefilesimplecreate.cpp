@@ -5,6 +5,8 @@
 #include <QFileInfo>
 #include <QMimeDatabase>
 #include <QTimer>
+#include <QJsonDocument>
+#include <QJsonParseError>
 
 GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
                                                        const QString &filepath)
@@ -26,12 +28,23 @@ GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeF
 
 GDrive::GDriveFileSimpleCreate::~GDriveFileSimpleCreate()
 {
-
+    m_file->close();
 }
 
 GDrive::GDriveFileResource GDrive::GDriveFileSimpleCreate::getResource() const
 {
-    return GDriveFileResource(m_replyData);
+    QJsonParseError jsonErr;
+    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveFileResource();
+    }
+    return GDriveFileResource(doc);
+}
+
+QByteArray GDrive::GDriveFileSimpleCreate::getReplyString() const
+{
+    return m_replyData;
 }
 
 void GDrive::GDriveFileSimpleCreate::request_UploadStart()

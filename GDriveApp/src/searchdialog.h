@@ -17,8 +17,6 @@ public:
     ~SearchDialog();
 signals:
     void query(const QString &q,
-               const QString &spaces,
-               const QString &fields,
                const QString &pageToken);
 public slots:
     void onFileSearch_finished();

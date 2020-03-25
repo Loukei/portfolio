@@ -7,8 +7,8 @@
 
 namespace GDrive{
 /*!
-  \class GDrive
-  \brief A data class which store the result form {Files: list}. 一個儲存{Files: list}方法回傳資料的型別
+  \class GDriveFileList
+  \brief A data class which store the result form `Files: list`. 一個儲存`Files: list`方法回傳資料的型別
 
   1.這個類別用來儲存"搜尋檔案"的命令回傳的結果，原始的內容以json顯示。
   2.但此處會將其轉換成get函數，省去操作者手動轉換json的操作。
@@ -21,7 +21,11 @@ namespace GDrive{
 class GDriveFileList
 {
 public:
-    explicit GDriveFileList(const QByteArray &data);
+    /// constructor by QJsonDocument
+    explicit GDriveFileList(const QJsonDocument &doc);
+    /// constructor empty
+    explicit GDriveFileList();
+    /// destructor
     ~GDriveFileList();
     /// return m_kind
     QString kind() const;
@@ -30,13 +34,12 @@ public:
     /// return m_incompleteSearch
     bool incompleteSearch() const;
     /// return m_filelist
-    QList<GDriveFileResource> files() const;
-    /// return GDriveFileResource at index
-    GDriveFileResource at(int index);
-    /// return size of file list
-    int size() const;
-    /// return current error string
-    QString errorString() const;
+    QJsonArray files() const;
+
+private:
+    /// parse QJsonDocument form constructor,save to data member
+    void parseDocument(const QJsonDocument &doc);
+
 private:
     /// Identifies what kind of resource this is. Value: the fixed string "drive#fileList".
     QString m_kind;
@@ -52,10 +55,6 @@ private:
     /// The list of files.
     /// If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
     QJsonArray m_filelist;
-    /// save parse error use human readable string
-    QString m_errorString;
-    /// parse QJsonDocument form constructor,save to data member
-    void parseDocument(const QJsonDocument &doc);
 };
 }
 

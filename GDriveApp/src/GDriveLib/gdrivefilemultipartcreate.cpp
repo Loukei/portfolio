@@ -6,6 +6,8 @@
 #include <QHttpMultiPart>
 #include <QFileInfo>
 #include <QTimer>
+#include <QJsonParseError>
+#include <QJsonDocument>
 
 GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2AuthorizationCodeFlow *parent,
                                                              const QString &filepath)
@@ -32,7 +34,18 @@ GDrive::GDriveFileMultipartCreate::~GDriveFileMultipartCreate()
 
 GDrive::GDriveFileResource GDrive::GDriveFileMultipartCreate::getResource() const
 {
-    return GDriveFileResource(m_replyData);
+    QJsonParseError jsonErr;
+    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveFileResource();
+    }
+    return GDriveFileResource(doc);
+}
+
+QByteArray GDrive::GDriveFileMultipartCreate::getReplyString() const
+{
+    return m_replyData;
 }
 
 void GDrive::GDriveFileMultipartCreate::request_UploadStart()

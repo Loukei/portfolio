@@ -1,48 +1,135 @@
 #include "gdriveaboutresource.h"
+#include <QJsonDocument>
 #include <QJsonParseError>
-#include <QJsonObject>
+#include <QJsonArray>
 #include <QDebug>
 
-GDrive::GDriveAboutResource::GDriveAboutResource(const QByteArray &data)
+//GDrive::GDriveAboutResource::GDriveAboutResource(const QByteArray &data)
+//{
+//    QJsonParseError jsonErr;
+//    //! m_data return null if parse error
+//    m_data = QJsonDocument::fromJson(data,&jsonErr);
+//    if(jsonErr.error != QJsonParseError::NoError){
+//        m_errorString = jsonErr.errorString();
+//    }
+//    qInfo() << Q_FUNC_INFO << this;
+//}
+
+GDrive::GDriveAboutResource::GDriveAboutResource(const QJsonDocument &doc)
+    :m_object(doc.object())
 {
-    QJsonParseError jsonErr;
-    //! m_data return null if parse error
-    m_data = QJsonDocument::fromJson(data,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        m_errorString = jsonErr.errorString();
-    }
-    qDebug() << "GDriveAboutResource(const QByteArray &data):" << this;
+}
+
+GDrive::GDriveAboutResource::GDriveAboutResource()
+    :m_object()
+{
 }
 
 GDrive::GDriveAboutResource::~GDriveAboutResource()
 {
-    qInfo() << "GDrive::GDriveAboutResource::~GDriveAboutResource():" << this;
 }
 
-QString GDrive::GDriveAboutResource::displayName() const
+QString GDrive::GDriveAboutResource::kind() const
 {
-    auto userobj = m_data.object()["user"].toObject();
-    return userobj["displayName"].toString();
+    return m_object["kind"].toString();
 }
 
-QString GDrive::GDriveAboutResource::emailAddress() const
+QJsonObject GDrive::GDriveAboutResource::user() const
 {
-    auto userobj = m_data.object()["user"].toObject();
-    return userobj["emailAddress"].toString();
+    return m_object["user"].toObject();
 }
 
-QString GDrive::GDriveAboutResource::permissionId() const
+QString GDrive::GDriveAboutResource::user_kind() const
 {
-    auto userobj = m_data.object()["user"].toObject();
-    return userobj["permissionId"].toString();
+    return user()["kind"].toString();
 }
 
-bool GDrive::GDriveAboutResource::isNull()
+QString GDrive::GDriveAboutResource::user_displayName() const
 {
-    return m_data.isNull();
+    return user()["displayName"].toString();
 }
 
-QString GDrive::GDriveAboutResource::errorString() const
+QString GDrive::GDriveAboutResource::user_photoLink() const
 {
-    return m_errorString;
+    return user()["photoLink"].toString();
+}
+
+bool GDrive::GDriveAboutResource::user_me() const
+{
+    return user()["me"].toBool();
+}
+
+QString GDrive::GDriveAboutResource::user_permissionId() const
+{
+    return user()["permissionId"].toString();
+}
+
+QJsonObject GDrive::GDriveAboutResource::storageQuota() const
+{
+    return m_object["storageQuota"].toObject();
+}
+
+long GDrive::GDriveAboutResource::storageQuota_limit() const
+{
+    return storageQuota()["limit"].toInt();
+}
+
+long GDrive::GDriveAboutResource::storageQuota_usage() const
+{
+    return storageQuota()["usage"].toInt();
+}
+
+long GDrive::GDriveAboutResource::storageQuota_usageInDrive() const
+{
+    return storageQuota()["usageInDrive"].toInt();
+}
+
+long GDrive::GDriveAboutResource::storageQuota_usageInDriveTrash() const
+{
+    return storageQuota()["usageInDriveTrash"].toInt();
+}
+
+QJsonObject GDrive::GDriveAboutResource::importFormats() const
+{
+    return m_object["importFormats"].toObject();
+}
+
+QJsonObject GDrive::GDriveAboutResource::exportFormats() const
+{
+    return m_object["exportFormats"].toObject();
+}
+
+QJsonObject GDrive::GDriveAboutResource::maxImportSizes() const
+{
+    return m_object["maxImportSizes"].toObject();
+}
+
+long GDrive::GDriveAboutResource::maxUploadSize() const
+{
+    return m_object["maxUploadSize"].toInt();
+}
+
+bool GDrive::GDriveAboutResource::appInstalled() const
+{
+    return m_object["appInstalled"].toBool();
+}
+
+QJsonArray GDrive::GDriveAboutResource::folderColorPalette() const
+{
+    return m_object["folderColorPalette"].toArray();
+}
+
+QJsonArray GDrive::GDriveAboutResource::driveThemes() const
+{
+    return m_object["teamDriveThemes"].toArray();
+}
+
+bool GDrive::GDriveAboutResource::canCreateDrives() const
+{
+    return m_object["canCreateDrives"].toBool();
+}
+
+bool GDrive::GDriveAboutResource::isEmpty() const
+{
+    return m_object.isEmpty();
 }

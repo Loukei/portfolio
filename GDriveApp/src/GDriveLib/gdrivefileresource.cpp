@@ -4,29 +4,30 @@
 #include <QStringList>
 #include <QJsonArray>
 
-GDrive::GDriveFileResource::GDriveFileResource(const QByteArray &data)
-{
-    QJsonParseError jsonErr;
-    //! m_data return null if parse error
-    m_data = QJsonDocument::fromJson(data,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        m_errorString = jsonErr.errorString();
-        return;
-    }
-}
+//GDrive::GDriveFileResource::GDriveFileResource(const QByteArray &data)
+//{
+//    QJsonParseError jsonErr;
+//    //! m_data return null if parse error
+//    m_data = QJsonDocument::fromJson(data,&jsonErr);
+//    if(jsonErr.error != QJsonParseError::NoError){
+//        m_errorString = jsonErr.errorString();
+//        return;
+//    }
+//}
 
 GDrive::GDriveFileResource::GDriveFileResource(const QJsonValue &value)
+    :m_object(value.toObject())
 {
-    if(value.isUndefined() | value.isNull()){
-        m_data = QJsonDocument(); //! Constructs an empty document
-        return;
-    }
-    m_data = QJsonDocument(value.toObject());
+}
+
+GDrive::GDriveFileResource::GDriveFileResource(const QJsonDocument &doc)
+    :m_object(doc.object())
+{
 }
 
 GDrive::GDriveFileResource::GDriveFileResource()
+    :m_object()
 {
-    m_data = QJsonDocument();
 }
 
 GDrive::GDriveFileResource::~GDriveFileResource()
@@ -35,54 +36,40 @@ GDrive::GDriveFileResource::~GDriveFileResource()
 
 QString GDrive::GDriveFileResource::kind() const
 {
-    QJsonObject obj = m_data.object();
-    return obj["kind"].toString();
+    return m_object["kind"].toString();
 }
 
-QString GDrive::GDriveFileResource::fileID() const
+QString GDrive::GDriveFileResource::id() const
 {
-    QJsonObject obj = m_data.object();
-    return obj["id"].toString();
+    return m_object["id"].toString();
 }
 
 QString GDrive::GDriveFileResource::name() const
 {
-    QJsonObject obj = m_data.object();
-    return obj["name"].toString();
+    return m_object["name"].toString();
 }
 
 QString GDrive::GDriveFileResource::mimeType() const
 {
-    QJsonObject obj = m_data.object();
-    return obj["mimeType"].toString();
+    return m_object["mimeType"].toString();
 }
 
 QString GDrive::GDriveFileResource::description() const
 {
-    QJsonObject obj = m_data.object();
-    return obj["description"].toString();
+    return m_object["description"].toString();
 }
 
-QStringList GDrive::GDriveFileResource::parents() const
+long GDrive::GDriveFileResource::version() const
 {
-    //! todo
-    QJsonObject obj = m_data.object();
-    QJsonArray arr = obj["parents"].toArray();
-    return QStringList();
+    return m_object["version"].toInt();
 }
 
 long GDrive::GDriveFileResource::size() const
 {    
-    QJsonObject obj = m_data.object();
-    return obj["size"].toInt();
+    return m_object["size"].toInt();
 }
 
-bool GDrive::GDriveFileResource::isNull() const
+bool GDrive::GDriveFileResource::isEmpty() const
 {
-    return m_data.isNull();
-}
-
-QString GDrive::GDriveFileResource::errorString() const
-{
-    return m_errorString;
+    return m_object.isEmpty();
 }

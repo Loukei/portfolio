@@ -1,6 +1,8 @@
 #include "gdrivefilesearch.h"
 #include <QOAuth2AuthorizationCodeFlow>
 #include <QUrlQuery>
+#include <QJsonParseError>
+#include <QJsonDocument>
 
 GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
                                            const QString &q,
@@ -12,6 +14,14 @@ GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
     request_Search(q,spaces,fields,pageToken);
 }
 
+GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
+                                           const QString &q,
+                                           const QString &pageToken)
+    :GDriveFileTask (parent)
+{
+    request_Search(q,"drive","",pageToken);
+}
+
 GDrive::GDriveFileSearch::~GDriveFileSearch()
 {
 
@@ -19,7 +29,13 @@ GDrive::GDriveFileSearch::~GDriveFileSearch()
 
 GDrive::GDriveFileList GDrive::GDriveFileSearch::getFileList() const
 {
-    return GDriveFileList(m_replyData);
+    QJsonParseError jsonErr;
+    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveFileList();
+    }
+    return GDriveFileList(doc);
 }
 
 QByteArray GDrive::GDriveFileSearch::getReplyString() const
@@ -33,7 +49,6 @@ void GDrive::GDriveFileSearch::request_Search(const QString &q,
                                               const QString &pageToken)
 {
     QUrlQuery query;
-//    query.addQueryItem("corpora","user");
     query.addQueryItem("q",q);
     if(!spaces.isEmpty()){
         query.addQueryItem("spaces",spaces);

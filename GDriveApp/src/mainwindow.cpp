@@ -58,7 +58,7 @@ void MainWindow::accountAbout()
             [userAbout,this](bool success){
         if(success){
             GDriveAboutResource resource = userAbout->getResource();
-            ui->label->setText("Account: " + resource.displayName());
+            ui->label->setText("Account: " + resource.user_displayName());
         }else {
             ui->label->setText("Unknown");
             ui->plainTextEdit->appendPlainText("About message Error.\n");
@@ -249,10 +249,10 @@ void MainWindow::on_action_Search_file_folder_triggered()
     m_dialogSearch->exec();
 }
 
-void MainWindow::onSearchDialog_query(const QString &q, const QString &spaces, const QString &fields, const QString &pageToken)
+void MainWindow::onSearchDialog_query(const QString &q, const QString &pageToken)
 {
     qInfo() << Q_FUNC_INFO;
-    auto task = m_Drive->fileList(q,spaces,fields,pageToken);
+    auto task = m_Drive->fileList(q,pageToken);
     connect(task,&GDriveFileSearch::finished,
             m_dialogSearch,&SearchDialog::onFileSearch_finished);
 }

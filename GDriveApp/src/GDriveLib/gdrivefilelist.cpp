@@ -2,17 +2,17 @@
 #include <QJsonParseError>
 #include <QJsonObject>
 
-GDrive::GDriveFileList::GDriveFileList(const QByteArray &data)
+GDrive::GDriveFileList::GDriveFileList(const QJsonDocument &doc)
 {
-    QJsonParseError jsonErr;
-    //! m_data return null if parse error
-    QJsonDocument doc = QJsonDocument::fromJson(data,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        m_errorString = jsonErr.errorString();
-        return;
-    }
-    //! Parse doc here
     parseDocument(doc);
+}
+
+GDrive::GDriveFileList::GDriveFileList()
+{
+    m_kind = QString();
+    m_nextPageToken = QString();
+    m_incompleteSearch = false;
+    m_filelist = QJsonArray();
 }
 
 GDrive::GDriveFileList::~GDriveFileList()
@@ -34,33 +34,9 @@ bool GDrive::GDriveFileList::incompleteSearch() const
     return m_incompleteSearch;
 }
 
-QList<GDrive::GDriveFileResource> GDrive::GDriveFileList::files() const
+QJsonArray GDrive::GDriveFileList::files() const
 {
-    QList<GDrive::GDriveFileResource> list;
-    for (int i = 0; i < m_filelist.size(); i++) {
-        list.append(GDriveFileResource(m_filelist.at(i)));
-    }
-    return list;
-}
-
-GDrive::GDriveFileResource GDrive::GDriveFileList::at(int index)
-{
-    QJsonValue value = m_filelist.at(index);
-    if(value.isUndefined() | value.isNull()){
-        return GDriveFileResource(); //! return empty GDriveFileResource
-    }else{
-       return GDriveFileResource(value);
-    }
-}
-
-int GDrive::GDriveFileList::size() const
-{
-    return m_filelist.size();
-}
-
-QString GDrive::GDriveFileList::errorString() const
-{
-    return m_errorString;
+    return m_filelist;
 }
 
 void GDrive::GDriveFileList::parseDocument(const QJsonDocument &doc)

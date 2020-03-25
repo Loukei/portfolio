@@ -7,6 +7,14 @@
 class QOAuth2AuthorizationCodeFlow;
 class QFile;
 namespace GDrive {
+/*!
+ * \class GDriveFileResumableCreate
+ * \brief Creates a new file with Resumable upload.
+ *
+ * ## Reference
+ * [Files: create]:https://developers.google.com/drive/api/v3/reference/files/create
+ * [Perform a resumable upload]:https://developers.google.com/drive/api/v3/manage-uploads#resumable
+ */
 class GDriveFileResumableCreate : public GDriveFileTask
 {
     Q_OBJECT
@@ -15,6 +23,9 @@ public:
                                        const QString& filepath);
     ~GDriveFileResumableCreate() override;
     GDriveFileResource getResource() const;
+    /// return File resource to JSON string data format
+    QByteArray getReplyString() const;
+
 private:
     /// Start resumable upload session, first step to get session Uri
     void request_InitialSession();

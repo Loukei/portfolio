@@ -11,13 +11,34 @@ GDrive::GDriveFileDownloader::GDriveFileDownloader(QOAuth2AuthorizationCodeFlow 
         QSharedPointer<QFile> file)
     :GDriveFileTask (parent),mp_file(file)
 {
+    //! Initialization
+    m_replyData = QByteArray();
+    m_isFailed = false;
+    m_isComplete = false;
+    //! Start download
     request_Download(fileId,fields);
 }
 
 GDrive::GDriveFileDownloader::~GDriveFileDownloader()
 {
+    qInfo() << Q_FUNC_INFO << this;
     mp_file->close();
-    qInfo() << "GDriveFileDownloader::~GDriveFileDownloader " << this;
+}
+
+GDrive::GDriveFileResource GDrive::GDriveFileDownloader::getResource() const
+{
+    QJsonParseError jsonErr;
+    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveFileResource();
+    }
+    return GDriveFileResource(doc);
+}
+
+QByteArray GDrive::GDriveFileDownloader::getReplyString() const
+{
+    return m_replyData;
 }
 
 void GDrive::GDriveFileDownloader::request_Download(const QString &fileId, const QString &fields)
@@ -71,7 +92,7 @@ QString GDrive::GDriveFileDownloader::getErrorMessage(QNetworkReply *reply)
 
 void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
 {
-    qInfo() << "GDrive::GDriveFileDownloader::on_Download_ReplyFinished()";
+    qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error() != QNetworkReply::NoError){
         m_errStr += "Network reply error:" + reply->errorString();
@@ -86,7 +107,7 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
 
 void GDrive::GDriveFileDownloader::on_Download_ReplyError(QNetworkReply::NetworkError)
 {
-    qInfo() << "GDrive::GDriveFileDownloader::on_Download_ReplyError()";
+    qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
     m_errStr += getErrorMessage(reply);
     m_isFailed = true;

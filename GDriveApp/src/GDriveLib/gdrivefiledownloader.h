@@ -3,9 +3,22 @@
 #include <QObject>
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
+#include "gdrivefileresource.h"
 
 class QFile;
 namespace GDrive {
+/*!
+ * \class GDriveFileDownloader
+ * \brief Implement Google Drive `Files: get` method to download file,using fileID
+ *
+ * - 實作`Files: get`方法的下載檔案
+ * - 必須在使用此class之前建立QFile指定存檔位置，使用QSharedPointer來操作QFile
+ *
+ * \example
+ *
+ * ## Reference 參考資料
+ * [Download files]:https://developers.google.com/drive/api/v3/manage-downloads
+ */
 class GDriveFileDownloader : public GDriveFileTask
 {
     Q_OBJECT
@@ -16,10 +29,19 @@ public:
                                   const QString &fileId,
                                   const QString &fields,
                                   QSharedPointer<QFile> file);
+    /// destructor
     ~GDriveFileDownloader() override;
+    /// return GDriveFileResource
+    GDriveFileResource getResource() const;
+    /// return File resource to JSON string data format
+    QByteArray getReplyString() const;
+
 private:
     /// pointer to Shared QFile ready to write,DELETE by owner
     QSharedPointer<QFile> mp_file;
+    /// save network reply json,usually file matadata
+    QByteArray m_replyData;
+
 private:
     /// send download request
     void request_Download(const QString &fileId,const QString &fields);
@@ -27,14 +49,10 @@ private:
     bool writeFile(QNetworkReply *reply);
     /// Parse Error message form reply
     QString getErrorMessage(QNetworkReply *reply);
+
 private slots:
     void on_Download_ReplyFinished();
     void on_Download_ReplyError(QNetworkReply::NetworkError);
 };
 }
-/*! \example
- *  QSharedPointer<QFile> writeTo =
- * QSharedPointer<QFile>(new QFile(path,this),&QFile::deleteLater);
- *  GDriveFileDownloader(m_google,"[fileID]","[fields]",QSharedPointer<QFile>(&writeTo))
-  */
 #endif // GDRIVEFILEDOWNLOADER_H

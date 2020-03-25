@@ -7,14 +7,27 @@
 
 class QFile;
 namespace GDrive {
+/*!
+ * \class GDriveFileSimpleCreate
+ * \brief Creates a new file with Simple upload.
+ *
+ * ## Reference
+ * [Files: create]:https://developers.google.com/drive/api/v3/reference/files/create
+ * [Perform a simple upload]:https://developers.google.com/drive/api/v3/manage-uploads#simple
+ */
 class GDriveFileSimpleCreate : public GDriveFileTask
 {
     Q_OBJECT
 public:
+    /// constructor
     explicit GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
                                     const QString &filepath);
+    /// destructor
     ~GDriveFileSimpleCreate() override;
+    /// return File resource
     GDriveFileResource getResource() const;
+    /// return File resource to JSON string data format
+    QByteArray getReplyString() const;
 private:
     /// send simpleupload request
     void request_UploadStart();

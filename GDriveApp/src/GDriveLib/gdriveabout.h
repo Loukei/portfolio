@@ -6,6 +6,13 @@
 
 class QOAuth2AuthorizationCodeFlow;
 namespace GDrive {
+/*!
+ * \class GDriveAbout
+ * \brief Gets information about the user, the user's Drive, and system capabilities
+ *
+ * ## Reference
+ * [About: get]:https://developers.google.com/drive/api/v3/reference/about/get
+ */
 class GDriveAbout : public QObject
 {
     Q_OBJECT
@@ -19,10 +26,15 @@ public:
     /// Constructor,the parent object use to send request
     explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,AboutArgs args);
     /// use direct url to send request
-    explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,const QString &aboutUrls);
+    explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,const QString &fields);
+    /// Destructor
     virtual ~GDriveAbout() final;
+    /// return error string
+    QString errorString() const;
     /// return resource, if data not received, return null if parse error
-    GDriveAboutResource getResource();
+    GDriveAboutResource getResource() const;
+    /// return About resource to JSON string data format
+    QByteArray getReplyString() const;
 
 signals:
     void received(bool success);
@@ -30,6 +42,8 @@ signals:
 private:
     /// save reply data
     QByteArray m_data;
+    /// Human readable error string
+    QString m_errStr;
     /// Turn AboutArgs to request Url
     QUrl aboutArgToUrl(const AboutArgs& args) const;
 

@@ -5,6 +5,8 @@
 #include <QMimeDatabase>
 #include <QUrlQuery>
 #include <QRegularExpression>
+#include <QJsonParseError>
+#include <QJsonDocument>
 
 GDrive::GDriveFileResumableCreate::GDriveFileResumableCreate(
         QOAuth2AuthorizationCodeFlow *parent,
@@ -31,7 +33,13 @@ GDrive::GDriveFileResumableCreate::~GDriveFileResumableCreate()
 
 GDrive::GDriveFileResource GDrive::GDriveFileResumableCreate::getResource() const
 {
-    return GDriveFileResource(m_replyData);
+    QJsonParseError jsonErr;
+    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveFileResource();
+    }
+    return GDriveFileResource(doc);
 }
 
 void GDrive::GDriveFileResumableCreate::request_InitialSession()
@@ -39,7 +47,7 @@ void GDrive::GDriveFileResumableCreate::request_InitialSession()
     /// reference:
     /// https://developers.google.com/drive/api/v3/manage-uploads
     /// #example_initiate_a_resumable_upload_session
-    qDebug() << "GDrive::GDriveFileResumableCreate::request_InitialSession()";
+    qDebug() << Q_FUNC_INFO;
     //! collect file info
     const QString fileName = QFileInfo(m_file->fileName()).baseName();
     const QString fileMimeType = QMimeDatabase().mimeTypeForFile(*m_file).name();
@@ -72,7 +80,7 @@ void GDrive::GDriveFileResumableCreate::request_UploadStart()
 {
     /// reference: https://developers.google.com/drive/api/v3/manage-uploads
     /// #example_upload_the_file
-    qDebug() << "GDrive::GDriveFileResumableCreate::request_UploadStart()";
+    qDebug() << Q_FUNC_INFO;
     if(!m_file->open(QIODevice::ReadOnly)){
         m_errStr += QString("[Error]File %1:%2")
                 .arg(m_file->fileName()).arg(m_file->errorString());
@@ -97,7 +105,7 @@ void GDrive::GDriveFileResumableCreate::request_AskUploadStatus()
 {
     /// refenence:https://developers.google.com/drive/api/v3/manage-uploads
     /// #example_resume_an_interrupted_upload
-    qDebug() << "GDrive::GDriveFileResumableCreate::request_AskUploadStatus()";
+    qDebug() << Q_FUNC_INFO;
     //! collect file info
     const QByteArray rangeVal = "bytes */" + QByteArray::number(m_file->size());
     //! construct request
@@ -116,7 +124,7 @@ void GDrive::GDriveFileResumableCreate::request_UploadResume(const qint64 offset
 {
     /// reference:https://developers.google.com/drive/api/v3/manage-uploads
     /// #example_resume_an_interrupted_upload
-    qDebug() << "GDrive::GDriveFileResumableCreate::request_UploadResume(const qint64 offset)";
+    qDebug() << Q_FUNC_INFO;
     if(!m_file->open(QIODevice::ReadOnly)){
         qWarning() << "file " << m_file->fileName() << ": " << m_file->errorString();
         state_FailedUpload();
@@ -169,7 +177,7 @@ void GDrive::GDriveFileResumableCreate::request_UploadResume(const qint64 offset
 
 void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyFinished()
 {
-    qInfo() << "GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyFinished()";
+    qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
         m_errStr += QString("[Error]Resumable Upload Initial session error: %1\n")
@@ -186,7 +194,7 @@ void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyFinished()
 
 void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyError(QNetworkReply::NetworkError)
 {
-    qDebug() << "GDriveResumableUpload::on_InitialSession_ReplyError";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     auto httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(httpStatus == (500|502|503|504|403)){   // retry request
@@ -202,7 +210,7 @@ void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyError(QNetworkRep
 
 void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyFinished()
 {
-    qInfo() << "GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyFinished()";
+    qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
         qWarning() << "[Error]Resumable Upload reply error: " << reply->errorString();
@@ -216,7 +224,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyFinished()
 
 void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyError(QNetworkReply::NetworkError)
 {
-    qDebug() << "GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyError";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     auto httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(httpStatus == 503){                         // request resume upload
@@ -234,7 +242,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyError(QNetworkReply:
 
 void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyFinished()
 {
-    qDebug() << "GDriveResumableUpload::on_AskUploadStatus_ReplyFinished()";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
         qWarning() << "[Error]Resumable Upload reply error: " << reply->errorString();
@@ -248,7 +256,7 @@ void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyFinished()
 
 void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyError(QNetworkReply::NetworkError)
 {
-    qDebug() << "GDriveResumableUpload::on_AskUploadStatus_ReplyError";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     qWarning() << "[Error]" << reply->errorString();
     //! get Http status code
@@ -278,7 +286,7 @@ void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyError(QNetworkRe
 
 void GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyFinished()
 {
-    qDebug() << "GDriveResumableUpload::on_UploadResume_ReplyFinished()";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
         qWarning() << "[Error]Resumable Upload reply error: " << reply->errorString();
@@ -291,7 +299,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyFinished()
 
 void GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyError(QNetworkReply::NetworkError)
 {
-    qDebug() << "GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyError";
+    qDebug() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     //! get Http status code
     auto httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();

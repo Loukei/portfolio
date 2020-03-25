@@ -17,6 +17,19 @@ class QNetworkAccessManager;
 class QFile;
 
 namespace GDrive {
+/*!
+ * \class GDriveService
+ * \brief The main class to provide Google Drive serviece
+ *
+ * - 提供Google Drive Api的服務
+ * - Google Drive Api採用資源導向操作，每個method都是對資源的操作
+ * - 除了登入帳號外，其他method都使用factory pattern操作。
+ * 每執行一項操作都會回傳一個以`m_google`為parent的物件，我稱之為Task。
+ * Task在建立時就會立刻執行，以建構子的參數處理對應的請求，並在完成時發出信號通知
+ *
+ * ## Reference
+ * [Introduction to Google Drive API]:https://developers.google.com/drive/api/v3/about-sdk
+ */
 class GDriveService : public QObject
 {
     Q_OBJECT
@@ -24,15 +37,9 @@ public:
     explicit GDriveService(QObject *parent = nullptr);
     virtual ~GDriveService() final;
 
-//    enum UploadType{
-//        SimpleUpload,
-//        MultipartUpload,
-//        ResumableUpload
-//    };
-
     /// start Authorization
     void start();
-    /// logout
+    /// logout account (depercated)
     void logout();
     /// show OAuth 2.0 token
     QString showInfo() const;
@@ -48,8 +55,6 @@ public:
 //    GDriveFileTask* fileGet(const QString &fileId,const QString &fields);
     /// Search Files in drive
     GDriveFileSearch* fileList(const QString &q,
-                               const QString &spaces,
-                               const QString &fields,
                                const QString &pageToken);
     /// Get File download by fileID
     GDriveFileDownloader* fileDownload(const QString &fileId,

@@ -19,10 +19,9 @@ GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, AboutArgs args)
             this,&GDriveAbout::onReplyError);
 }
 
-GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, const QString &aboutUrls)
+GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, const QString &fields)
 {
-    //! Reference: https://developers.google.com/drive/api/v3/reference/about
-    QNetworkReply *reply = parent->get(aboutUrls);
+    QNetworkReply *reply = parent->get(fields);
     connect(reply,&QNetworkReply::finished,
             this,&GDriveAbout::onReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
@@ -31,12 +30,28 @@ GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, const QString &ab
 
 GDriveAbout::~GDriveAbout()
 {
-    qDebug() << "GDriveAbout::~GDriveAbout(): " << this;
 }
 
-GDriveAboutResource GDriveAbout::getResource()
+QString GDriveAbout::errorString() const
 {
-    return GDriveAboutResource(m_data);///RVO
+    return m_errStr;
+}
+
+GDriveAboutResource GDriveAbout::getResource() const
+{
+    QJsonParseError jsonErr;
+    //! doc return null if parse error
+    QJsonDocument doc = QJsonDocument::fromJson(m_data,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
+        return GDriveAboutResource();
+    }
+    return GDriveAboutResource(doc);// RVO will work
+}
+
+QByteArray GDriveAbout::getReplyString() const
+{
+    return m_data;
 }
 
 QUrl GDriveAbout::aboutArgToUrl(const AboutArgs& args) const

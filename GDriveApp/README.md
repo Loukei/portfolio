@@ -27,6 +27,9 @@
 - 下載檔案，需要輸入fileID
 ![image][Demo_Download.gif]
 
+- 搜尋，取得檔案fileID
+![image][Demo_Search.gif]
+
 ## 自行編譯 Building App
 
 1. 下載程式碼(src)
@@ -190,6 +193,17 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 }
 ```
 
+### 搜尋檔案&資料夾
+
+對應Google Drive Api的`Files: list`方法
+
+1. 使用`GDriveFileSearch *GDriveService::fileList(QString &q, QString &pageToken)`搜尋檔案。
+
+參數名稱    | 用途
+------------|:-------------------------------------------
+q           | 過濾搜尋的內容
+pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內容
+
 ## 未完成功能
 
 - 記憶上次登入的帳號
@@ -202,9 +216,21 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 - Qt5.13.0 MinGW 32bit
 - win7 32bit
 
+## Credit
+
+[QJsonModel](https://github.com/dridk/QJsonModel)
+
 ## 參考 Reference
 
-[Connecting your Qt application with Google Services using OAuth 2.0](https://www.qt.io/blog/2017/01/25/connecting-qt-application-google-services-using-oauth-2-0)
+1. [Connecting your Qt application with Google Services using OAuth 2.0](https://www.qt.io/blog/2017/01/25/connecting-qt-application-google-services-using-oauth-2-0)
+
+2. [Download files](https://developers.google.com/drive/api/v3/manage-downloads)
+
+3. [Upload files](https://developers.google.com/drive/api/v3/manage-uploads)
+
+4. [Files: list](https://developers.google.com/drive/api/v3/reference/files/list)
+
+5. [Search for files and folders](https://developers.google.com/drive/api/v3/search-files)
 
 [Demo_mainwindow.png]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_mainwindow.png
 
@@ -213,3 +239,5 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 [Demo_Upload.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Upload.gif
 
 [Demo_Download.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Download.gif
+
+[Demo_Search.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Search.gif

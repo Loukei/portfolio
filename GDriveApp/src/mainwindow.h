@@ -56,8 +56,6 @@ private slots:
     void on_action_Search_file_folder_triggered();
     /// Receive m_DialogSearch::query, then return search result to m_DialogSearch
     void onSearchDialog_query(const QString &q,
-                              const QString &spaces,
-                              const QString &fields,
                               const QString &pageToken);
 private:
     /// GDriveService Account Login

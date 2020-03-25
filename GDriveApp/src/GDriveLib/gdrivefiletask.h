@@ -5,13 +5,28 @@
 
 class QOAuth2AuthorizationCodeFlow;
 namespace GDrive {
+/*!
+ * \class GDriveFileTask
+ * \brief A base class to handle all the Google Drive Api `File` method
+ *
+ * - 處理`File`類型的基底類別
+ * - 使用`GDriveFileTask::finished`信號表示操作完成或失敗
+ * - `errorString()`回傳錯誤的字串
+ * - `isComplete()`表示任務完成與否，初始值為false
+ * - `isFailed()`表示任務是否失敗，預設為false
+ * - `getExpBackoffSleepTime()`用於計算指數退避所需時間
+ *
+ * ## Reference 參考資料
+ * [Implementing exponential backoff]:https://cloud.google.com/iot/docs/how-tos/exponential-backoff?hl=zh-TW
+ */
 class GDriveFileTask : public QObject
 {
     Q_OBJECT
 public:
+    /// constructor
     explicit GDriveFileTask(QOAuth2AuthorizationCodeFlow *parent);
+    /// destructor
     virtual ~GDriveFileTask();
-
     /// return human readable string after receive(false) emit
     QString errorString() const;
     /// return true if task complete

@@ -46,7 +46,5 @@ void SearchDialog::on_pushButton_search_clicked()
 {
     qInfo() << Q_FUNC_INFO;
     emit query(ui->lineEdit_Q->text(),
-               ui->lineEdit_spaces->text(),
-               ui->lineEdit_fields->text(),
                ui->lineEdit_pageToken->text());
 }
