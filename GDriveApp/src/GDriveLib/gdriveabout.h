@@ -10,6 +10,18 @@ namespace GDrive {
  * \class GDriveAbout
  * \brief Gets information about the user, the user's Drive, and system capabilities
  *
+ * - GDriveAbout 負責發送並保存使用者的About資訊
+ * - 實作Google Drive Api的`About: get`方法
+ * - 發送網路請求的工作由`QOAuth2AuthorizationCodeFlow`物件處理，發送過程在constructor中進行，
+ * 而產生的`QNetworkReply`實際上也是由`QOAuth2AuthorizationCodeFlow`持有。
+ * - 基於上一點的原因，不可以在`GDriveAbout`工作完成前刪除`QOAuth2AuthorizationCodeFlow`物件，
+ * 否則會產生不可預期的錯誤
+ * - 使用 `QObject::deleteLater()`刪除，而非 delete
+ * - 透過`QByteArray getReplyString()`取出字串版的json資料
+ * - 透過`GDriveAboutResource getResource()`取出`GDriveAboutResource`類型的資料
+ * - AboutArg是用來快速指定想要的回傳範圍，一般人只在意使用者名稱所以便沒有實作更多參數。
+ * 但是你可以透過`fields`參數自訂內容
+ *
  * ## Reference
  * [About: get]:https://developers.google.com/drive/api/v3/reference/about/get
  */
@@ -25,7 +37,7 @@ public:
     Q_DECLARE_FLAGS(AboutArgs,AboutArg)
     /// Constructor,the parent object use to send request
     explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,AboutArgs args);
-    /// use direct url to send request
+    /// Constructor,use direct url to send request
     explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,const QString &fields);
     /// Destructor
     virtual ~GDriveAbout() final;
@@ -56,13 +68,3 @@ private slots:
 Q_DECLARE_OPERATORS_FOR_FLAGS(GDriveAbout::AboutArgs)
 }
 #endif // GDRIVEABOUT_H
-
-/*!
- * \class GDriveAbout 負責發送並保存使用者的About資訊
- * 發送的reply由QOAuth2AuthorizationCodeFlow持有，
- * 因此當QOAuth2AuthorizationCodeFlow物件消失會產生錯誤
- *
- * GDriveAbout 負責發送about請求，接收回傳、解析資料並保存
- *
- * GDriveAbout 是 async 的，收到received信號且內容true時才可以正確取出資料
- */

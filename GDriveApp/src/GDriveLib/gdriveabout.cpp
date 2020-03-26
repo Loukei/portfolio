@@ -100,6 +100,7 @@ void GDriveAbout::onReplyError(QNetworkReply::NetworkError)
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     qWarning() << "[Error]About reply network error: " << reply->error();
+    m_data = reply->readAll();
     emit received(false);
     reply->deleteLater();
 }

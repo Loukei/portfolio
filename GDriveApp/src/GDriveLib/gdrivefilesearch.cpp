@@ -97,7 +97,7 @@ void GDrive::GDriveFileSearch::on_Search_ReplyError(QNetworkReply::NetworkError)
     QString errStr = QString("[Error]Reply error code:%1 >> %2")
             .arg(httpStatus)
             .arg(reply->errorString());
-    qWarning() << errStr;
+    qWarning() << Q_FUNC_INFO << errStr;
     m_errStr += errStr;
     m_replyData = reply->readAll();
 

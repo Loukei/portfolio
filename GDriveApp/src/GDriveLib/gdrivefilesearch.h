@@ -8,7 +8,10 @@ class QOAuth2AuthorizationCodeFlow;
 namespace GDrive {
 /*!
  * \class GDriveFileSearch
- * \brief The GDriveFileSearch class
+ * \brief GDriveFileSearch provide lists or searches files.
+ *
+ * - 負責搜尋與列出Drive裡的檔案資訊
+ * -
  *
  * ## Reference
  * [Search for files and folders]:https://developers.google.com/drive/api/v3/search-files

@@ -14,6 +14,10 @@ namespace GDrive {
 class SearchDialog;
 class UIDownloadDialog;
 class QSettings;
+/*!
+ * \class MainWindow
+ * \brief The MainWindow class is the ui
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -32,7 +36,7 @@ private:
     QString m_currentUploadFilePath;
     /// Save settings
     QSettings *m_settings;
-    /// Google Drive Api
+    /// Google Drive Api serviece
     GDrive::GDriveService *m_Drive;
 
 private slots:

@@ -2,10 +2,11 @@
 #define TESTOAUTH_H
 
 #include <QObject>
-#include "gdriveabout.h"
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
 #include "gdrivefilelist.h"
+#include "gdriveerrorformat.h"
+#include "gdriveabout.h"
 #include "gdrivefiledownloader.h"
 #include "gdrivefilesimplecreate.h"
 #include "gdrivefilemultipartcreate.h"

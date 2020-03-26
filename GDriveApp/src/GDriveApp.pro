@@ -27,6 +27,7 @@ CONFIG += c++11
 SOURCES += \
         GDriveLib/gdriveabout.cpp \
         GDriveLib/gdriveaboutresource.cpp \
+        GDriveLib/gdriveerrorformat.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
         GDriveLib/gdrivefilelist.cpp \
         GDriveLib/gdrivefilemultipartcreate.cpp \
@@ -46,6 +47,7 @@ SOURCES += \
 HEADERS += \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
+        GDriveLib/gdriveerrorformat.h \
         GDriveLib/gdrivefiledownloader.h \
         GDriveLib/gdrivefilelist.h \
         GDriveLib/gdrivefilemultipartcreate.h \
