@@ -269,7 +269,7 @@ void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyError(QNetworkRe
             const qint64 offset = match.captured("offset").toLongLong();
             request_UploadResume(offset);
         }else {
-            qDebug() << "Match failed:" << reply->rawHeader("Content-Range");
+            qWarning() << "Match failed:" << reply->rawHeader("Content-Range");
             //STOP
             state_FailedUpload();
         }

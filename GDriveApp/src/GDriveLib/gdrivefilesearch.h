@@ -10,12 +10,12 @@ namespace GDrive {
  * \class GDriveFileSearch
  * \brief GDriveFileSearch provide lists or searches files.
  *
+ * - `GDriveFileSearch`實作google drive api的`Files: list`方法
  * - 負責搜尋與列出Drive裡的檔案資訊
- * -
  *
  * ## Reference
- * [Search for files and folders]:https://developers.google.com/drive/api/v3/search-files
- * [Files: list]:https://developers.google.com/drive/api/v3/reference/files/list
+ * - [Search for files and folders](https://developers.google.com/drive/api/v3/search-files)
+ * - [Files: list](https://developers.google.com/drive/api/v3/reference/files/list)
  */
 class GDriveFileSearch : public GDriveFileTask
 {
@@ -39,15 +39,18 @@ public:
     QByteArray getReplyString() const;
 
 private:
+    /// send network request to search file
     void request_Search(const QString &q,
                         const QString &spaces,
                         const QString &fields,
                         const QString &pageToken);
+
 private slots:
     void on_Search_ReplyFinished();
     void on_Search_ReplyError(QNetworkReply::NetworkError);
+
 private:
-    QByteArray m_replyData;
+    QByteArray m_replyData = QByteArray();
 };
 }
 

@@ -32,11 +32,6 @@ GDriveAbout::~GDriveAbout()
 {
 }
 
-QString GDriveAbout::errorString() const
-{
-    return m_errStr;
-}
-
 GDriveAboutResource GDriveAbout::getResource() const
 {
     QJsonParseError jsonErr;
@@ -52,6 +47,16 @@ GDriveAboutResource GDriveAbout::getResource() const
 QByteArray GDriveAbout::getReplyString() const
 {
     return m_data;
+}
+
+bool GDriveAbout::isComplete() const
+{
+    return m_isComplete;
+}
+
+bool GDriveAbout::isFailed() const
+{
+    return m_isFailed;
 }
 
 QUrl GDriveAbout::aboutArgToUrl(const AboutArgs& args) const
@@ -91,7 +96,10 @@ void GDriveAbout::onReplyFinished()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error() == QNetworkReply::NoError){
         m_data = reply->readAll();
-        emit received(true);
+        m_isComplete = true;
+        m_isFailed = false;
+        emit finished();
+//        emit received(true);
     }
     reply->deleteLater();
 }
@@ -101,6 +109,9 @@ void GDriveAbout::onReplyError(QNetworkReply::NetworkError)
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     qWarning() << "[Error]About reply network error: " << reply->error();
     m_data = reply->readAll();
-    emit received(false);
+    m_isComplete = true;
+    m_isFailed = true;
+    emit finished();
+//    emit received(false);
     reply->deleteLater();
 }

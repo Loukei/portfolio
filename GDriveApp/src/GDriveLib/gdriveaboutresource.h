@@ -8,13 +8,14 @@ namespace GDrive {
  * \class GDriveAboutResource
  * \brief Information about the user, the user's Drive, and system capabilities.
  *
- * - `About`儲存了使用者帳號以及drive的訊息
+ * - 儲存了使用者帳號以及drive的訊息
  * - `GDriveAboutResource`負責將原本的json字串轉成使用function的方式存取資料
  * - 內部使用QJsonObject保存資料，因為每次回傳的內容根據api指定的fields不同，有些內容不會回傳
  * - 編譯器有RVO的關係所以不實作拷貝&移動建構子
+ * - `bool isEmpty()` 回傳本身是否空值，其於函數用來取得對應欄位的資料
  *
  * ## Reference 參考資料
- * [About]:https://developers.google.com/drive/api/v3/reference/about#resource
+ * - [About](https://developers.google.com/drive/api/v3/reference/about#resource)
  */
 class GDriveAboutResource
 {
@@ -82,7 +83,7 @@ public:
 
 private:
     /// save data form constructer resource
-    QJsonObject m_object;
+    QJsonObject m_object = QJsonObject();
 };
 }
 

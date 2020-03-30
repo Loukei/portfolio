@@ -1,6 +1,5 @@
 #ifndef GDRIVEFILERESOURCE_H
 #define GDRIVEFILERESOURCE_H
-//#include <QJsonDocument>
 #include <QJsonObject>
 #include <QDateTime>
 
@@ -16,7 +15,7 @@ namespace GDrive {
  * - 編譯器有RVO的關係所以不實作拷貝&移動建構子
  *
  * ## Reference 參考資料
- * [Files]:https://developers.google.com/drive/api/v3/reference/files#resource
+ * - [Files](https://developers.google.com/drive/api/v3/reference/files#resource)
  */
 class GDriveFileResource
 {
@@ -348,7 +347,7 @@ public:
     bool isEmpty() const;
 private:
     /// save data form constructer resource
-    QJsonObject m_object;
+    QJsonObject m_object = QJsonObject();
 };
 }
 

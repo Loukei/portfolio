@@ -14,10 +14,8 @@ namespace GDrive {
  * - 實作`Files: get`方法的下載檔案
  * - 必須在使用此class之前建立QFile指定存檔位置，使用QSharedPointer來操作QFile
  *
- * \example
- *
  * ## Reference 參考資料
- * [Download files]:https://developers.google.com/drive/api/v3/manage-downloads
+ * - [Download files](https://developers.google.com/drive/api/v3/manage-downloads)
  */
 class GDriveFileDownloader : public GDriveFileTask
 {
@@ -32,15 +30,15 @@ public:
     /// destructor
     ~GDriveFileDownloader() override;
     /// return GDriveFileResource
-    GDriveFileResource getResource() const;
-    /// return File resource to JSON string data format
+//    GDriveFileResource getResource() const;
+    /// return network reply
     QByteArray getReplyString() const;
 
 private:
     /// pointer to Shared QFile ready to write,DELETE by owner
     QSharedPointer<QFile> mp_file;
-    /// save network reply json,usually file matadata
-    QByteArray m_replyData;
+    /// save network reply usually file matadata
+    QByteArray m_replyData = QByteArray();
 
 private:
     /// send download request
@@ -51,7 +49,9 @@ private:
     QString getErrorMessage(QNetworkReply *reply);
 
 private slots:
+    /// Solt for `QNetworkReply::finished` in `request_Download()`
     void on_Download_ReplyFinished();
+    /// Solt for `QNetworkReply::error` in `request_Download()`
     void on_Download_ReplyError(QNetworkReply::NetworkError);
 };
 }

@@ -12,8 +12,8 @@ namespace GDrive {
  * \brief Creates a new file with Resumable upload.
  *
  * ## Reference
- * [Files: create]:https://developers.google.com/drive/api/v3/reference/files/create
- * [Perform a resumable upload]:https://developers.google.com/drive/api/v3/manage-uploads#resumable
+ * - [Files: create](https://developers.google.com/drive/api/v3/reference/files/create)
+ * - [Perform a resumable upload](https://developers.google.com/drive/api/v3/manage-uploads#resumable)
  */
 class GDriveFileResumableCreate : public GDriveFileTask
 {
@@ -36,13 +36,14 @@ private:
     /// Resume upload when interrupt form offset position
     void request_UploadResume(const qint64 offset);
 
-    enum State{
-        NONE = 0,
-        RESTARTUPLOAD = 5,
-        FAIL = 6,
-        COMPLETE = 7
-    };
+//    enum State{
+//        NONE = 0,
+//        RESTARTUPLOAD = 5,
+//        FAIL = 6,
+//        COMPLETE = 7
+//    };
 //    void setState(State s);
+
 private slots:
     /// process request_InitialSession reply finished
     void on_InitialSession_ReplyFinished();
@@ -60,6 +61,17 @@ private slots:
     void on_UploadResume_ReplyFinished();
     /// process request_UploadResume reply error
     void on_UploadResume_ReplyError(QNetworkReply::NetworkError);
+
+private:
+    /// State to Restart Upload
+    void state_RestartUpload();
+    /// State to Resume Upload
+    void state_ResumeUpload();
+    /// State to emit finished() signal and return Fail upload
+    void state_FailedUpload();
+    /// State to emit finished() signal and return Success upload
+    void state_CompleteUpload();
+
 private:
     /// An member of upload file,use to upload on Google Drive.
     QFile *m_file = nullptr;
@@ -67,11 +79,6 @@ private:
     QUrl m_sessionUri = QUrl();
     /// Save network reply after upload finished
     QByteArray m_replyData = QByteArray();
-
-    void state_RestartUpload();
-    void state_ResumeUpload();
-    void state_FailedUpload();
-    void state_CompleteUpload();
 };
 }
 #endif // GDRIVEFILERESUMABLECREATE_H

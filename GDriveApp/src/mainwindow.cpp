@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "uidownloaddialog.h"
+#include "downloaddialog.h"
 #include "searchdialog.h"
+#include "filematadatadialog.h"
 #include "GDriveLib/googledriveservice.h"
 #include <QSettings>
 #include <QDebug>
@@ -15,21 +16,25 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    /// Read Settings
+    //! Read Settings
     m_settings = new QSettings("GDriveApp_Settings.ini",QSettings::IniFormat,this);
     m_settings->setIniCodec("UTF-8");
     this->setGeometry(readGeometry(m_settings));
     m_currentUploadFilePath = readUploadFilePath(m_settings);
-    /// Setup download dialog
-    m_dialogDownload = new UIDownloadDialog(this,
+    //! Setup download dialog
+    m_dialogDownload = new DownloadDialog(this,
                                           tr("Download File"),
                                           readDownloadFilePath(m_settings),
                                           readDownloadFileID(m_settings));
-    /// Setup search dialog
+    //! Setup search dialog
     m_dialogSearch = new SearchDialog(this);
     connect(m_dialogSearch,&SearchDialog::query,
             this,&MainWindow::onSearchDialog_query);
-    /// Create Google Drive Serviece instance
+    //! Setup File::Get dialog
+    m_dialogFileMataData = new FileMataDataDialog(this);
+    connect(m_dialogFileMataData,&FileMataDataDialog::query,
+            this,&MainWindow::onFileMataDataDialog_query);
+    //! Create Google Drive Serviece instance
     m_Drive = new GDriveService(this);
     connect(m_Drive,&GDriveService::granted,
             this,&MainWindow::onGDrive_granted);
@@ -53,10 +58,9 @@ void MainWindow::accountLogout()
 
 void MainWindow::accountAbout()
 {
-    auto userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
-    connect(userAbout,&GDriveAbout::received,
-            [userAbout,this](bool success){
-        if(success){
+    GDriveAbout* userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
+    auto onAboutFinished = [userAbout,this](){
+        if(userAbout->isComplete() && !userAbout->isFailed()){
             GDriveAboutResource resource = userAbout->getResource();
             ui->label->setText("Account: " + resource.user_displayName());
         }else {
@@ -64,7 +68,9 @@ void MainWindow::accountAbout()
             ui->plainTextEdit->appendPlainText("About message Error.\n");
         }
         userAbout->deleteLater();
-    });
+    };
+    connect(userAbout,&GDriveAbout::finished,
+            this,onAboutFinished);
 }
 
 void MainWindow::fileSimpleUpload(const QString &filepath)
@@ -165,12 +171,13 @@ void MainWindow::on_actionLogin_account_triggered()
 
 void MainWindow::onGDrive_granted()
 {
-    ui->plainTextEdit->appendPlainText(m_Drive->showInfo());
-    //!Open other UI menu
+    ui->plainTextEdit->appendPlainText(m_Drive->receivedToken());
+    //! Open other UI menu
     ui->actionAbout->setEnabled(true);
     ui->menuUpload_file->setEnabled(true);
     ui->actionDownload_file->setEnabled(true);
     ui->action_Search_file_folder->setEnabled(true);
+    ui->actionGet_file_matadata->setEnabled(true);
 }
 
 void MainWindow::on_action_Logout_Account_triggered()
@@ -183,6 +190,7 @@ void MainWindow::on_action_Logout_Account_triggered()
     ui->menuUpload_file->setEnabled(false);
     ui->actionDownload_file->setEnabled(false);
     ui->action_Search_file_folder->setEnabled(false);
+    ui->actionGet_file_matadata->setEnabled(false);
 }
 
 void MainWindow::on_actionAbout_triggered()
@@ -255,4 +263,18 @@ void MainWindow::onSearchDialog_query(const QString &q, const QString &pageToken
     auto task = m_Drive->fileList(q,pageToken);
     connect(task,&GDriveFileSearch::finished,
             m_dialogSearch,&SearchDialog::onFileSearch_finished);
+}
+
+void MainWindow::on_actionGet_file_matadata_triggered()
+{
+    qInfo() << Q_FUNC_INFO;
+    m_dialogFileMataData->exec();
+}
+
+void MainWindow::onFileMataDataDialog_query(const QString &fileID, const QString &fields)
+{
+    qInfo() << Q_FUNC_INFO;
+    auto task = m_Drive->fileGet(fileID,fields);
+    connect(task,&GDriveFileGet::finished,
+            m_dialogFileMataData,&FileMataDataDialog::onFileGet_finished);
 }

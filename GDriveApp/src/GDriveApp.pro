@@ -29,6 +29,7 @@ SOURCES += \
         GDriveLib/gdriveaboutresource.cpp \
         GDriveLib/gdriveerrorformat.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
+        GDriveLib/gdrivefileget.cpp \
         GDriveLib/gdrivefilelist.cpp \
         GDriveLib/gdrivefilemultipartcreate.cpp \
         GDriveLib/gdrivefileresource.cpp \
@@ -39,16 +40,18 @@ SOURCES += \
         GDriveLib/gdrivefiletask.cpp \
         GDriveLib/googledriveservice.cpp \
         QJsonModel/qjsonmodel.cpp \
+        downloaddialog.cpp \
+        filematadatadialog.cpp \
         main.cpp \
         mainwindow.cpp \
-        searchdialog.cpp \
-        uidownloaddialog.cpp
+        searchdialog.cpp
 
 HEADERS += \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
         GDriveLib/gdriveerrorformat.h \
         GDriveLib/gdrivefiledownloader.h \
+        GDriveLib/gdrivefileget.h \
         GDriveLib/gdrivefilelist.h \
         GDriveLib/gdrivefilemultipartcreate.h \
         GDriveLib/gdrivefileresource.h \
@@ -60,14 +63,16 @@ HEADERS += \
         GDriveLib/googledriveservice.h \
         QJsonModel/qjsonmodel.h \
         Secret/oauthglobal.h \
+        downloaddialog.h \
+        filematadatadialog.h \
         mainwindow.h \
-        searchdialog.h \
-        uidownloaddialog.h
+        searchdialog.h
 
 FORMS += \
+        downloaddialog.ui \
+        filematadatadialog.ui \
         mainwindow.ui \
-        searchdialog.ui \
-        uidownloaddialog.ui
+        searchdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

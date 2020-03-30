@@ -73,6 +73,7 @@
     <addaction name="menuUpload_file"/>
     <addaction name="actionDownload_file"/>
     <addaction name="action_Search_file_folder"/>
+    <addaction name="actionGet_file_matadata"/>
    </widget>
    <addaction name="menuAcount"/>
    <addaction name="menuFile"/>
@@ -133,6 +134,14 @@
    </property>
    <property name="text">
     <string>&amp;Search file&amp;folder</string>
+   </property>
+  </action>
+  <action name="actionGet_file_matadata">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Get file matadata...</string>
    </property>
   </action>
  </widget>

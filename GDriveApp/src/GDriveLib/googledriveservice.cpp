@@ -56,7 +56,7 @@ void GDriveService::logout()
     */
 }
 
-QString GDriveService::showInfo() const
+QString GDriveService::receivedToken() const
 {
     QString msg;
     msg += QString("Receive Token: %1\n").arg(m_google->token());
@@ -64,7 +64,7 @@ QString GDriveService::showInfo() const
 }
 
 GDriveAbout* GDriveService::getAbout(GDriveAbout::AboutArgs args)
-{   //https://developers.google.com/drive/api/v3/reference/about
+{
     return new GDriveAbout(m_google,args);
 }
 
@@ -83,14 +83,15 @@ GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &fil
     return new GDriveFileResumableCreate(m_google,filepath);
 }
 
+GDriveFileGet *GDriveService::fileGet(const QString &fileId, const QString &fields)
+{
+    return new GDriveFileGet(m_google,fileId,fields);
+}
+
 GDriveFileSearch *GDriveService::fileList(const QString &q, const QString &pageToken)
 {
      return new GDriveFileSearch(m_google,q,pageToken);
 }
-
-//GDriveFileTask *GDriveService::fileGet(const QString &fileId, const QString &fields)
-//{
-//}
 
 GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, QSharedPointer<QFile> file)
 {

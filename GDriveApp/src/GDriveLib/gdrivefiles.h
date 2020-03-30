@@ -5,6 +5,10 @@
 #include "gdrivefiletask.h" // upload new file
 
 namespace GDrive {
+/*!
+ * \class GDriveFiles
+ * \brief The GDriveFiles class is design for handle all file resource management(Unused)
+ */
 class GDriveFiles : public QObject
 {
     Q_OBJECT
@@ -18,8 +22,6 @@ public:
     void update();
     /// delete file
     void remove();
-
-signals:
 private:
     QOAuth2AuthorizationCodeFlow *m_google;
 };

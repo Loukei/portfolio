@@ -19,8 +19,8 @@ namespace GDrive {
  * 接收上傳完成後的network reply資料
  *
  * ## Reference
- * [Files: create]:https://developers.google.com/drive/api/v3/reference/files/create
- * [Perform a multipart upload]:https://developers.google.com/drive/api/v3/manage-uploads#multipart
+ * - [Files: create](https://developers.google.com/drive/api/v3/reference/files/create)
+ * - [Perform a multipart upload](https://developers.google.com/drive/api/v3/manage-uploads#multipart)
  */
 class GDriveFileMultipartCreate : public GDriveFileTask
 {
@@ -34,19 +34,24 @@ public:
     GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
+
 private:
     /// send Multipart upload request
     void request_UploadStart();
     /// retry upload
     void retry();
+
 private slots:
+    /// Solt for `QNetworkReply::finished` in `request_UploadStart()`
     void on_UploadStart_ReplyFinished();
+    /// Solt for `QNetworkReply::error` in `request_UploadStart()`
     void on_UploadStart_ReplyError(QNetworkReply::NetworkError);
+
 private:
     /// An member of upload file,use to upload on Google Drive.
-    QFile *m_file;
+    QFile *m_file = nullptr;
     /// Save network reply after upload finished
-    QByteArray m_replyData;
+    QByteArray m_replyData = QByteArray();
 };
 }
 #endif // GDRIVEFILEMULTIPARTCREATE_H

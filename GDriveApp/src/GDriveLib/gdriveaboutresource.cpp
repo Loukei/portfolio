@@ -21,7 +21,6 @@ GDrive::GDriveAboutResource::GDriveAboutResource(const QJsonDocument &doc)
 }
 
 GDrive::GDriveAboutResource::GDriveAboutResource()
-    :m_object()
 {
 }
 
