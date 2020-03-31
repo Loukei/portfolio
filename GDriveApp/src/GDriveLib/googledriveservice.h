@@ -4,7 +4,7 @@
 #include <QObject>
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
-#include "gdrivefilelist.h"
+#include "gdrivefileresourcelist.h"
 #include "gdriveerrorformat.h"
 #include "gdriveabout.h"
 #include "gdrivefiledownloader.h"
@@ -14,9 +14,11 @@
 #include "gdrivefilesearch.h"
 #include "gdrivefileget.h"
 
+QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
 class QNetworkAccessManager;
 class QFile;
+QT_END_NAMESPACE
 
 /*!
  * \namespace GDrive

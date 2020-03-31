@@ -3,7 +3,11 @@
 
 #include <QObject>
 
+
+QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveFileTask

@@ -4,7 +4,10 @@
 #include <QNetworkReply> //for network reply error
 #include "gdriveaboutresource.h"
 
+QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveAbout

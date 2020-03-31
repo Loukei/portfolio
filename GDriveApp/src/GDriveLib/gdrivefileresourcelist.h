@@ -1,12 +1,12 @@
-#ifndef GDRIVEFILELIST_H
-#define GDRIVEFILELIST_H
+#ifndef GDRIVEFILERESOURCELIST_H
+#define GDRIVEFILERESOURCELIST_H
 #include <QJsonArray>
 #include <QList>
 #include "GDriveLib/gdrivefileresource.h"
 
 namespace GDrive{
 /*!
- * \class GDriveFileList
+ * \class GDriveFileResourceList
  * \brief A data class which store the result form `Files: list`.
  *
  * - 一個儲存`Files: list`方法回傳資料的型別
@@ -18,15 +18,15 @@ namespace GDrive{
  * - [Search for files and folders](https://developers.google.com/drive/api/v3/search-files)
  * - [Files: list](https://developers.google.com/drive/api/v3/reference/files/list)
  */
-class GDriveFileList
+class GDriveFileResourceList
 {
 public:
     /// constructor by QJsonDocument
-    explicit GDriveFileList(const QJsonDocument &doc);
+    explicit GDriveFileResourceList(const QJsonDocument &doc);
     /// constructor empty
-    explicit GDriveFileList();
+    explicit GDriveFileResourceList();
     /// destructor
-    ~GDriveFileList();
+    ~GDriveFileResourceList();
     /// return m_kind
     QString kind() const;
     /// return m_nextPageToken
@@ -58,4 +58,4 @@ private:
 };
 }
 
-#endif // GDRIVEFILELIST_H
+#endif // GDRIVEFILERESOURCELIST_H

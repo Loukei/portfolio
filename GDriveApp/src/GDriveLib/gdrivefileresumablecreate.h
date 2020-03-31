@@ -4,8 +4,12 @@
 #include <QNetworkReply>
 #include "gdrivefileresource.h"
 
+
+QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
 class QFile;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveFileResumableCreate

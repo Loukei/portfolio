@@ -27,6 +27,7 @@ void GDrive::GDriveFileGet::request_FilesGet(const QString &fileId, const QStrin
     if(!fields.isEmpty()){
         query.addQueryItem("field",fields);
     }
+    query.addQueryItem("access_token",mp_google->token());
     QUrl url("https://www.googleapis.com/drive/v3/files/" + fileId);
     url.setQuery(query);
     QNetworkRequest request(url);
@@ -36,7 +37,7 @@ void GDrive::GDriveFileGet::request_FilesGet(const QString &fileId, const QStrin
     connect(reply,&QNetworkReply::finished,
             this,&GDriveFileGet::on_Request_FilesGet_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-            this,&GDriveFileGet::on_Request_FilesGet_ReplyFinished);
+            this,&GDriveFileGet::on_Request_FilesGet_ReplyError);
 }
 
 void GDrive::GDriveFileGet::on_Request_FilesGet_ReplyFinished()

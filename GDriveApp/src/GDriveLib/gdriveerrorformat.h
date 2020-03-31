@@ -2,7 +2,10 @@
 #define GDRIVEERRORFORMAT_H
 #include <QJsonArray>
 
+QT_BEGIN_NAMESPACE
 class QJsonDocument;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveErrorItem

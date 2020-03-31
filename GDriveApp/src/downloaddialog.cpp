@@ -3,9 +3,9 @@
 #include <QFileDialog>
 
 DownloadDialog::DownloadDialog(QWidget *parent,
-                                   const QString &caption,
-                                   const QString &downloadPath,
-                                   const QString &fileID) :
+                               const QString &caption,
+                               const QString &downloadPath,
+                               const QString &fileID) :
     QDialog(parent),
     ui(new Ui::DownloadDialog)
 {
@@ -20,12 +20,12 @@ DownloadDialog::~DownloadDialog()
     delete ui;
 }
 
-QString DownloadDialog::getDownloadFilePath()
+QString DownloadDialog::getDownloadFilePath() const
 {
     return ui->lineEdit_DownloadPath->text();
 }
 
-QString DownloadDialog::getFileId()
+QString DownloadDialog::getFileId() const
 {
     return ui->lineEdit_FileID->text();
 }

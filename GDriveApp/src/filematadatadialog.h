@@ -16,10 +16,19 @@ class FileMataDataDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit FileMataDataDialog(QWidget *parent = nullptr);
+    /// constructor
+    explicit FileMataDataDialog(QWidget *parent = nullptr,
+                                const QString &fileID = QString(),
+                                const QString &fields = QString());
+    /// destructor
     ~FileMataDataDialog();
+    /// return fileID in dialog
+    QString getFileID() const;
+    /// return Fields in dialog
+    QString getFields() const;
 
 public slots:
+    /// slot when FileGet task complete, update m_model
     void onFileGet_finished();
 
 signals:

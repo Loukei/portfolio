@@ -5,7 +5,10 @@
 #include <QNetworkReply>
 #include "gdrivefileresource.h"
 
+QT_BEGIN_NAMESPACE
 class QFile;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveFileDownloader

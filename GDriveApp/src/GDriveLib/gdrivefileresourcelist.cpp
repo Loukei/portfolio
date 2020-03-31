@@ -1,13 +1,13 @@
-#include "gdrivefilelist.h"
+#include "gdrivefileresourcelist.h"
 #include <QJsonParseError>
 #include <QJsonObject>
 
-GDrive::GDriveFileList::GDriveFileList(const QJsonDocument &doc)
+GDrive::GDriveFileResourceList::GDriveFileResourceList(const QJsonDocument &doc)
 {
     parseDocument(doc);
 }
 
-GDrive::GDriveFileList::GDriveFileList()
+GDrive::GDriveFileResourceList::GDriveFileResourceList()
 {
     m_kind = QString();
     m_nextPageToken = QString();
@@ -15,31 +15,31 @@ GDrive::GDriveFileList::GDriveFileList()
     m_filelist = QJsonArray();
 }
 
-GDrive::GDriveFileList::~GDriveFileList()
+GDrive::GDriveFileResourceList::~GDriveFileResourceList()
 {
 }
 
-QString GDrive::GDriveFileList::kind() const
+QString GDrive::GDriveFileResourceList::kind() const
 {
     return m_kind;
 }
 
-QString GDrive::GDriveFileList::nextPageToken() const
+QString GDrive::GDriveFileResourceList::nextPageToken() const
 {
     return m_nextPageToken;
 }
 
-bool GDrive::GDriveFileList::incompleteSearch() const
+bool GDrive::GDriveFileResourceList::incompleteSearch() const
 {
     return m_incompleteSearch;
 }
 
-QJsonArray GDrive::GDriveFileList::files() const
+QJsonArray GDrive::GDriveFileResourceList::files() const
 {
     return m_filelist;
 }
 
-void GDrive::GDriveFileList::parseDocument(const QJsonDocument &doc)
+void GDrive::GDriveFileResourceList::parseDocument(const QJsonDocument &doc)
 {
     QJsonObject obj = doc.object();
     m_kind = obj["kind"].toString();

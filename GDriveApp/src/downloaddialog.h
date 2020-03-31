@@ -23,15 +23,18 @@ public:
                               const QString &fileID = QString());
     ~DownloadDialog() override;
     /// return Download path form lineEdit_DownloadPath
-    QString getDownloadFilePath();
+    QString getDownloadFilePath() const;
     /// return fileID form lineEdit_FileID
-    QString getFileId();
+    QString getFileId() const;
+
 signals:
     /// return download path and fileId to mainWindow
     void downloadParam(QString downloadFilePath,QString fileId);
+
 public slots:
     /// override accept(), emit downloadParam(...)
     virtual void accept() override;
+
 private slots:
     /// open file dialog to choose download path
     void on_pushButton_DownloadPath_clicked();

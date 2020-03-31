@@ -30,9 +30,9 @@ SOURCES += \
         GDriveLib/gdriveerrorformat.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
         GDriveLib/gdrivefileget.cpp \
-        GDriveLib/gdrivefilelist.cpp \
         GDriveLib/gdrivefilemultipartcreate.cpp \
         GDriveLib/gdrivefileresource.cpp \
+        GDriveLib/gdrivefileresourcelist.cpp \
         GDriveLib/gdrivefileresumablecreate.cpp \
         GDriveLib/gdrivefiles.cpp \
         GDriveLib/gdrivefilesearch.cpp \
@@ -52,9 +52,9 @@ HEADERS += \
         GDriveLib/gdriveerrorformat.h \
         GDriveLib/gdrivefiledownloader.h \
         GDriveLib/gdrivefileget.h \
-        GDriveLib/gdrivefilelist.h \
         GDriveLib/gdrivefilemultipartcreate.h \
         GDriveLib/gdrivefileresource.h \
+        GDriveLib/gdrivefileresourcelist.h \
         GDriveLib/gdrivefileresumablecreate.h \
         GDriveLib/gdrivefiles.h \
         GDriveLib/gdrivefilesearch.h \

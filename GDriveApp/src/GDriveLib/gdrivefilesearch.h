@@ -1,10 +1,14 @@
 #ifndef GDRIVEFILESEARCH_H
 #define GDRIVEFILESEARCH_H
 #include "gdrivefiletask.h"
-#include "gdrivefilelist.h"
+#include "gdrivefileresourcelist.h"
 #include <QNetworkReply>
 
+
+QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveFileSearch
@@ -34,7 +38,7 @@ public:
     /// destructor
     ~GDriveFileSearch() override;
     /// get search result to GDriveFileList data format
-    GDriveFileList getFileList() const;
+    GDriveFileResourceList getFileList() const;
     /// get search result to JSON string data format
     QByteArray getReplyString() const;
 

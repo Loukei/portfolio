@@ -11,6 +11,38 @@
 
 using namespace GDrive;
 
+namespace Settings {
+inline QRect MainWindow_Geometry(QSettings *settings)
+{
+    return settings->value("MainWindow/Geometry",QRect(0,0,630,495)).toRect();
+}
+
+inline QString Upload_FilePath(QSettings *settings)
+{
+    return settings->value("MainWindow/DialogUpload/FilePath","/home").toString();
+}
+
+inline QString Download_FilePath(QSettings *settings)
+{
+    return settings->value("MainWindow/DialogDownload/FilePath","/home").toString();
+}
+
+inline QString Download_FileID(QSettings *settings)
+{
+    return settings->value("MainWindow/DialogDownload/FileID","YOUR_FILE_ID").toString();
+}
+
+inline QString FileGet_FileID(QSettings *settings)
+{
+    return settings->value("MainWindow/DialogFileMataData/FileID","YOUR_FILE_ID").toString();
+}
+
+inline QString FileGet_Fields(QSettings *settings)
+{
+    return settings->value("MainWindow/DialogFileMataData/Fields","YOUR_FILE_ID").toString();
+}
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -19,19 +51,21 @@ MainWindow::MainWindow(QWidget *parent) :
     //! Read Settings
     m_settings = new QSettings("GDriveApp_Settings.ini",QSettings::IniFormat,this);
     m_settings->setIniCodec("UTF-8");
-    this->setGeometry(readGeometry(m_settings));
-    m_currentUploadFilePath = readUploadFilePath(m_settings);
+    this->setGeometry(Settings::MainWindow_Geometry(m_settings));
+    m_currentUploadFilePath = Settings::Upload_FilePath(m_settings);
     //! Setup download dialog
     m_dialogDownload = new DownloadDialog(this,
                                           tr("Download File"),
-                                          readDownloadFilePath(m_settings),
-                                          readDownloadFileID(m_settings));
+                                          Settings::Download_FilePath(m_settings),
+                                          Settings::Download_FileID(m_settings));
     //! Setup search dialog
     m_dialogSearch = new SearchDialog(this);
     connect(m_dialogSearch,&SearchDialog::query,
             this,&MainWindow::onSearchDialog_query);
     //! Setup File::Get dialog
-    m_dialogFileMataData = new FileMataDataDialog(this);
+    m_dialogFileMataData = new FileMataDataDialog(this,
+                                                  Settings::FileGet_FileID(m_settings),
+                                                  Settings::FileGet_Fields(m_settings));
     connect(m_dialogFileMataData,&FileMataDataDialog::query,
             this,&MainWindow::onFileMataDataDialog_query);
     //! Create Google Drive Serviece instance
@@ -133,33 +167,15 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
     });
 }
 
-QRect MainWindow::readGeometry(QSettings *settings)
-{
-    return settings->value("MainWindow/Geometry",QRect(0,0,630,495)).toRect();
-}
-
-QString MainWindow::readUploadFilePath(QSettings *settings)
-{
-    return settings->value("MainWindow/UploadFilePath","/home").toString();
-}
-
-QString MainWindow::readDownloadFilePath(QSettings *settings)
-{
-    return settings->value("MainWindow/DownloadFilePath","/home").toString();
-}
-
-QString MainWindow::readDownloadFileID(QSettings *settings)
-{
-    return settings->value("MainWindow/DownloadFileID","YOUR_FILE_ID").toString();
-}
-
 void MainWindow::writeSettings()
 {
     m_settings->beginGroup("MainWindow");
     m_settings->setValue("Geometry",this->geometry());
-    m_settings->setValue("DownloadFileID",m_dialogDownload->getFileId());
-    m_settings->setValue("DownloadFilePath",m_dialogDownload->getDownloadFilePath());
-    m_settings->setValue("UploadFilePath",m_currentUploadFilePath);
+    m_settings->setValue("DialogDownload/FileID",m_dialogDownload->getFileId());
+    m_settings->setValue("DialogDownload/FilePath",m_dialogDownload->getDownloadFilePath());
+    m_settings->setValue("DialogUpload/FilePath",m_currentUploadFilePath);
+    m_settings->setValue("DialogFileMataData/FileID",m_dialogFileMataData->getFileID());
+    m_settings->setValue("DialogFileMataData/Fields",m_dialogFileMataData->getFields());
     m_settings->endGroup();
 }
 

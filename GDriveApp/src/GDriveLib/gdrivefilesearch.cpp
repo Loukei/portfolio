@@ -27,15 +27,15 @@ GDrive::GDriveFileSearch::~GDriveFileSearch()
 
 }
 
-GDrive::GDriveFileList GDrive::GDriveFileSearch::getFileList() const
+GDrive::GDriveFileResourceList GDrive::GDriveFileSearch::getFileList() const
 {
     QJsonParseError jsonErr;
     QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
     if(jsonErr.error != QJsonParseError::NoError){
         qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveFileList();
+        return GDriveFileResourceList();
     }
-    return GDriveFileList(doc);
+    return GDriveFileResourceList(doc);
 }
 
 QByteArray GDrive::GDriveFileSearch::getReplyString() const

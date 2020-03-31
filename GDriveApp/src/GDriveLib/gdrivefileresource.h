@@ -3,7 +3,11 @@
 #include <QJsonObject>
 #include <QDateTime>
 
+
+QT_BEGIN_NAMESPACE
 class QJsonDocument;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveFileResource

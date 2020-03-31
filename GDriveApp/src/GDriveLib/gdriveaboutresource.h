@@ -2,7 +2,10 @@
 #define GDRIVEABOUTRESOURCE_H
 #include <QJsonObject>
 
+QT_BEGIN_NAMESPACE
 class QJsonDocument;
+QT_END_NAMESPACE
+
 namespace GDrive {
 /*!
  * \class GDriveAboutResource

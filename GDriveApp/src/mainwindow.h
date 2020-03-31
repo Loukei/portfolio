@@ -14,7 +14,10 @@ namespace GDrive {
 class SearchDialog;
 class DownloadDialog;
 class FileMataDataDialog;
+QT_BEGIN_NAMESPACE
 class QSettings;
+QT_END_NAMESPACE
+
 /*!
  * \class MainWindow
  * \brief The main UI widget
@@ -85,14 +88,6 @@ private:
     void fileResumableUpload(const QString &filepath);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
-    /// read Settings to Window geometry
-    inline QRect readGeometry(QSettings *settings);
-    /// read Settings(UploadFilePath) to m_currentUploadFilePath
-    inline QString readUploadFilePath(QSettings *settings);
-    /// read Settings(DownloadFilePath) to downloadDialog
-    inline QString readDownloadFilePath(QSettings *settings);
-    /// read Settings(DownloadFileID) to downloadDialog
-    inline QString readDownloadFileID(QSettings *settings);
     /// write settings to ini file
     void writeSettings();
 };
