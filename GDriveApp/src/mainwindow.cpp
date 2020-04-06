@@ -3,7 +3,9 @@
 #include "downloaddialog.h"
 #include "searchdialog.h"
 #include "filematadatadialog.h"
+#include "updatedialog.h"
 #include "GDriveLib/googledriveservice.h"
+#include "QJsonModel/qjsonmodel.h"
 #include <QSettings>
 #include <QDebug>
 #include <QFile>
@@ -11,35 +13,58 @@
 
 using namespace GDrive;
 
+/*!
+ * \namespace Settings
+ * \brief Settings is used for collect all settings key and read settings
+ */
 namespace Settings {
+const QString key_Geometry = "MainWindow/Geometry";
+const QString key_Upload_FilePath = "MainWindow/DialogUpload/FilePath";
+const QString key_Download_FilePath = "MainWindow/DialogDownload/FilePath";
+const QString key_Download_FileID = "MainWindow/DialogDownload/FileID";
+const QString key_FileGet_FileID = "MainWindow/DialogFileMataData/FileID";
+const QString key_FileGet_Fields = "MainWindow/DialogFileMataData/Fields";
+const QString key_Update_FilePath = "MainWindow/DialogUpdate/FilePath";
+const QString key_Update_FileID = "MainWindow/DialogUpdate/FileID";
+
 inline QRect MainWindow_Geometry(QSettings *settings)
 {
-    return settings->value("MainWindow/Geometry",QRect(0,0,630,495)).toRect();
+    return settings->value(key_Geometry,QRect(0,0,630,495)).toRect();
 }
 
 inline QString Upload_FilePath(QSettings *settings)
 {
-    return settings->value("MainWindow/DialogUpload/FilePath","/home").toString();
+    return settings->value(key_Upload_FilePath,"/home").toString();
 }
 
 inline QString Download_FilePath(QSettings *settings)
 {
-    return settings->value("MainWindow/DialogDownload/FilePath","/home").toString();
+    return settings->value(key_Download_FilePath,"/home").toString();
 }
 
 inline QString Download_FileID(QSettings *settings)
 {
-    return settings->value("MainWindow/DialogDownload/FileID","YOUR_FILE_ID").toString();
+    return settings->value(key_Download_FileID,"YOUR_FILE_ID").toString();
 }
 
 inline QString FileGet_FileID(QSettings *settings)
 {
-    return settings->value("MainWindow/DialogFileMataData/FileID","YOUR_FILE_ID").toString();
+    return settings->value(key_FileGet_FileID,"YOUR_FILE_ID").toString();
 }
 
 inline QString FileGet_Fields(QSettings *settings)
 {
-    return settings->value("MainWindow/DialogFileMataData/Fields","YOUR_FILE_ID").toString();
+    return settings->value(key_FileGet_Fields,"YOUR_FILE_ID").toString();
+}
+
+inline QString Update_FilePath(QSettings *settings)
+{
+    return settings->value(key_Update_FilePath,"/home").toString();
+}
+
+inline QString Update_FileID(QSettings *settings)
+{
+    return settings->value(key_Update_FileID,"YOUR_FILE_ID").toString();
 }
 }
 
@@ -68,6 +93,13 @@ MainWindow::MainWindow(QWidget *parent) :
                                                   Settings::FileGet_Fields(m_settings));
     connect(m_dialogFileMataData,&FileMataDataDialog::query,
             this,&MainWindow::onFileMataDataDialog_query);
+    //! Setup file update dialog
+    m_dialogUpdate = new UpdateDialog(this,
+                                      Settings::Update_FileID(m_settings),
+                                      Settings::Update_FilePath(m_settings));
+    //! Setup Reply TreeView and model
+    m_model = new QJsonModel(this);
+    ui->treeView_Reply->setModel(m_model);
     //! Create Google Drive Serviece instance
     m_Drive = new GDriveService(this);
     connect(m_Drive,&GDriveService::granted,
@@ -96,11 +128,12 @@ void MainWindow::accountAbout()
     auto onAboutFinished = [userAbout,this](){
         if(userAbout->isComplete() && !userAbout->isFailed()){
             GDriveAboutResource resource = userAbout->getResource();
-            ui->label->setText("Account: " + resource.user_displayName());
+            ui->label_UserName->setText("Account: " + resource.user_displayName());
         }else {
-            ui->label->setText("Unknown");
+            ui->label_UserName->setText("Unknown");
             ui->plainTextEdit->appendPlainText("About message Error.\n");
         }
+        updateModel(userAbout->getReplyString());
         userAbout->deleteLater();
     };
     connect(userAbout,&GDriveAbout::finished,
@@ -112,10 +145,11 @@ void MainWindow::fileSimpleUpload(const QString &filepath)
     auto task = m_Drive->fileSimpleCreate(filepath);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){ //! 上傳任務成功必須(1)完成且(2)沒有失敗
-            ui->plainTextEdit->appendPlainText(filepath + " Simple Upload Success.\n");
+            ui->plainTextEdit->appendPlainText(filepath + " Simple Upload Success.\n");            
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Simple Upload error:" + task->errorString());
         }
+        updateModel(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -131,6 +165,7 @@ void MainWindow::fileMultipartUpload(const QString &filepath)
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Upload error:" + task->errorString());
         }
+        updateModel(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -146,6 +181,23 @@ void MainWindow::fileResumableUpload(const QString &filepath)
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Upload error:" + task->errorString());
         }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
+}
+
+void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID)
+{
+    auto task = m_Drive->fileSimpleUpdate(filepath,fileID);
+    auto onUploadreceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -163,25 +215,37 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
         }else {
             ui->plainTextEdit->appendPlainText(downloadFilePath + " Download error:" + task->errorString());
         }
+        updateModel(task->getReplyString());
         task->deleteLater();
     });
 }
 
 void MainWindow::writeSettings()
 {
-    m_settings->beginGroup("MainWindow");
-    m_settings->setValue("Geometry",this->geometry());
-    m_settings->setValue("DialogDownload/FileID",m_dialogDownload->getFileId());
-    m_settings->setValue("DialogDownload/FilePath",m_dialogDownload->getDownloadFilePath());
-    m_settings->setValue("DialogUpload/FilePath",m_currentUploadFilePath);
-    m_settings->setValue("DialogFileMataData/FileID",m_dialogFileMataData->getFileID());
-    m_settings->setValue("DialogFileMataData/Fields",m_dialogFileMataData->getFields());
-    m_settings->endGroup();
+    m_settings->setValue(Settings::key_Geometry,this->geometry());
+    m_settings->setValue(Settings::key_Download_FileID,m_dialogDownload->getFileId());
+    m_settings->setValue(Settings::key_Download_FilePath,m_dialogDownload->getDownloadFilePath());
+    m_settings->setValue(Settings::key_Upload_FilePath,m_currentUploadFilePath);
+    m_settings->setValue(Settings::key_FileGet_FileID,m_dialogFileMataData->getFileID());
+    m_settings->setValue(Settings::key_FileGet_Fields,m_dialogFileMataData->getFields());
+    m_settings->setValue(Settings::key_Update_FilePath,m_dialogUpdate->getFilePath());
+    m_settings->setValue(Settings::key_Update_FileID,m_dialogUpdate->getFileID());
+}
+
+void MainWindow::updateModel(const QByteArray &json)
+{
+    m_model->loadJson(json);
+}
+
+void MainWindow::clearModel()
+{
+    m_model->loadJson("{}");
 }
 
 void MainWindow::on_actionLogin_account_triggered()
 {
     qInfo() << Q_FUNC_INFO;
+    clearModel();
     accountLogin();
 }
 
@@ -199,8 +263,9 @@ void MainWindow::onGDrive_granted()
 void MainWindow::on_action_Logout_Account_triggered()
 {
     qInfo() << Q_FUNC_INFO;
+    clearModel();
     accountLogout();
-    ui->label->clear();
+    ui->label_UserName->clear();
     ui->plainTextEdit->appendPlainText("Account logout.\n");
     ui->actionAbout->setEnabled(false);
     ui->menuUpload_file->setEnabled(false);
@@ -211,6 +276,8 @@ void MainWindow::on_action_Logout_Account_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
+    qInfo() << Q_FUNC_INFO;
+    clearModel();
     accountAbout();
 }
 
@@ -218,6 +285,7 @@ void MainWindow::on_actionDownload_file_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     if(m_dialogDownload->exec() == QDialog::Accepted){
+        clearModel();
         fileDownload(m_dialogDownload->getDownloadFilePath(),
                      m_dialogDownload->getFileId());
     }else { //! QDialog::Rejected
@@ -232,6 +300,7 @@ void MainWindow::on_actionSimple_Upload_triggered()
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
     if (!fileName.isEmpty()) {
+        clearModel();
         m_currentUploadFilePath = fileName;
         fileSimpleUpload(fileName);
     }else {
@@ -246,6 +315,7 @@ void MainWindow::on_actionMultipart_Upload_triggered()
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
     if (!fileName.isEmpty()) {
+        clearModel();
         m_currentUploadFilePath = fileName;
         fileMultipartUpload(fileName);
     }else {
@@ -260,6 +330,7 @@ void MainWindow::on_actionResumable_Upload_triggered()
                                                     tr("Upload File"),
                                                     m_currentUploadFilePath);
     if (!fileName.isEmpty()) {
+        clearModel();
         m_currentUploadFilePath = fileName;
         fileResumableUpload(fileName);
     }else {
@@ -293,4 +364,18 @@ void MainWindow::onFileMataDataDialog_query(const QString &fileID, const QString
     auto task = m_Drive->fileGet(fileID,fields);
     connect(task,&GDriveFileGet::finished,
             m_dialogFileMataData,&FileMataDataDialog::onFileGet_finished);
+}
+
+void MainWindow::on_actionUpdate_file_triggered()
+{
+    qInfo() << Q_FUNC_INFO;
+    if(m_dialogUpdate->exec() == QDialog::Accepted){
+        clearModel();
+        int uploadtype = m_dialogUpdate->getUploadType();
+        if(uploadtype == 0){
+            fileSimpleUpdate(m_dialogUpdate->getFilePath(),m_dialogUpdate->getFileID());
+        }
+    }else {
+        ui->plainTextEdit->appendPlainText("Update cancled.\n");
+    }
 }

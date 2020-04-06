@@ -37,6 +37,7 @@ SOURCES += \
         GDriveLib/gdrivefiles.cpp \
         GDriveLib/gdrivefilesearch.cpp \
         GDriveLib/gdrivefilesimplecreate.cpp \
+        GDriveLib/gdrivefilesimpleupdate.cpp \
         GDriveLib/gdrivefiletask.cpp \
         GDriveLib/googledriveservice.cpp \
         QJsonModel/qjsonmodel.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
         filematadatadialog.cpp \
         main.cpp \
         mainwindow.cpp \
-        searchdialog.cpp
+        searchdialog.cpp \
+        updatedialog.cpp
 
 HEADERS += \
         GDriveLib/gdriveabout.h \
@@ -59,6 +61,7 @@ HEADERS += \
         GDriveLib/gdrivefiles.h \
         GDriveLib/gdrivefilesearch.h \
         GDriveLib/gdrivefilesimplecreate.h \
+        GDriveLib/gdrivefilesimpleupdate.h \
         GDriveLib/gdrivefiletask.h \
         GDriveLib/googledriveservice.h \
         QJsonModel/qjsonmodel.h \
@@ -66,13 +69,15 @@ HEADERS += \
         downloaddialog.h \
         filematadatadialog.h \
         mainwindow.h \
-        searchdialog.h
+        searchdialog.h \
+        updatedialog.h
 
 FORMS += \
         downloaddialog.ui \
         filematadatadialog.ui \
         mainwindow.ui \
-        searchdialog.ui
+        searchdialog.ui \
+        updatedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

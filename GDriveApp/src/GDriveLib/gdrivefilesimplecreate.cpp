@@ -16,8 +16,7 @@ GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeF
     if(!QFile::exists(filepath)){
         qWarning() << "file doesnt exist " << filepath;
         m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        m_isFailed = false;
-        m_isComplete = true;
+        taskFailed();
         return;
     }
     //! Initial file
@@ -53,9 +52,7 @@ void GDrive::GDriveFileSimpleCreate::request_UploadStart()
     if(!m_file->open(QIODevice::ReadOnly)){
         m_errStr += QString("[Error]File %1: %2\n")
                 .arg(m_file->fileName()).arg(m_file->errorString());
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        taskFailed();
         return;
     }
     //! gather file message to build simple upload request
@@ -92,9 +89,7 @@ void GDrive::GDriveFileSimpleCreate::retry()
                            ,&GDriveFileSimpleCreate::request_UploadStart);
     }else {
         m_errStr += QStringLiteral("[Error]Too many retrys.");
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        taskFailed();
     }
 }
 
@@ -107,9 +102,7 @@ void GDrive::GDriveFileSimpleCreate::on_UploadStart_ReplyFinished()
     }
     //! QByteArray support implicit sharing
     m_replyData = reply->readAll();
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -117,17 +110,17 @@ void GDrive::GDriveFileSimpleCreate::on_UploadStart_ReplyError(QNetworkReply::Ne
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     auto httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    auto replyErr = QString("[Error]Simple Update reply error %1: %2\n")
+            .arg(httpStatus)
+            .arg(reply->errorString());
+    qWarning() << Q_FUNC_INFO << replyErr;
     if(httpStatus == (500|502|503|504|403)){    //Retry upload
         retry();
     }else if (httpStatus == 404) {              //Restart upload
         retry();
     }else {                                     //Unslove error
-        m_errStr += QString("[Error]Simple Upload reply error: %1\n")
-                .arg(reply->errorString());
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        m_errStr += replyErr;
+        taskFailed();
     }
-    qWarning() << "[Error]Reply error code:" << httpStatus << " >> " << reply->errorString();
     reply->deleteLater();
 }

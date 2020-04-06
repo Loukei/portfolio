@@ -18,20 +18,38 @@
     <normaloff>:/Icon/Icon/Icon_main.png</normaloff>:/Icon/Icon/Icon_main.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,3">
     <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Account:</string>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label_UserName">
+        <property name="text">
+         <string>Account:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="plainTextEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_CurrentReply">
+        <property name="text">
+         <string>Current reply</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTreeView" name="treeView_Reply"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -74,6 +92,7 @@
     <addaction name="actionDownload_file"/>
     <addaction name="action_Search_file_folder"/>
     <addaction name="actionGet_file_matadata"/>
+    <addaction name="actionUpdate_file"/>
    </widget>
    <addaction name="menuAcount"/>
    <addaction name="menuFile"/>
@@ -124,6 +143,9 @@
    </property>
   </action>
   <action name="action_Logout_Account">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Logout Account</string>
    </property>
@@ -142,6 +164,11 @@
    </property>
    <property name="text">
     <string>Get file matadata...</string>
+   </property>
+  </action>
+  <action name="actionUpdate_file">
+   <property name="text">
+    <string>&amp;Update file</string>
    </property>
   </action>
  </widget>

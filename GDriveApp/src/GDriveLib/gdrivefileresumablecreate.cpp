@@ -42,6 +42,11 @@ GDrive::GDriveFileResource GDrive::GDriveFileResumableCreate::getResource() cons
     return GDriveFileResource(doc);
 }
 
+QByteArray GDrive::GDriveFileResumableCreate::getReplyString() const
+{
+    return m_replyData;
+}
+
 void GDrive::GDriveFileResumableCreate::request_InitialSession()
 {
     /// reference:

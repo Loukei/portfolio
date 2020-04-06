@@ -38,3 +38,17 @@ int GDrive::GDriveFileTask::getExpBackoffSleepTime(int collisions, int slottime,
     int r = QRandomGenerator::global()->bounded(p);
     return int(slottime * r);
 }
+
+void GDrive::GDriveFileTask::taskSucceeded()
+{
+    m_isFailed = false;
+    m_isComplete = true;
+    emit finished();
+}
+
+void GDrive::GDriveFileTask::taskFailed()
+{
+    m_isFailed = true;
+    m_isComplete = true;
+    emit finished();
+}

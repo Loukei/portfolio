@@ -14,6 +14,8 @@ namespace GDrive {
 class SearchDialog;
 class DownloadDialog;
 class FileMataDataDialog;
+class UpdateDialog;
+class QJsonModel;
 QT_BEGIN_NAMESPACE
 class QSettings;
 QT_END_NAMESPACE
@@ -38,10 +40,14 @@ private:
     SearchDialog *m_dialogSearch;
     /// A dialog to Query File matadata
     FileMataDataDialog *m_dialogFileMataData;
+    /// A dialog to update file
+    UpdateDialog *m_dialogUpdate;
     /// Save recent upload file
     QString m_currentUploadFilePath;
     /// Save settings
     QSettings *m_settings;
+    /// save m_Drive Operation reply
+    QJsonModel *m_model;
     /// Google Drive Api serviece
     GDrive::GDriveService *m_Drive;
 
@@ -73,6 +79,8 @@ private slots:
     void onFileMataDataDialog_query(const QString &fileID,
                                     const QString &fields);
 
+    void on_actionUpdate_file_triggered();
+
 private:
     /// GDriveService Account Login
     void accountLogin();
@@ -86,10 +94,16 @@ private:
     void fileMultipartUpload(const QString &filepath);
     /// GDriveService upload(Create) file Resumable method
     void fileResumableUpload(const QString &filepath);
+    /// GDriveService upload(Update) file Simple method
+    void fileSimpleUpdate(const QString &filepath,const QString &fileID);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
     /// write settings to ini file
     void writeSettings();
+    /// take Google Drive Api response show on Treeview
+    void updateModel(const QByteArray &json);
+    /// claer Json model, used for UI update treeView
+    void clearModel();
 };
 
 #endif // MAINWINDOW_H

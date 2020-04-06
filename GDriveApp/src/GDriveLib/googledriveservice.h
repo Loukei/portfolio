@@ -11,6 +11,7 @@
 #include "gdrivefilesimplecreate.h"
 #include "gdrivefilemultipartcreate.h"
 #include "gdrivefileresumablecreate.h"
+#include "gdrivefilesimpleupdate.h"
 #include "gdrivefilesearch.h"
 #include "gdrivefileget.h"
 
@@ -66,6 +67,9 @@ public:
     GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath);
     /// Resumable upload create file
     GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
+    /// simple upload upload file
+    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
+                                             const QString &fileId);
     /// Gets a file's metadata by ID.
     GDriveFileGet* fileGet(const QString &fileId,const QString &fields);
     /// Search Files in drive

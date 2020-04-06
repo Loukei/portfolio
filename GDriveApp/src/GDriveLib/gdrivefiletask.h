@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
 QT_END_NAMESPACE
@@ -47,7 +46,7 @@ protected:
     QOAuth2AuthorizationCodeFlow * const mp_google;
     /// Human readable error string
     QString m_errStr = QString();
-    /// Does task complete and not failed?
+    /// Does task failed? True means task fail, False means task success
     bool m_isFailed = false;
     /// Does task complete
     bool m_isComplete = false;
@@ -55,6 +54,10 @@ protected:
 protected:
     /// calculate exponential backoff sleep time,return -1 if collisions > maxretry
     int getExpBackoffSleepTime(int collisions,int slottime,int maxretry) const;
+    /// Task complete and not failed
+    void taskSucceeded();
+    /// Task complete and failed
+    void taskFailed();
 };
 }
 #endif // GDRIVEFILETASK_H
