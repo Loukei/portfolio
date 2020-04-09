@@ -17,8 +17,7 @@ GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2Authorizatio
     if(!QFile::exists(filepath)){
         qWarning() << "file doesnt exist " << filepath;
         m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        m_isFailed = false;
-        m_isComplete = true;
+        taskFailed();
         return;
     }
     //! Initial file
@@ -54,8 +53,7 @@ void GDrive::GDriveFileMultipartCreate::request_UploadStart()
     if(!m_file->open(QIODevice::ReadOnly)){
         m_errStr += QString("[Error]File %1: %2\n")
                 .arg(m_file->fileName()).arg(m_file->errorString());
-        m_isFailed = true;
-        m_isComplete = false;
+        taskFailed();
         return;
     }
     //! the url will use to create new upload
@@ -99,9 +97,7 @@ void GDrive::GDriveFileMultipartCreate::retry()
                            ,&GDriveFileMultipartCreate::request_UploadStart);
     }else {
         m_errStr += QStringLiteral("[Error]Too many retrys.");
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        taskFailed();
     }
 }
 
@@ -114,9 +110,7 @@ void GDrive::GDriveFileMultipartCreate::on_UploadStart_ReplyFinished()
     }
     //! QByteArray support implicit sharing
     m_replyData = reply->readAll();
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -131,9 +125,7 @@ void GDrive::GDriveFileMultipartCreate::on_UploadStart_ReplyError(QNetworkReply:
     }else {                                     //Unslove error
         m_errStr += QString("[Error]Simple Upload reply error: %1\n")
                 .arg(reply->errorString());
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        taskFailed();
     }
     qWarning() << "[Error]Reply error code:" << httpStatus << " >> " << reply->errorString();
     reply->deleteLater();

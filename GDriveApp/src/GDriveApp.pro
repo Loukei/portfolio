@@ -27,13 +27,16 @@ CONFIG += c++11
 SOURCES += \
         GDriveLib/gdriveabout.cpp \
         GDriveLib/gdriveaboutresource.cpp \
+        GDriveLib/gdriveargs.cpp \
         GDriveLib/gdriveerrorformat.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
         GDriveLib/gdrivefileget.cpp \
         GDriveLib/gdrivefilemultipartcreate.cpp \
+        GDriveLib/gdrivefilemultipartupdate.cpp \
         GDriveLib/gdrivefileresource.cpp \
         GDriveLib/gdrivefileresourcelist.cpp \
         GDriveLib/gdrivefileresumablecreate.cpp \
+        GDriveLib/gdrivefileresumableupdate.cpp \
         GDriveLib/gdrivefiles.cpp \
         GDriveLib/gdrivefilesearch.cpp \
         GDriveLib/gdrivefilesimplecreate.cpp \
@@ -51,13 +54,16 @@ SOURCES += \
 HEADERS += \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
+        GDriveLib/gdriveargs.h \
         GDriveLib/gdriveerrorformat.h \
         GDriveLib/gdrivefiledownloader.h \
         GDriveLib/gdrivefileget.h \
         GDriveLib/gdrivefilemultipartcreate.h \
+        GDriveLib/gdrivefilemultipartupdate.h \
         GDriveLib/gdrivefileresource.h \
         GDriveLib/gdrivefileresourcelist.h \
         GDriveLib/gdrivefileresumablecreate.h \
+        GDriveLib/gdrivefileresumableupdate.h \
         GDriveLib/gdrivefiles.h \
         GDriveLib/gdrivefilesearch.h \
         GDriveLib/gdrivefilesimplecreate.h \

@@ -95,7 +95,11 @@ private:
     /// GDriveService upload(Create) file Resumable method
     void fileResumableUpload(const QString &filepath);
     /// GDriveService upload(Update) file Simple method
-    void fileSimpleUpdate(const QString &filepath,const QString &fileID);
+    void fileSimpleUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
+    /// GDriveService upload(Update) file Multipart method
+    void fileMultipartUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
+    /// GDriveService upload(Update) file Resumable method
+    void fileResumableUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
     /// write settings to ini file

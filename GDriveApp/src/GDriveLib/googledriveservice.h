@@ -12,6 +12,8 @@
 #include "gdrivefilemultipartcreate.h"
 #include "gdrivefileresumablecreate.h"
 #include "gdrivefilesimpleupdate.h"
+#include "gdrivefilemultipartupdate.h"
+#include "gdrivefileresumableupdate.h"
 #include "gdrivefilesearch.h"
 #include "gdrivefileget.h"
 
@@ -65,11 +67,35 @@ public:
     GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath);
     /// multipart upload create file
     GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath);
-    /// Resumable upload create file
+    /// resumable upload create file
     GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
-    /// simple upload upload file
+    /// simple upload update file
     GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
-                                             const QString &fileId);
+                                             const QString &fileId,
+                                             const QString &addParents,
+                                             bool enforceSingleParent,
+                                             bool keepRevisionForever,
+                                             const QString &ocrLanguage,
+                                             const QString &removeParents,
+                                             bool useContentAsIndexableText);
+    /// multipart upload update file
+    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
+                                                   const QString &fileId,
+                                                   const QString &addParents,
+                                                   bool enforceSingleParent,
+                                                   bool keepRevisionForever,
+                                                   const QString &ocrLanguage,
+                                                   const QString &removeParents,
+                                                   bool useContentAsIndexableText);
+    /// resumable upload update file
+    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
+                                                   const QString &fileId,
+                                                   const QString &addParents,
+                                                   bool enforceSingleParent,
+                                                   bool keepRevisionForever,
+                                                   const QString &ocrLanguage,
+                                                   const QString &removeParents,
+                                                   bool useContentAsIndexableText);
     /// Gets a file's metadata by ID.
     GDriveFileGet* fileGet(const QString &fileId,const QString &fields);
     /// Search Files in drive
@@ -77,8 +103,8 @@ public:
                                const QString &pageToken);
     /// Get File download by fileID
     GDriveFileDownloader* fileDownload(const QString &fileId,
-                                 const QString &fields,
-                                 QSharedPointer<QFile> file);
+                                       const QString &fields,
+                                       QSharedPointer<QFile> file);
 
 signals:
     /// This signal is emitted when the authorization flow finishes successfully.

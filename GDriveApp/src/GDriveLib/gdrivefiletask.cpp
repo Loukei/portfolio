@@ -52,3 +52,9 @@ void GDrive::GDriveFileTask::taskFailed()
     m_isComplete = true;
     emit finished();
 }
+
+QByteArray GDrive::GDriveFileTask::formBoolean(bool value)
+{
+    if(value)   return "true";
+    else        return "false";
+}

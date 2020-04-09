@@ -75,6 +75,11 @@ void UpdateDialog::setOcrLanguage(const QString &ocrLanguage)
     ui->lineEdit_ocrLanguage->setText(ocrLanguage);
 }
 
+QString UpdateDialog::getOcrLanguage() const
+{
+    return ui->lineEdit_ocrLanguage->text();
+}
+
 void UpdateDialog::setRemoveParents(const QString &removeParents)
 {
     ui->lineEdit_removeParents->setText(removeParents);

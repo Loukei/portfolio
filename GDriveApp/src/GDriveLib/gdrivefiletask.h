@@ -58,6 +58,8 @@ protected:
     void taskSucceeded();
     /// Task complete and failed
     void taskFailed();
+    /// Turn bool value to String type 'true' or 'false', use for setup url value
+    QByteArray formBoolean(bool value);
 };
 }
 #endif // GDRIVEFILETASK_H

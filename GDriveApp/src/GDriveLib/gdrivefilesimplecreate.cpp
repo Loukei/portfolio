@@ -10,7 +10,7 @@
 
 GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
                                                        const QString &filepath)
-    :GDriveFileTask (parent),m_replyData("")
+    :GDriveFileTask (parent)
 {
     //! check file exist
     if(!QFile::exists(filepath)){

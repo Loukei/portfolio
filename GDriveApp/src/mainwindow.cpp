@@ -188,14 +188,46 @@ void MainWindow::fileResumableUpload(const QString &filepath)
             this,onUploadreceive);
 }
 
-void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID)
+void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
-    auto task = m_Drive->fileSimpleUpdate(filepath,fileID);
-    auto onUploadreceive = [task,this,filepath](){
+    auto task = m_Drive->fileSimpleUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+    auto onUpdatereceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUpdatereceive);
+}
+
+void MainWindow::fileMultipartUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+{
+    auto task = m_Drive->fileMultipartUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+    auto onUpdatereceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUpdatereceive);
+}
+
+void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+{
+    auto task = m_Drive->fileResumableUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+    auto onUploadreceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update error:" + task->errorString());
         }
         updateModel(task->getReplyString());
         task->deleteLater();
@@ -373,7 +405,32 @@ void MainWindow::on_actionUpdate_file_triggered()
         clearModel();
         int uploadtype = m_dialogUpdate->getUploadType();
         if(uploadtype == 0){
-            fileSimpleUpdate(m_dialogUpdate->getFilePath(),m_dialogUpdate->getFileID());
+            fileSimpleUpdate(m_dialogUpdate->getFilePath(),
+                             m_dialogUpdate->getFileID(),
+                             m_dialogUpdate->getAddParents(),
+                             m_dialogUpdate->getEnforceSingleParent(),
+                             m_dialogUpdate->getKeepRevisionForever(),
+                             m_dialogUpdate->getOcrLanguage(),
+                             m_dialogUpdate->getRemoveParents(),
+                             m_dialogUpdate->getUseContentAsIndexableText());
+        }else if (uploadtype ==1) {
+            fileMultipartUpdate(m_dialogUpdate->getFilePath(),
+                                m_dialogUpdate->getFileID(),
+                                m_dialogUpdate->getAddParents(),
+                                m_dialogUpdate->getEnforceSingleParent(),
+                                m_dialogUpdate->getKeepRevisionForever(),
+                                m_dialogUpdate->getOcrLanguage(),
+                                m_dialogUpdate->getRemoveParents(),
+                                m_dialogUpdate->getUseContentAsIndexableText());
+        }else if (uploadtype == 2) {
+            fileResumableUpdate(m_dialogUpdate->getFilePath(),
+                                m_dialogUpdate->getFileID(),
+                                m_dialogUpdate->getAddParents(),
+                                m_dialogUpdate->getEnforceSingleParent(),
+                                m_dialogUpdate->getKeepRevisionForever(),
+                                m_dialogUpdate->getOcrLanguage(),
+                                m_dialogUpdate->getRemoveParents(),
+                                m_dialogUpdate->getUseContentAsIndexableText());
         }
     }else {
         ui->plainTextEdit->appendPlainText("Update cancled.\n");

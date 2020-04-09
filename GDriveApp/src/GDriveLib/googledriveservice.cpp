@@ -83,9 +83,19 @@ GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &fil
     return new GDriveFileResumableCreate(m_google,filepath);
 }
 
-GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const QString &fileId)
+GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
-    return new GDriveFileSimpleUpdate(m_google,filepath,fileId);
+    return new GDriveFileSimpleUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+}
+
+GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+{
+    return new GDriveFileMultipartUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+}
+
+GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+{
+    return new GDriveFileResumableUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
 }
 
 GDriveFileGet *GDriveService::fileGet(const QString &fileId, const QString &fields)

@@ -17,7 +17,7 @@ GDrive::GDriveFileResumableCreate::GDriveFileResumableCreate(
     if(!QFile::exists(filepath)){
         qWarning() << "file doesnt exist " << filepath;
         m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        state_FailedUpload();
+        taskFailed();
         return;
     }
     //! Initial file
@@ -89,7 +89,7 @@ void GDrive::GDriveFileResumableCreate::request_UploadStart()
     if(!m_file->open(QIODevice::ReadOnly)){
         m_errStr += QString("[Error]File %1:%2")
                 .arg(m_file->fileName()).arg(m_file->errorString());
-        state_FailedUpload();
+        taskFailed();
         return;
     }
     //! collect file info
@@ -132,7 +132,7 @@ void GDrive::GDriveFileResumableCreate::request_UploadResume(const qint64 offset
     qDebug() << Q_FUNC_INFO;
     if(!m_file->open(QIODevice::ReadOnly)){
         qWarning() << "file " << m_file->fileName() << ": " << m_file->errorString();
-        state_FailedUpload();
+        taskFailed();
         return;
     }
     //! collect file info
@@ -207,7 +207,7 @@ void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyError(QNetworkRep
     }else if(httpStatus == 404){               // restart upload
         state_RestartUpload();
     }else {                                    // Bad End
-        state_FailedUpload();
+        taskFailed();
     }
     qWarning() << "[Error]Reply error code:" << httpStatus << " " << reply->errorString();
     reply->deleteLater();
@@ -223,7 +223,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyFinished()
     }
     //! upload success: save file resource, set state, emit finished
     m_replyData = reply->readAll();
-    state_CompleteUpload();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -239,7 +239,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadStart_ReplyError(QNetworkReply:
     }else if(httpStatus == 404){                   // restart upload
         state_RestartUpload();
     }else {                                        // Bad End
-        state_FailedUpload();
+        taskFailed();
     }
     qWarning() << "[Error]Reply error code:" << httpStatus << " " << reply->errorString();
     reply->deleteLater();
@@ -255,7 +255,7 @@ void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyFinished()
     }
     //200 means upload has complete
     qInfo() << "Info :" << reply->readAll();
-    state_CompleteUpload();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -276,14 +276,14 @@ void GDrive::GDriveFileResumableCreate::on_AskUploadStatus_ReplyError(QNetworkRe
         }else {
             qWarning() << "Match failed:" << reply->rawHeader("Content-Range");
             //STOP
-            state_FailedUpload();
+            taskFailed();
         }
     }else if (httpStatus == (500|502|503|504|403)) {   //Resume
         state_ResumeUpload();
     }else if (httpStatus == 404) {                     //Restart
         state_RestartUpload();
-    }else {                                             //Badend
-        state_FailedUpload();
+    }else {                                            //Badend
+        taskFailed();
     }
     qWarning() << "[Error]Reply error code:" << httpStatus << " " << reply->errorString();
     reply->deleteLater();
@@ -298,7 +298,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyFinished()
         return;
     }
     qInfo() << "Info :" << reply->readAll();
-    state_CompleteUpload();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -314,7 +314,7 @@ void GDrive::GDriveFileResumableCreate::on_UploadResume_ReplyError(QNetworkReply
     }else if(httpStatus == 404){               // restart upload
         state_RestartUpload();
     }else {                                     // Bad End
-        state_FailedUpload();
+        taskFailed();
     }
     qWarning() << "[Error]Reply error code:" << httpStatus << " " << reply->errorString();
     reply->deleteLater();
@@ -330,18 +330,3 @@ void GDrive::GDriveFileResumableCreate::state_ResumeUpload()
 {
     request_AskUploadStatus();
 }
-
-void GDrive::GDriveFileResumableCreate::state_FailedUpload()
-{
-    m_isFailed = true;
-    m_isComplete = true;
-    emit finished();
-}
-
-void GDrive::GDriveFileResumableCreate::state_CompleteUpload()
-{
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
-}
-

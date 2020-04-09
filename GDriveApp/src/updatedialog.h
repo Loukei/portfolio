@@ -35,7 +35,7 @@ public:
     void setKeepRevisionForever(bool keepRevisionForever = false);
     bool getKeepRevisionForever() const;
     void setOcrLanguage(const QString &ocrLanguage = "");
-    QString getOcrLanguage();
+    QString getOcrLanguage() const;
     void setRemoveParents(const QString &removeParents = "");
     QString getRemoveParents() const;
     void setUseContentAsIndexableText(bool useContentAsIndexableText = false);
