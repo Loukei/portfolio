@@ -3,91 +3,85 @@
 #include <QString>
 
 namespace GDrive {
+/*!
+ * \namespace Args
+ * \brief The Args is use for define the argument of Google drive parameter
+ */
+namespace Args {
 
-enum uploadType{
-
+enum class UPLOADTYPE : char
+{
+    MEDIA = 0x01,
+    MULTIPART = 0x02,
+    RESUMABLE = 0x03
 };
 
-class FileCreateArg{
+class FileCreateArgs{
 public:
-    FileCreateArg();
-    ~FileCreateArg() = default;
+    FileCreateArgs();
+    ~FileCreateArgs() = default;
 
-    bool getEnforceSingleParent() const;
-    void setEnforceSingleParent(bool value);
+    QString uploadType() const;
 
-    bool getIgnoreDefaultVisibility() const;
-    void setIgnoreDefaultVisibility(bool value);
+    bool enforceSingleParent() const;
+    void setEnforceSingleParent(bool enforceSingleParent);
 
-    bool getKeepRevisionForever() const;
-    void setKeepRevisionForever(bool value);
+    bool ignoreDefaultVisibility() const;
+    void setIgnoreDefaultVisibility(bool ignoreDefaultVisibility);
 
-    QString getOcrLanguage() const;
-    void setOcrLanguage(const QString &value);
+    bool keepRevisionForever() const;
+    void setKeepRevisionForever(bool keepRevisionForever);
 
-    bool getUseContentAsIndexableText() const;
-    void setUseContentAsIndexableText(bool value);
+    QString ocrLanguage() const;
+    void setOcrLanguage(const QString &ocrLanguage);
+
+    bool useContentAsIndexableText() const;
+    void setUseContentAsIndexableText(bool useContentAsIndexableText);
 
 protected:
-    bool enforceSingleParent = false;
-    bool ignoreDefaultVisibility = false;
-    bool keepRevisionForever = false;
-    QString ocrLanguage = "";
-    bool useContentAsIndexableText = false;
+//    QString m_uploadType = "media";
+    bool m_enforceSingleParent = false;
+    bool m_ignoreDefaultVisibility = false;
+    bool m_keepRevisionForever = false;
+    QString m_ocrLanguage = "";
+    bool m_useContentAsIndexableText = false;
 };
 
-class FileGetArg{
+class FileGetArgs{
 public:
-    FileGetArg(const QString &fileId = "");
-    ~FileGetArg() = default;
+    FileGetArgs(const QString &fileId = "");
+    ~FileGetArgs() = default;
 
-    QString getFileId() const;
-    void setFileId(const QString &value);
+    QString fileId() const;
 
-    bool getAcknowledgeAbuse() const;
-    void setAcknowledgeAbuse(bool value);
+    bool acknowledgeAbuse() const;
+    void setAcknowledgeAbuse(bool acknowledgeAbuse);
 
-    QString getFields() const;
-    void setFields(const QString &value);
+    QString fields() const;
+    void setFields(const QString &fields);
 
 protected:
-    QString fileId;
-    bool acknowledgeAbuse = false;
-    QString fields = "";
+    QString m_fileId;
+    bool m_acknowledgeAbuse = false;
+    QString m_fields = "";
 };
 
-class FileUpdateArg{
+class FileUpdateArgs{
 public:
-    FileUpdateArg();
-    ~FileUpdateArg() = default;
+    FileUpdateArgs(const QString &fileId);
+    ~FileUpdateArgs() = default;
 
-    QString getAddParents() const;
-    void setAddParents(const QString &value);
-
-    bool getEnforceSingleParent() const;
-    void setEnforceSingleParent(bool value);
-
-    bool getKeepRevisionForever() const;
-    void setKeepRevisionForever(bool value);
-
-    QString getOcrLanguage() const;
-    void setOcrLanguage(const QString &value);
-
-    QString getRemoveParents() const;
-    void setRemoveParents(const QString &value);
-
-    bool getUseContentAsIndexableText() const;
-    void setUseContentAsIndexableText(bool value);
-
-protected:
-    QString addParents = "";
-    bool enforceSingleParent = false;
-    bool keepRevisionForever = false;
-    QString ocrLanguage = "";
-    QString removeParents = "";
-    bool useContentAsIndexableText = false;
+    QString m_fileId;
+    QString m_addParents = "";
+    bool m_enforceSingleParent = false;
+    bool m_keepRevisionForever = false;
+    QString m_ocrLanguage = "";
+    QString m_removeParents = "";
+    bool m_useContentAsIndexableText = false;
 };
-
 }
+
+
+} // GDrive
 
 #endif // GDRIVEARGS_H

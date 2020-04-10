@@ -58,9 +58,6 @@ void GDrive::GDriveFileSimpleCreate::request_UploadStart()
     //! gather file message to build simple upload request
     QString mimeType = QMimeDatabase().mimeTypeForFile(m_file->fileName()).name();
     QString fileSize = QString::number(m_file->size());
-//    QByteArray fileBody("\r\n\r\n");
-//    fileBody.append(m_file->readAll());
-//    m_file->close();
     QUrlQuery query;
     query.addQueryItem("uploadType","media");
     query.addQueryItem("access_token",mp_google->token());

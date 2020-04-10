@@ -1,156 +1,61 @@
 #include "gdriveargs.h"
 
-GDrive::FileUpdateArg::FileUpdateArg()
+GDrive::Args::FileCreateArgs::FileCreateArgs()
 {
 
 }
 
-QString GDrive::FileUpdateArg::getAddParents() const
+bool GDrive::Args::FileCreateArgs::useContentAsIndexableText() const
 {
-    return addParents;
+    return m_useContentAsIndexableText;
 }
 
-void GDrive::FileUpdateArg::setAddParents(const QString &value)
+void GDrive::Args::FileCreateArgs::setUseContentAsIndexableText(bool useContentAsIndexableText)
 {
-    addParents = value;
+    m_useContentAsIndexableText = useContentAsIndexableText;
 }
 
-bool GDrive::FileUpdateArg::getUseContentAsIndexableText() const
+QString GDrive::Args::FileCreateArgs::ocrLanguage() const
 {
-    return useContentAsIndexableText;
+    return m_ocrLanguage;
 }
 
-void GDrive::FileUpdateArg::setUseContentAsIndexableText(bool value)
+void GDrive::Args::FileCreateArgs::setOcrLanguage(const QString &ocrLanguage)
 {
-    useContentAsIndexableText = value;
+    m_ocrLanguage = ocrLanguage;
 }
 
-QString GDrive::FileUpdateArg::getRemoveParents() const
+bool GDrive::Args::FileCreateArgs::keepRevisionForever() const
 {
-    return removeParents;
+    return m_keepRevisionForever;
 }
 
-void GDrive::FileUpdateArg::setRemoveParents(const QString &value)
+void GDrive::Args::FileCreateArgs::setKeepRevisionForever(bool keepRevisionForever)
 {
-    removeParents = value;
+    m_keepRevisionForever = keepRevisionForever;
 }
 
-QString GDrive::FileUpdateArg::getOcrLanguage() const
+bool GDrive::Args::FileCreateArgs::ignoreDefaultVisibility() const
 {
-    return ocrLanguage;
+    return m_ignoreDefaultVisibility;
 }
 
-void GDrive::FileUpdateArg::setOcrLanguage(const QString &value)
+void GDrive::Args::FileCreateArgs::setIgnoreDefaultVisibility(bool ignoreDefaultVisibility)
 {
-    ocrLanguage = value;
+    m_ignoreDefaultVisibility = ignoreDefaultVisibility;
 }
 
-bool GDrive::FileUpdateArg::getKeepRevisionForever() const
+bool GDrive::Args::FileCreateArgs::enforceSingleParent() const
 {
-    return keepRevisionForever;
+    return m_enforceSingleParent;
 }
 
-void GDrive::FileUpdateArg::setKeepRevisionForever(bool value)
+void GDrive::Args::FileCreateArgs::setEnforceSingleParent(bool enforceSingleParent)
 {
-    keepRevisionForever = value;
+    m_enforceSingleParent = enforceSingleParent;
 }
 
-bool GDrive::FileUpdateArg::getEnforceSingleParent() const
-{
-    return enforceSingleParent;
-}
-
-void GDrive::FileUpdateArg::setEnforceSingleParent(bool value)
-{
-    enforceSingleParent = value;
-}
-
-GDrive::FileCreateArg::FileCreateArg()
+GDrive::Args::FileUpdateArgs::FileUpdateArgs(const QString &fileId)
 {
 
-}
-
-bool GDrive::FileCreateArg::getEnforceSingleParent() const
-{
-    return enforceSingleParent;
-}
-
-void GDrive::FileCreateArg::setEnforceSingleParent(bool value)
-{
-    enforceSingleParent = value;
-}
-
-bool GDrive::FileCreateArg::getIgnoreDefaultVisibility() const
-{
-    return ignoreDefaultVisibility;
-}
-
-void GDrive::FileCreateArg::setIgnoreDefaultVisibility(bool value)
-{
-    ignoreDefaultVisibility = value;
-}
-
-bool GDrive::FileCreateArg::getKeepRevisionForever() const
-{
-    return keepRevisionForever;
-}
-
-void GDrive::FileCreateArg::setKeepRevisionForever(bool value)
-{
-    keepRevisionForever = value;
-}
-
-QString GDrive::FileCreateArg::getOcrLanguage() const
-{
-    return ocrLanguage;
-}
-
-void GDrive::FileCreateArg::setOcrLanguage(const QString &value)
-{
-    ocrLanguage = value;
-}
-
-bool GDrive::FileCreateArg::getUseContentAsIndexableText() const
-{
-    return useContentAsIndexableText;
-}
-
-void GDrive::FileCreateArg::setUseContentAsIndexableText(bool value)
-{
-    useContentAsIndexableText = value;
-}
-
-GDrive::FileGetArg::FileGetArg(const QString &fileId)
-{
-    this->fileId = fileId;
-}
-
-QString GDrive::FileGetArg::getFileId() const
-{
-    return fileId;
-}
-
-void GDrive::FileGetArg::setFileId(const QString &value)
-{
-    fileId = value;
-}
-
-bool GDrive::FileGetArg::getAcknowledgeAbuse() const
-{
-    return acknowledgeAbuse;
-}
-
-void GDrive::FileGetArg::setAcknowledgeAbuse(bool value)
-{
-    acknowledgeAbuse = value;
-}
-
-QString GDrive::FileGetArg::getFields() const
-{
-    return fields;
-}
-
-void GDrive::FileGetArg::setFields(const QString &value)
-{
-    fields = value;
 }

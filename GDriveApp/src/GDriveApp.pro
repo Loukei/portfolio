@@ -49,7 +49,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         searchdialog.cpp \
-        updatedialog.cpp
+        updatedialog.cpp \
+        uploaddialog.cpp
 
 HEADERS += \
         GDriveLib/gdriveabout.h \
@@ -76,14 +77,16 @@ HEADERS += \
         filematadatadialog.h \
         mainwindow.h \
         searchdialog.h \
-        updatedialog.h
+        updatedialog.h \
+        uploaddialog.h
 
 FORMS += \
         downloaddialog.ui \
         filematadatadialog.ui \
         mainwindow.ui \
         searchdialog.ui \
-        updatedialog.ui
+        updatedialog.ui \
+        uploaddialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
