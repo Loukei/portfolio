@@ -64,46 +64,21 @@ public:
     /// send request to get About message, use deletelater to delete GDriveAbout
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
     /// simple upload create file
-    GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath);
+    GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath,
+                                             const FileCreateArgs &args);
     /// multipart upload create file
-    GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath);
+    GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath,
+                                                   const FileCreateArgs &args);
     /// resumable upload create file
-    GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
+    GDriveFileResumableCreate* fileResumableCreate(const QString &filepath,
+                                                   const FileCreateArgs &args);
     /// simple upload update file
-    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
-                                             const QString &fileId,
-                                             const QString &addParents,
-                                             bool enforceSingleParent,
-                                             bool keepRevisionForever,
-                                             const QString &ocrLanguage,
-                                             const QString &removeParents,
-                                             bool useContentAsIndexableText);
-
-
     GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
                                              const FileUpdateArgs &args);
     /// multipart upload update file
     GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
-                                                   const QString &fileId,
-                                                   const QString &addParents,
-                                                   bool enforceSingleParent,
-                                                   bool keepRevisionForever,
-                                                   const QString &ocrLanguage,
-                                                   const QString &removeParents,
-                                                   bool useContentAsIndexableText);
-
-    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
                                                    const FileUpdateArgs &args);
     /// resumable upload update file
-    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
-                                                   const QString &fileId,
-                                                   const QString &addParents,
-                                                   bool enforceSingleParent,
-                                                   bool keepRevisionForever,
-                                                   const QString &ocrLanguage,
-                                                   const QString &removeParents,
-                                                   bool useContentAsIndexableText);
-
     GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
                                                    const FileUpdateArgs &args);
     /// Gets a file's metadata by ID.

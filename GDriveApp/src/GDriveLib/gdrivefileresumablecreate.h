@@ -25,6 +25,9 @@ class GDriveFileResumableCreate : public GDriveFileTask
 public:
     explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString& filepath);
+    explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,
+                                       const QString& filepath,
+                                       const GDrive::FileCreateArgs &args);
     ~GDriveFileResumableCreate() override;
     GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
@@ -33,6 +36,10 @@ public:
 private:
     /// Start resumable upload session, first step to get session Uri
     void request_InitialSession();
+    /// return QUrl for Initial request
+    QUrl setupInitialUrl();
+    /// return QUrl for Initial request
+    QUrl setupInitialUrl(const GDrive::FileCreateArgs &args);
     /// After receive Session Uri, send upload request by Single request method
     void request_UploadStart();
     /// Upload interrupt, asking google server for upload status
@@ -75,6 +82,8 @@ private:
 private:
     /// An member of upload file,use to upload on Google Drive.
     QFile *m_file = nullptr;
+    /// The Url for request initial session
+    QUrl m_iniUrl;
     /// save session uri
     QUrl m_sessionUri = QUrl();
     /// Save network reply after upload finished

@@ -13,6 +13,7 @@ class UploadDialog : public QDialog
 
 public:
     explicit UploadDialog(QWidget *parent = nullptr,
+                          const QString &caption = QString(),
                           const QString &filePath = QString());
     ~UploadDialog() override;
 

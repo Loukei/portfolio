@@ -32,6 +32,9 @@ public:
     /// constructor
     explicit GDriveFileMultipartCreate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString &filepath);
+    explicit GDriveFileMultipartCreate(QOAuth2AuthorizationCodeFlow *parent,
+                                       const QString &filepath,
+                                       const GDrive::FileCreateArgs &args);
     /// destructor
     ~GDriveFileMultipartCreate() override;
     /// return GDriveFileResource as upload response
@@ -42,6 +45,10 @@ public:
 private:
     /// send Multipart upload request
     void request_UploadStart();
+    /// return QUrl for request
+    QUrl setupUrl();
+    /// return QUrl by optional parameter
+    QUrl setupUrl(const GDrive::FileCreateArgs &args);
     /// retry upload
     void retry();
 
@@ -54,6 +61,8 @@ private slots:
 private:
     /// An member of upload file,use to upload on Google Drive.
     QFile *m_file = nullptr;
+    ///
+    QUrl m_url;
     /// Save network reply after upload finished
     QByteArray m_replyData = QByteArray();
 };

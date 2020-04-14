@@ -120,7 +120,6 @@ void GDrive::GDriveFileSimpleUpdate::request_UploadStart()
     request.setRawHeader("Authorization:",
                          QByteArray("Bearer " + mp_google->token().toLatin1()));
     //! send request & connect reply handle function
-//    auto reply = mp_google->networkAccessManager()->post(request,m_file);
     auto reply = mp_google->networkAccessManager()->sendCustomRequest(request,"PATCH",m_file);
     connect(reply,&QNetworkReply::finished,
             this,&GDriveFileSimpleUpdate::on_UploadStart_ReplyFinished);

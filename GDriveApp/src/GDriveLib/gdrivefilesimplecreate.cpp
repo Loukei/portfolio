@@ -19,6 +19,28 @@ GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeF
         taskFailed();
         return;
     }
+    //!
+    m_url = setupUrl();
+    //! Initial file
+    m_file = new QFile(filepath,this);
+    //! Upload file
+    request_UploadStart();
+}
+
+GDrive::GDriveFileSimpleCreate::GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
+                                                       const QString &filepath,
+                                                       const GDrive::FileCreateArgs &args)
+    :GDriveFileTask (parent)
+{
+    //! check file exist
+    if(!QFile::exists(filepath)){
+        qWarning() << "file doesnt exist " << filepath;
+        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
+        taskFailed();
+        return;
+    }
+    //! Setup url
+    m_url = setupUrl(args);
     //! Initial file
     m_file = new QFile(filepath,this);
     //! Upload file
@@ -58,12 +80,7 @@ void GDrive::GDriveFileSimpleCreate::request_UploadStart()
     //! gather file message to build simple upload request
     QString mimeType = QMimeDatabase().mimeTypeForFile(m_file->fileName()).name();
     QString fileSize = QString::number(m_file->size());
-    QUrlQuery query;
-    query.addQueryItem("uploadType","media");
-    query.addQueryItem("access_token",mp_google->token());
-    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
-    url.setQuery(query);
-    QNetworkRequest request(url);
+    QNetworkRequest request(m_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader,mimeType.toLatin1());
     request.setHeader(QNetworkRequest::ContentLengthHeader,fileSize.toLatin1());
     request.setRawHeader("Authorization:",
@@ -74,6 +91,48 @@ void GDrive::GDriveFileSimpleCreate::request_UploadStart()
             this,&GDriveFileSimpleCreate::on_UploadStart_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,&GDriveFileSimpleCreate::on_UploadStart_ReplyError);
+}
+
+QUrl GDrive::GDriveFileSimpleCreate::setupUrl()
+{
+    QUrlQuery query;
+    query.addQueryItem("uploadType","media");
+    query.addQueryItem("access_token",mp_google->token());
+    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
+    url.setQuery(query);
+    return url;
+}
+
+QUrl GDrive::GDriveFileSimpleCreate::setupUrl(const GDrive::FileCreateArgs &args)
+{
+    QUrlQuery query;
+    query.addQueryItem("uploadType","media");
+
+    if(args.enforceSingleParent()){
+        query.addQueryItem("enforceSingleParent",
+                           BooleanToString(args.enforceSingleParent()));
+    }
+    if(args.ignoreDefaultVisibility()){
+        query.addQueryItem("ignoreDefaultVisibility",
+                           BooleanToString(args.ignoreDefaultVisibility()));
+    }
+    if(args.keepRevisionForever()){
+        query.addQueryItem("keepRevisionForever",
+                           BooleanToString(args.keepRevisionForever()));
+    }
+    if(!args.ocrLanguage().isEmpty()){
+        query.addQueryItem("ocrLanguage",args.ocrLanguage());
+    }
+    if(args.useContentAsIndexableText()){
+        query.addQueryItem("useContentAsIndexableText",
+                           BooleanToString(args.useContentAsIndexableText()));
+    }
+
+    query.addQueryItem("access_token",mp_google->token());
+    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
+    url.setQuery(query);
+
+    return url;
 }
 
 void GDrive::GDriveFileSimpleCreate::retry()

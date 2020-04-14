@@ -77,18 +77,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuUpload_file">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Upload file</string>
-     </property>
-     <addaction name="actionSimple_Upload"/>
-     <addaction name="actionMultipart_Upload"/>
-     <addaction name="actionResumable_Upload"/>
-    </widget>
-    <addaction name="menuUpload_file"/>
+    <addaction name="actionUpload_File"/>
     <addaction name="actionDownload_file"/>
     <addaction name="action_Search_file_folder"/>
     <addaction name="actionGet_file_matadata"/>
@@ -128,6 +117,9 @@
    </property>
   </action>
   <action name="actionSimple_Upload">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Simple Upload</string>
    </property>
@@ -167,8 +159,19 @@
    </property>
   </action>
   <action name="actionUpdate_file">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>&amp;Update file</string>
+    <string>&amp;Update File</string>
+   </property>
+  </action>
+  <action name="actionUpload_File">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Upload File...</string>
    </property>
   </action>
  </widget>

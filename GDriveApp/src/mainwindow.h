@@ -8,10 +8,11 @@ namespace Ui {
 class MainWindow;
 }
 
+class UploadDialog;
+class UpdateDialog;
 class SearchDialog;
 class DownloadDialog;
 class FileMataDataDialog;
-class UpdateDialog;
 class QJsonModel;
 QT_BEGIN_NAMESPACE
 class QSettings;
@@ -39,8 +40,8 @@ private:
     FileMataDataDialog *m_dialogFileMataData;
     /// A dialog to update file
     UpdateDialog *m_dialogUpdate;
-    /// Save recent upload file
-    QString m_currentUploadFilePath;
+    /// A dialog to upload file
+    UploadDialog *m_dialogUpload;
     /// Save settings
     QSettings *m_settings;
     /// save m_Drive Operation reply
@@ -59,12 +60,6 @@ private slots:
     void on_actionAbout_triggered();
     /// Click menu Download file
     void on_actionDownload_file_triggered();
-    /// Click menu Simple Upload
-    void on_actionSimple_Upload_triggered();
-    /// Click menu Multipart Upload
-    void on_actionMultipart_Upload_triggered();
-    /// Click menu Resumable Upload
-    void on_actionResumable_Upload_triggered();
     /// Click menu Search file&folder
     void on_action_Search_file_folder_triggered();
     /// Receive SearchDialog::query, then return search result to m_DialogSearch
@@ -78,6 +73,8 @@ private slots:
 
     void on_actionUpdate_file_triggered();
 
+    void on_actionUpload_File_triggered();
+
 private:
     /// GDriveService Account Login
     void accountLogin();
@@ -86,22 +83,16 @@ private:
     /// GDriveService Account get About message
     void accountAbout();
     /// GDriveService upload(Create) file Simple method
-    void fileSimpleUpload(const QString &filepath);
+    void fileSimpleUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Create) file Multipart method
-    void fileMultipartUpload(const QString &filepath);
+    void fileMultipartUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Create) file Resumable method
-    void fileResumableUpload(const QString &filepath);
+    void fileResumableUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Update) file Simple method
-    void fileSimpleUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
-
     void fileSimpleUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Multipart method
-    void fileMultipartUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
-
     void fileMultipartUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Resumable method
-    void fileResumableUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
-
     void fileResumableUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);

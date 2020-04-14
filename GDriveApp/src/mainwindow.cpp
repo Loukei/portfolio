@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "uploaddialog.h"
 #include "downloaddialog.h"
 #include "searchdialog.h"
 #include "filematadatadialog.h"
@@ -23,7 +24,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_settings = new QSettings("GDriveApp_Settings.ini",QSettings::IniFormat,this);
     m_settings->setIniCodec("UTF-8");
     this->setGeometry(Settings::MainWindow_Geometry(m_settings));
-    m_currentUploadFilePath = Settings::Upload_FilePath(m_settings);
+    //!
+    m_dialogUpload = new UploadDialog(this,
+                                      tr("Upload File"),
+                                      Settings::Upload_FilePath(m_settings));
     //! Setup download dialog
     m_dialogDownload = new DownloadDialog(this,
                                           tr("Download File"),
@@ -86,12 +90,12 @@ void MainWindow::accountAbout()
             this,onAboutFinished);
 }
 
-void MainWindow::fileSimpleUpload(const QString &filepath)
+void MainWindow::fileSimpleUpload(const QString &filepath, const FileCreateArgs &args)
 {
-    auto task = m_Drive->fileSimpleCreate(filepath);
+    auto task = m_Drive->fileSimpleCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){ //! 上傳任務成功必須(1)完成且(2)沒有失敗
-            ui->plainTextEdit->appendPlainText(filepath + " Simple Upload Success.\n");            
+            ui->plainTextEdit->appendPlainText(filepath + " Simple Upload Success.\n");
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Simple Upload error:" + task->errorString());
         }
@@ -102,9 +106,9 @@ void MainWindow::fileSimpleUpload(const QString &filepath)
             this,onUploadreceive);
 }
 
-void MainWindow::fileMultipartUpload(const QString &filepath)
+void MainWindow::fileMultipartUpload(const QString &filepath, const FileCreateArgs &args)
 {
-    auto task = m_Drive->fileMultipartCreate(filepath);
+    auto task = m_Drive->fileMultipartCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Multipart Upload Success.\n");
@@ -118,9 +122,9 @@ void MainWindow::fileMultipartUpload(const QString &filepath)
             this,onUploadreceive);
 }
 
-void MainWindow::fileResumableUpload(const QString &filepath)
+void MainWindow::fileResumableUpload(const QString &filepath, const FileCreateArgs &args)
 {
-    auto task = m_Drive->fileResumableCreate(filepath);
+    auto task = m_Drive->fileResumableCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Resumable Upload Success.\n");
@@ -134,22 +138,6 @@ void MainWindow::fileResumableUpload(const QString &filepath)
             this,onUploadreceive);
 }
 
-void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    auto task = m_Drive->fileSimpleUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
-    auto onUpdatereceive = [task,this,filepath](){
-        if(task->isComplete() && !task->isFailed()){
-            ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
-        }else {
-            ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
-        }
-        updateModel(task->getReplyString());
-        task->deleteLater();
-    };
-    connect(task,&GDriveFileTask::finished,
-            this,onUpdatereceive);
-}
-
 void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
 {
     auto task = m_Drive->fileSimpleUpdate(filepath,args);
@@ -158,22 +146,6 @@ void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs 
             ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
-        }
-        updateModel(task->getReplyString());
-        task->deleteLater();
-    };
-    connect(task,&GDriveFileTask::finished,
-            this,onUpdatereceive);
-}
-
-void MainWindow::fileMultipartUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    auto task = m_Drive->fileMultipartUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
-    auto onUpdatereceive = [task,this,filepath](){
-        if(task->isComplete() && !task->isFailed()){
-            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update Success.\n");
-        }else {
-            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update error:" + task->errorString());
         }
         updateModel(task->getReplyString());
         task->deleteLater();
@@ -196,22 +168,6 @@ void MainWindow::fileMultipartUpdate(const QString &filepath, const FileUpdateAr
     };
     connect(task,&GDriveFileTask::finished,
             this,onUpdatereceive);
-}
-
-void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    auto task = m_Drive->fileResumableUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
-    auto onUploadreceive = [task,this,filepath](){
-        if(task->isComplete() && !task->isFailed()){
-            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update Success.\n");
-        }else {
-            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update error:" + task->errorString());
-        }
-        updateModel(task->getReplyString());
-        task->deleteLater();
-    };
-    connect(task,&GDriveFileTask::finished,
-            this,onUploadreceive);
 }
 
 void MainWindow::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
@@ -251,7 +207,7 @@ void MainWindow::writeSettings()
     m_settings->setValue(Settings::key_Geometry,this->geometry());
     m_settings->setValue(Settings::key_Download_FileID,m_dialogDownload->getFileId());
     m_settings->setValue(Settings::key_Download_FilePath,m_dialogDownload->getDownloadFilePath());
-    m_settings->setValue(Settings::key_Upload_FilePath,m_currentUploadFilePath);
+    m_settings->setValue(Settings::key_Upload_FilePath,m_dialogUpload->getFilePath());
     m_settings->setValue(Settings::key_FileGet_FileID,m_dialogFileMataData->getFileID());
     m_settings->setValue(Settings::key_FileGet_Fields,m_dialogFileMataData->getFields());
     m_settings->setValue(Settings::key_Update_FilePath,m_dialogUpdate->getFilePath());
@@ -280,7 +236,8 @@ void MainWindow::onGDrive_granted()
     ui->plainTextEdit->appendPlainText(m_Drive->receivedToken());
     //! Open other UI menu
     ui->actionAbout->setEnabled(true);
-    ui->menuUpload_file->setEnabled(true);
+    ui->actionUpload_File->setEnabled(true);
+    ui->actionUpdate_file->setEnabled(true);
     ui->actionDownload_file->setEnabled(true);
     ui->action_Search_file_folder->setEnabled(true);
     ui->actionGet_file_matadata->setEnabled(true);
@@ -294,7 +251,8 @@ void MainWindow::on_action_Logout_Account_triggered()
     ui->label_UserName->clear();
     ui->plainTextEdit->appendPlainText("Account logout.\n");
     ui->actionAbout->setEnabled(false);
-    ui->menuUpload_file->setEnabled(false);
+    ui->actionUpload_File->setEnabled(false);
+    ui->actionUpdate_file->setEnabled(false);
     ui->actionDownload_file->setEnabled(false);
     ui->action_Search_file_folder->setEnabled(false);
     ui->actionGet_file_matadata->setEnabled(false);
@@ -316,51 +274,6 @@ void MainWindow::on_actionDownload_file_triggered()
                      m_dialogDownload->getFileId());
     }else { //! QDialog::Rejected
         ui->plainTextEdit->appendPlainText("Download cancled.\n");
-    }
-}
-
-void MainWindow::on_actionSimple_Upload_triggered()
-{
-    qInfo() << Q_FUNC_INFO;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Upload File"),
-                                                    m_currentUploadFilePath);
-    if (!fileName.isEmpty()) {
-        clearModel();
-        m_currentUploadFilePath = fileName;
-        fileSimpleUpload(fileName);
-    }else {
-        ui->plainTextEdit->appendPlainText("upload cancled.\n");
-    }
-}
-
-void MainWindow::on_actionMultipart_Upload_triggered()
-{
-    qInfo() << Q_FUNC_INFO;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Upload File"),
-                                                    m_currentUploadFilePath);
-    if (!fileName.isEmpty()) {
-        clearModel();
-        m_currentUploadFilePath = fileName;
-        fileMultipartUpload(fileName);
-    }else {
-        ui->plainTextEdit->appendPlainText("upload cancled.\n");
-    }
-}
-
-void MainWindow::on_actionResumable_Upload_triggered()
-{
-    qInfo() << Q_FUNC_INFO;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("Upload File"),
-                                                    m_currentUploadFilePath);
-    if (!fileName.isEmpty()) {
-        clearModel();
-        m_currentUploadFilePath = fileName;
-        fileResumableUpload(fileName);
-    }else {
-        ui->plainTextEdit->appendPlainText("upload cancled.\n");
     }
 }
 
@@ -397,7 +310,7 @@ void MainWindow::on_actionUpdate_file_triggered()
     qInfo() << Q_FUNC_INFO;
     if(m_dialogUpdate->exec() == QDialog::Accepted){
         clearModel();
-
+        //! upload type in args doesnt infected here
         GDrive::FileUpdateArgs args(m_dialogUpdate->getFileID(),
                                     GDrive::UrlArgs::UploadType::MEDIA,
                                     m_dialogUpdate->getAddParents(),
@@ -409,37 +322,38 @@ void MainWindow::on_actionUpdate_file_triggered()
 
         int uploadtype = m_dialogUpdate->getUploadType();
         if(uploadtype == 0){
-//            fileSimpleUpdate(m_dialogUpdate->getFilePath(),
-//                             m_dialogUpdate->getFileID(),
-//                             m_dialogUpdate->getAddParents(),
-//                             m_dialogUpdate->getEnforceSingleParent(),
-//                             m_dialogUpdate->getKeepRevisionForever(),
-//                             m_dialogUpdate->getOcrLanguage(),
-//                             m_dialogUpdate->getRemoveParents(),
-//                             m_dialogUpdate->getUseContentAsIndexableText());
             fileSimpleUpdate(m_dialogUpdate->getFilePath(),args);
         }else if (uploadtype ==1) {
-//            fileMultipartUpdate(m_dialogUpdate->getFilePath(),
-//                                m_dialogUpdate->getFileID(),
-//                                m_dialogUpdate->getAddParents(),
-//                                m_dialogUpdate->getEnforceSingleParent(),
-//                                m_dialogUpdate->getKeepRevisionForever(),
-//                                m_dialogUpdate->getOcrLanguage(),
-//                                m_dialogUpdate->getRemoveParents(),
-//                                m_dialogUpdate->getUseContentAsIndexableText());
             fileMultipartUpdate(m_dialogUpdate->getFilePath(),args);
         }else if (uploadtype == 2) {
-//            fileResumableUpdate(m_dialogUpdate->getFilePath(),
-//                                m_dialogUpdate->getFileID(),
-//                                m_dialogUpdate->getAddParents(),
-//                                m_dialogUpdate->getEnforceSingleParent(),
-//                                m_dialogUpdate->getKeepRevisionForever(),
-//                                m_dialogUpdate->getOcrLanguage(),
-//                                m_dialogUpdate->getRemoveParents(),
-//                                m_dialogUpdate->getUseContentAsIndexableText());
             fileResumableUpdate(m_dialogUpdate->getFilePath(),args);
         }
     }else {
         ui->plainTextEdit->appendPlainText("Update cancled.\n");
+    }
+}
+
+void MainWindow::on_actionUpload_File_triggered()
+{
+    qInfo() << Q_FUNC_INFO;
+    if(m_dialogUpload->exec() == QDialog::Accepted){
+        clearModel();
+
+        GDrive::FileCreateArgs args = { GDrive::UrlArgs::UploadType::MEDIA,
+                                      m_dialogUpload->getEnforceSingleParent(),
+                                      m_dialogUpload->getIgnoreDefaultVisibility(),
+                                      m_dialogUpload->getKeepRevisionForever(),
+                                      m_dialogUpload->getOcrLanguage(),
+                                      m_dialogUpload->getUseContentAsIndexableText()};
+        int uploadtype = m_dialogUpload->getUploadType();
+        if(uploadtype == 0){
+            fileSimpleUpload(m_dialogUpload->getFilePath(),args);
+        }else if (uploadtype == 1) {
+            fileMultipartUpload(m_dialogUpload->getFilePath(),args);
+        }else if (uploadtype == 2) {
+            fileResumableUpload(m_dialogUpload->getFilePath(),args);
+        }
+    }else {
+        ui->plainTextEdit->appendPlainText("Upload cancled.\n");
     }
 }

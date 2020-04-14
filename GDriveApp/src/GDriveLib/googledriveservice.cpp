@@ -57,24 +57,19 @@ GDriveAbout* GDriveService::getAbout(GDriveAbout::AboutArgs args)
     return new GDriveAbout(m_google,args);
 }
 
-GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath)
+GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath, const FileCreateArgs &args)
 {
-    return new GDriveFileSimpleCreate(m_google,filepath);
+    return new GDriveFileSimpleCreate(m_google,filepath,args);
 }
 
-GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath)
+GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath, const FileCreateArgs &args)
 {
-    return new GDriveFileMultipartCreate(m_google,filepath);
+    return new GDriveFileMultipartCreate(m_google,filepath,args);
 }
 
-GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath)
+GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath, const FileCreateArgs &args)
 {
-    return new GDriveFileResumableCreate(m_google,filepath);
-}
-
-GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    return new GDriveFileSimpleUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+    return new GDriveFileResumableCreate(m_google,filepath,args);
 }
 
 GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
@@ -82,19 +77,9 @@ GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath,
     return new GDriveFileSimpleUpdate(m_google,filepath,args);
 }
 
-GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    return new GDriveFileMultipartUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
-}
-
 GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const FileUpdateArgs &args)
 {
     return new GDriveFileMultipartUpdate(m_google,filepath,args);
-}
-
-GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
-{
-    return new GDriveFileResumableUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
 }
 
 GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
