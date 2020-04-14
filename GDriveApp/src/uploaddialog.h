@@ -12,10 +12,12 @@ class UploadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit UploadDialog(QWidget *parent = nullptr);
-    ~UploadDialog();
+    explicit UploadDialog(QWidget *parent = nullptr,
+                          const QString &filePath = QString());
+    ~UploadDialog() override;
 
     QString getFilePath() const;
+
     int getUploadType() const;
     QString getUploadTypeStr() const;
 

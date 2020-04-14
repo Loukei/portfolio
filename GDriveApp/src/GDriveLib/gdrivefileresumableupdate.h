@@ -43,6 +43,10 @@ public:
                                        const QString &ocrLanguage,
                                        const QString &removeParents,
                                        bool useContentAsIndexableText);
+    ///
+    explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
+                                       const QString& filepath,
+                                       const FileUpdateArgs &args);
     /// destructor
     ~GDriveFileResumableUpdate() override;
     /// return File resource
@@ -67,6 +71,8 @@ private:
                   const QString &ocrLanguage = "",
                   const QString &removeParents = "",
                   bool useContentAsIndexableText = false);
+
+    QUrl setupUrl(const FileUpdateArgs &args);
 
 private slots:
     /// process request_InitialSession reply finished

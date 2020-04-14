@@ -2,6 +2,7 @@
 #define GDRIVEFILETASK_H
 
 #include <QObject>
+#include "GDriveLib/gdriveargs.h"
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
@@ -58,8 +59,6 @@ protected:
     void taskSucceeded();
     /// Task complete and failed
     void taskFailed();
-    /// Turn bool value to String type 'true' or 'false', use for setup url value
-    QByteArray formBoolean(bool value);
 };
 }
 #endif // GDRIVEFILETASK_H

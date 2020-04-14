@@ -2,13 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "GDriveLib/googledriveservice.h"
 
 namespace Ui {
 class MainWindow;
-}
-
-namespace GDrive {
-    class GDriveService;
 }
 
 class SearchDialog;
@@ -96,10 +93,16 @@ private:
     void fileResumableUpload(const QString &filepath);
     /// GDriveService upload(Update) file Simple method
     void fileSimpleUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
+
+    void fileSimpleUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Multipart method
     void fileMultipartUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
+
+    void fileMultipartUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Resumable method
     void fileResumableUpdate(const QString &filepath,const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText);
+
+    void fileResumableUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
     /// write settings to ini file

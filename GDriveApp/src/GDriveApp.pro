@@ -76,6 +76,7 @@ HEADERS += \
         downloaddialog.h \
         filematadatadialog.h \
         mainwindow.h \
+        mainwindow_settings.h \
         searchdialog.h \
         updatedialog.h \
         uploaddialog.h

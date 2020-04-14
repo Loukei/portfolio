@@ -6,67 +6,13 @@
 #include "updatedialog.h"
 #include "GDriveLib/googledriveservice.h"
 #include "QJsonModel/qjsonmodel.h"
+#include "mainwindow_settings.h" // namespace Settings
 #include <QSettings>
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 
 using namespace GDrive;
-
-/*!
- * \namespace Settings
- * \brief Settings is used for collect all settings key and read settings
- */
-namespace Settings {
-const QString key_Geometry = "MainWindow/Geometry";
-const QString key_Upload_FilePath = "MainWindow/DialogUpload/FilePath";
-const QString key_Download_FilePath = "MainWindow/DialogDownload/FilePath";
-const QString key_Download_FileID = "MainWindow/DialogDownload/FileID";
-const QString key_FileGet_FileID = "MainWindow/DialogFileMataData/FileID";
-const QString key_FileGet_Fields = "MainWindow/DialogFileMataData/Fields";
-const QString key_Update_FilePath = "MainWindow/DialogUpdate/FilePath";
-const QString key_Update_FileID = "MainWindow/DialogUpdate/FileID";
-
-inline QRect MainWindow_Geometry(QSettings *settings)
-{
-    return settings->value(key_Geometry,QRect(0,0,630,495)).toRect();
-}
-
-inline QString Upload_FilePath(QSettings *settings)
-{
-    return settings->value(key_Upload_FilePath,"/home").toString();
-}
-
-inline QString Download_FilePath(QSettings *settings)
-{
-    return settings->value(key_Download_FilePath,"/home").toString();
-}
-
-inline QString Download_FileID(QSettings *settings)
-{
-    return settings->value(key_Download_FileID,"YOUR_FILE_ID").toString();
-}
-
-inline QString FileGet_FileID(QSettings *settings)
-{
-    return settings->value(key_FileGet_FileID,"YOUR_FILE_ID").toString();
-}
-
-inline QString FileGet_Fields(QSettings *settings)
-{
-    return settings->value(key_FileGet_Fields,"YOUR_FILE_ID").toString();
-}
-
-inline QString Update_FilePath(QSettings *settings)
-{
-    return settings->value(key_Update_FilePath,"/home").toString();
-}
-
-inline QString Update_FileID(QSettings *settings)
-{
-    return settings->value(key_Update_FileID,"YOUR_FILE_ID").toString();
-}
-}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -204,6 +150,22 @@ void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID
             this,onUpdatereceive);
 }
 
+void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    auto task = m_Drive->fileSimpleUpdate(filepath,args);
+    auto onUpdatereceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUpdatereceive);
+}
+
 void MainWindow::fileMultipartUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
     auto task = m_Drive->fileMultipartUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
@@ -220,9 +182,41 @@ void MainWindow::fileMultipartUpdate(const QString &filepath, const QString &fil
             this,onUpdatereceive);
 }
 
+void MainWindow::fileMultipartUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    auto task = m_Drive->fileMultipartUpdate(filepath,args);
+    auto onUpdatereceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Multipart Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUpdatereceive);
+}
+
 void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
     auto task = m_Drive->fileResumableUpdate(filepath,fileID,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+    auto onUploadreceive = [task,this,filepath](){
+        if(task->isComplete() && !task->isFailed()){
+            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update Success.\n");
+        }else {
+            ui->plainTextEdit->appendPlainText(filepath + " Resumable Update error:" + task->errorString());
+        }
+        updateModel(task->getReplyString());
+        task->deleteLater();
+    };
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
+}
+
+void MainWindow::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    auto task = m_Drive->fileResumableUpdate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Resumable Update Success.\n");
@@ -403,34 +397,47 @@ void MainWindow::on_actionUpdate_file_triggered()
     qInfo() << Q_FUNC_INFO;
     if(m_dialogUpdate->exec() == QDialog::Accepted){
         clearModel();
+
+        GDrive::FileUpdateArgs args(m_dialogUpdate->getFileID(),
+                                    GDrive::UrlArgs::UploadType::MEDIA,
+                                    m_dialogUpdate->getAddParents(),
+                                    m_dialogUpdate->getEnforceSingleParent(),
+                                    m_dialogUpdate->getKeepRevisionForever(),
+                                    m_dialogUpdate->getOcrLanguage(),
+                                    m_dialogUpdate->getRemoveParents(),
+                                    m_dialogUpdate->getUseContentAsIndexableText());
+
         int uploadtype = m_dialogUpdate->getUploadType();
         if(uploadtype == 0){
-            fileSimpleUpdate(m_dialogUpdate->getFilePath(),
-                             m_dialogUpdate->getFileID(),
-                             m_dialogUpdate->getAddParents(),
-                             m_dialogUpdate->getEnforceSingleParent(),
-                             m_dialogUpdate->getKeepRevisionForever(),
-                             m_dialogUpdate->getOcrLanguage(),
-                             m_dialogUpdate->getRemoveParents(),
-                             m_dialogUpdate->getUseContentAsIndexableText());
+//            fileSimpleUpdate(m_dialogUpdate->getFilePath(),
+//                             m_dialogUpdate->getFileID(),
+//                             m_dialogUpdate->getAddParents(),
+//                             m_dialogUpdate->getEnforceSingleParent(),
+//                             m_dialogUpdate->getKeepRevisionForever(),
+//                             m_dialogUpdate->getOcrLanguage(),
+//                             m_dialogUpdate->getRemoveParents(),
+//                             m_dialogUpdate->getUseContentAsIndexableText());
+            fileSimpleUpdate(m_dialogUpdate->getFilePath(),args);
         }else if (uploadtype ==1) {
-            fileMultipartUpdate(m_dialogUpdate->getFilePath(),
-                                m_dialogUpdate->getFileID(),
-                                m_dialogUpdate->getAddParents(),
-                                m_dialogUpdate->getEnforceSingleParent(),
-                                m_dialogUpdate->getKeepRevisionForever(),
-                                m_dialogUpdate->getOcrLanguage(),
-                                m_dialogUpdate->getRemoveParents(),
-                                m_dialogUpdate->getUseContentAsIndexableText());
+//            fileMultipartUpdate(m_dialogUpdate->getFilePath(),
+//                                m_dialogUpdate->getFileID(),
+//                                m_dialogUpdate->getAddParents(),
+//                                m_dialogUpdate->getEnforceSingleParent(),
+//                                m_dialogUpdate->getKeepRevisionForever(),
+//                                m_dialogUpdate->getOcrLanguage(),
+//                                m_dialogUpdate->getRemoveParents(),
+//                                m_dialogUpdate->getUseContentAsIndexableText());
+            fileMultipartUpdate(m_dialogUpdate->getFilePath(),args);
         }else if (uploadtype == 2) {
-            fileResumableUpdate(m_dialogUpdate->getFilePath(),
-                                m_dialogUpdate->getFileID(),
-                                m_dialogUpdate->getAddParents(),
-                                m_dialogUpdate->getEnforceSingleParent(),
-                                m_dialogUpdate->getKeepRevisionForever(),
-                                m_dialogUpdate->getOcrLanguage(),
-                                m_dialogUpdate->getRemoveParents(),
-                                m_dialogUpdate->getUseContentAsIndexableText());
+//            fileResumableUpdate(m_dialogUpdate->getFilePath(),
+//                                m_dialogUpdate->getFileID(),
+//                                m_dialogUpdate->getAddParents(),
+//                                m_dialogUpdate->getEnforceSingleParent(),
+//                                m_dialogUpdate->getKeepRevisionForever(),
+//                                m_dialogUpdate->getOcrLanguage(),
+//                                m_dialogUpdate->getRemoveParents(),
+//                                m_dialogUpdate->getUseContentAsIndexableText());
+            fileResumableUpdate(m_dialogUpdate->getFilePath(),args);
         }
     }else {
         ui->plainTextEdit->appendPlainText("Update cancled.\n");

@@ -43,17 +43,6 @@ void GDriveService::logout()
 {
     m_google->setToken(QString());
     m_google->setRefreshToken(QString());
-    /*
-    void O2::unlink() {
-    qDebug() << "O2::unlink";
-    setLinked(false);
-    setToken(QString());
-    setRefreshToken(QString());
-    setExpires(0);
-    setExtraTokens(QVariantMap());
-    Q_EMIT linkingSucceeded();
-    }
-    */
 }
 
 QString GDriveService::receivedToken() const
@@ -88,14 +77,29 @@ GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath,
     return new GDriveFileSimpleUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
 }
 
+GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    return new GDriveFileSimpleUpdate(m_google,filepath,args);
+}
+
 GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
     return new GDriveFileMultipartUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
 }
 
+GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    return new GDriveFileMultipartUpdate(m_google,filepath,args);
+}
+
 GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const QString &fileId, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
 {
     return new GDriveFileResumableUpdate(m_google,filepath,fileId,addParents,enforceSingleParent,keepRevisionForever,ocrLanguage,removeParents,useContentAsIndexableText);
+}
+
+GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
+{
+    return new GDriveFileResumableUpdate(m_google,filepath,args);
 }
 
 GDriveFileGet *GDriveService::fileGet(const QString &fileId, const QString &fields)

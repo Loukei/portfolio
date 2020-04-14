@@ -2,11 +2,12 @@
 #include "ui_uploaddialog.h"
 #include <QFileDialog>
 
-UploadDialog::UploadDialog(QWidget *parent) :
+UploadDialog::UploadDialog(QWidget *parent, const QString &filePath) :
     QDialog(parent),
     ui(new Ui::UploadDialog)
 {
     ui->setupUi(this);
+    ui->lineEdit_FilePath->setText(filePath);
 }
 
 UploadDialog::~UploadDialog()

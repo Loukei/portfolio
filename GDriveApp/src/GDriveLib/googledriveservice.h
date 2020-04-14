@@ -78,6 +78,10 @@ public:
                                              const QString &ocrLanguage,
                                              const QString &removeParents,
                                              bool useContentAsIndexableText);
+
+
+    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
+                                             const FileUpdateArgs &args);
     /// multipart upload update file
     GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
                                                    const QString &fileId,
@@ -87,6 +91,9 @@ public:
                                                    const QString &ocrLanguage,
                                                    const QString &removeParents,
                                                    bool useContentAsIndexableText);
+
+    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
+                                                   const FileUpdateArgs &args);
     /// resumable upload update file
     GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
                                                    const QString &fileId,
@@ -96,6 +103,9 @@ public:
                                                    const QString &ocrLanguage,
                                                    const QString &removeParents,
                                                    bool useContentAsIndexableText);
+
+    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
+                                                   const FileUpdateArgs &args);
     /// Gets a file's metadata by ID.
     GDriveFileGet* fileGet(const QString &fileId,const QString &fields);
     /// Search Files in drive

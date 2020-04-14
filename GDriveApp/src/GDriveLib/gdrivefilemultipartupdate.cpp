@@ -61,6 +61,26 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2Authorizatio
     request_UploadStart();
 }
 
+GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
+                                                             const QString &filepath,
+                                                             const FileUpdateArgs &args)
+    :GDriveFileTask (parent)
+{
+    //! check file exist
+    if(!QFile::exists(filepath)){
+        qWarning() << "file doesnt exist " << filepath;
+        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
+        taskFailed();
+        return;
+    }
+    //! Initial file
+    m_file = new QFile(filepath,this);
+    /// Setup Url
+    m_url = setupUrl(args);
+    //! Upload file
+    request_UploadStart();
+}
+
 GDrive::GDriveFileMultipartUpdate::~GDriveFileMultipartUpdate()
 {
 
@@ -125,10 +145,12 @@ QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID, const QS
         query.addQueryItem("addParents",addParents);
     }
     if(enforceSingleParent){
-        query.addQueryItem("enforceSingleParent",formBoolean(enforceSingleParent));
+        query.addQueryItem("enforceSingleParent",
+                           GDrive::BooleanToString(enforceSingleParent));
     }
     if(keepRevisionForever){
-        query.addQueryItem("keepRevisionForever",formBoolean(keepRevisionForever));
+        query.addQueryItem("keepRevisionForever",
+                           GDrive::BooleanToString(keepRevisionForever));
     }
     if(!ocrLanguage.isEmpty()){
         query.addQueryItem("ocrLanguage",ocrLanguage);
@@ -137,10 +159,44 @@ QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID, const QS
         query.addQueryItem("removeParents",removeParents);
     }
     if(useContentAsIndexableText){
-        query.addQueryItem("useContentAsIndexableText",formBoolean(useContentAsIndexableText));
+        query.addQueryItem("useContentAsIndexableText",
+                           GDrive::BooleanToString(useContentAsIndexableText));
     }
     query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
+    url.setQuery(query);
+    return url;
+}
+
+QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const GDrive::FileUpdateArgs &args)
+{
+    QUrlQuery query;
+    query.addQueryItem("uploadType","multipart");
+    //! Set optional parameters
+    if(!args.addParents().isEmpty()){
+        query.addQueryItem("addParents",args.addParents());
+    }
+    if(args.enforceSingleParent()){
+        query.addQueryItem("enforceSingleParent",
+                           GDrive::BooleanToString(args.enforceSingleParent()));
+    }
+    if(args.keepRevisionForever()){
+        query.addQueryItem("keepRevisionForever",
+                           GDrive::BooleanToString(args.keepRevisionForever()));
+    }
+    if(!args.ocrLanguage().isEmpty()){
+        query.addQueryItem("ocrLanguage",args.ocrLanguage());
+    }
+    if(!args.removeParents().isEmpty()){
+        query.addQueryItem("removeParents",args.removeParents());
+    }
+    if(args.useContentAsIndexableText()){
+        query.addQueryItem("useContentAsIndexableText",
+                           GDrive::BooleanToString(args.useContentAsIndexableText()));
+    }
+    query.addQueryItem("access_token",mp_google->token());
+
+    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + args.fileId());
     url.setQuery(query);
     return url;
 }

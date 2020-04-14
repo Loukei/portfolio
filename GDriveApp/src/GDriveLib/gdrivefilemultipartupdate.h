@@ -43,6 +43,9 @@ public:
                                        const QString &ocrLanguage,
                                        const QString &removeParents,
                                        bool useContentAsIndexableText);
+    explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
+                                       const QString &filepath,
+                                       const FileUpdateArgs &args);
     /// destructor
     ~GDriveFileMultipartUpdate() override;
     /// return GDriveFileResource as upload response
@@ -61,6 +64,8 @@ private:
                   const QString &ocrLanguage = "",
                   const QString &removeParents = "",
                   bool useContentAsIndexableText = false);
+    /// return QUrl by fileID and optional parameter
+    QUrl setupUrl(const FileUpdateArgs &args);
     /// retry upload
     void retry();
 
