@@ -102,9 +102,10 @@ bool UpdateDialog::getUseContentAsIndexableText() const
 
 void UpdateDialog::on_pushButton_FilePath_clicked()
 {
+    QString oldpath = ui->lineEdit_FilePath->text();
     QString filepath = QFileDialog::getOpenFileName(this,
                                                     tr("Open file"),
-                                                    "/home");
+                                                    oldpath);
     if(!filepath.isEmpty()){
         ui->lineEdit_FilePath->setText(filepath);
     }

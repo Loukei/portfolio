@@ -38,9 +38,10 @@ void DownloadDialog::accept()
 
 void DownloadDialog::on_pushButton_DownloadPath_clicked()
 {
+    QString oldpath = ui->lineEdit_DownloadPath->text();
     QString save = QFileDialog::getSaveFileName(this,
                                                 tr("Save file"),
-                                                "/home");
+                                                oldpath);
     if(!save.isEmpty()){
         ui->lineEdit_DownloadPath->setText(save);
     }

@@ -30,38 +30,6 @@ GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2Authorizatio
 
 GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                                              const QString &filepath,
-                                                             const QString &fileID,
-                                                             const QString &addParents,
-                                                             bool enforceSingleParent,
-                                                             bool keepRevisionForever,
-                                                             const QString &ocrLanguage,
-                                                             const QString &removeParents,
-                                                             bool useContentAsIndexableText)
-    :GDriveFileTask (parent)
-{
-    //! check file exist
-    if(!QFile::exists(filepath)){
-        qWarning() << "file doesnt exist " << filepath;
-        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        taskFailed();
-        return;
-    }
-    //! Initial file
-    m_file = new QFile(filepath,this);
-    //! Setup request url
-    m_url = setupUrl(fileID,
-                     addParents,
-                     enforceSingleParent,
-                     keepRevisionForever,
-                     ocrLanguage,
-                     removeParents,
-                     useContentAsIndexableText);
-    //! request session URI
-    request_InitialSession();
-}
-
-GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
                                                              const GDrive::FileUpdateArgs &args)
     :GDriveFileTask (parent)
 {
@@ -187,33 +155,11 @@ void GDrive::GDriveFileResumableUpdate::request_UploadResume(const qint64 offset
             this,&GDriveFileResumableUpdate::on_UploadResume_ReplyError);
 }
 
-QUrl GDrive::GDriveFileResumableUpdate::setupUrl(const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+QUrl GDrive::GDriveFileResumableUpdate::setupUrl(const QString &fileID)
 {
     //https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&access_token=%1
     QUrlQuery query;
     query.addQueryItem("uploadType","resumable");
-    //! Set optional parameters
-    if(!addParents.isEmpty()){
-        query.addQueryItem("addParents",addParents);
-    }
-    if(enforceSingleParent){
-        query.addQueryItem("enforceSingleParent",
-                           GDrive::BooleanToString(enforceSingleParent));
-    }
-    if(keepRevisionForever){
-        query.addQueryItem("keepRevisionForever",
-                           GDrive::BooleanToString(keepRevisionForever));
-    }
-    if(!ocrLanguage.isEmpty()){
-        query.addQueryItem("ocrLanguage",ocrLanguage);
-    }
-    if(!removeParents.isEmpty()){
-        query.addQueryItem("removeParents",removeParents);
-    }
-    if(useContentAsIndexableText){
-        query.addQueryItem("useContentAsIndexableText",
-                           GDrive::BooleanToString(useContentAsIndexableText));
-    }
     query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
     url.setQuery(query);

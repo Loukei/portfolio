@@ -44,3 +44,5 @@ Makefile*
 .vscode/c_cpp_properties.json
 
 GDriveApp/Doxyfile
+
+GDriveApp/Http Network package log/

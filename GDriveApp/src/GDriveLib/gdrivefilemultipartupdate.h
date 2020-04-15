@@ -33,16 +33,6 @@ public:
     explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString &filepath,
                                        const QString &fileID);
-    /// constructor with optional parameter
-    explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString &filepath,
-                                       const QString &fileID,
-                                       const QString &addParents,
-                                       bool enforceSingleParent,
-                                       bool keepRevisionForever,
-                                       const QString &ocrLanguage,
-                                       const QString &removeParents,
-                                       bool useContentAsIndexableText);
     explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString &filepath,
                                        const FileUpdateArgs &args);
@@ -57,13 +47,7 @@ private:
     /// send Multipart upload request
     void request_UploadStart();
     /// return QUrl by fileID
-    QUrl setupUrl(const QString &fileID,
-                  const QString &addParents = "",
-                  bool enforceSingleParent = false,
-                  bool keepRevisionForever = false,
-                  const QString &ocrLanguage = "",
-                  const QString &removeParents = "",
-                  bool useContentAsIndexableText = false);
+    QUrl setupUrl(const QString &fileID);
     /// return QUrl by fileID and optional parameter
     QUrl setupUrl(const FileUpdateArgs &args);
     /// retry upload

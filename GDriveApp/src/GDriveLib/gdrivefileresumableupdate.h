@@ -33,16 +33,6 @@ public:
     explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString& filepath,
                                        const QString& fileID);
-    /// constructor
-    explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString& filepath,
-                                       const QString& fileID,
-                                       const QString &addParents,
-                                       bool enforceSingleParent,
-                                       bool keepRevisionForever,
-                                       const QString &ocrLanguage,
-                                       const QString &removeParents,
-                                       bool useContentAsIndexableText);
     ///
     explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                        const QString& filepath,
@@ -64,14 +54,8 @@ private:
     /// Resume upload when interrupt form offset position
     void request_UploadResume(const qint64 offset);
     /// return QUrl by fileID
-    QUrl setupUrl(const QString &fileID,
-                  const QString &addParents = "",
-                  bool enforceSingleParent = false,
-                  bool keepRevisionForever = false,
-                  const QString &ocrLanguage = "",
-                  const QString &removeParents = "",
-                  bool useContentAsIndexableText = false);
-
+    QUrl setupUrl(const QString &fileID);
+    /// return QUrl by args
     QUrl setupUrl(const FileUpdateArgs &args);
 
 private slots:

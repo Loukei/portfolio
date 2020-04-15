@@ -31,38 +31,6 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2Authorizatio
 
 GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
                                                              const QString &filepath,
-                                                             const QString &fileID,
-                                                             const QString &addParents,
-                                                             bool enforceSingleParent,
-                                                             bool keepRevisionForever,
-                                                             const QString &ocrLanguage,
-                                                             const QString &removeParents,
-                                                             bool useContentAsIndexableText)
-    :GDriveFileTask (parent)
-{
-    //! check file exist
-    if(!QFile::exists(filepath)){
-        qWarning() << "file doesnt exist " << filepath;
-        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        taskFailed();
-        return;
-    }
-    //! Initial file
-    m_file = new QFile(filepath,this);
-    /// Setup Url
-    m_url = setupUrl(fileID,
-                     addParents,
-                     enforceSingleParent,
-                     keepRevisionForever,
-                     ocrLanguage,
-                     removeParents,
-                     useContentAsIndexableText);
-    //! Upload file
-    request_UploadStart();
-}
-
-GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
                                                              const FileUpdateArgs &args)
     :GDriveFileTask (parent)
 {
@@ -136,32 +104,10 @@ void GDrive::GDriveFileMultipartUpdate::request_UploadStart()
             this,&GDriveFileMultipartUpdate::on_UploadStart_ReplyError);
 }
 
-QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID, const QString &addParents, bool enforceSingleParent, bool keepRevisionForever, const QString &ocrLanguage, const QString &removeParents, bool useContentAsIndexableText)
+QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID)
 {
     QUrlQuery query;
     query.addQueryItem("uploadType","multipart");
-    //! Set optional parameters
-    if(!addParents.isEmpty()){
-        query.addQueryItem("addParents",addParents);
-    }
-    if(enforceSingleParent){
-        query.addQueryItem("enforceSingleParent",
-                           GDrive::BooleanToString(enforceSingleParent));
-    }
-    if(keepRevisionForever){
-        query.addQueryItem("keepRevisionForever",
-                           GDrive::BooleanToString(keepRevisionForever));
-    }
-    if(!ocrLanguage.isEmpty()){
-        query.addQueryItem("ocrLanguage",ocrLanguage);
-    }
-    if(!removeParents.isEmpty()){
-        query.addQueryItem("removeParents",removeParents);
-    }
-    if(useContentAsIndexableText){
-        query.addQueryItem("useContentAsIndexableText",
-                           GDrive::BooleanToString(useContentAsIndexableText));
-    }
     query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
     url.setQuery(query);
