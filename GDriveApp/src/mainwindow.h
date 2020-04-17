@@ -63,8 +63,14 @@ private slots:
     /// Click menu Search file&folder
     void on_action_Search_file_folder_triggered();
     /// Receive SearchDialog::query, then return search result to m_DialogSearch
-    void onSearchDialog_query(const QString &q,
-                              const QString &pageToken);
+    void onSearchDialog_query(const QString &corpora,
+                              const QString &driveId,
+                              const QString &fields,
+                              const QString &orderBy,
+                              int pageSize,
+                              const QString &pageToken,
+                              const QString &q,
+                              const QString &spaces);
     /// Click menu Get file matadata
     void on_actionGet_file_matadata_triggered();
     /// Receive FileMataDataDialog::query, then return GDriveFileGet to m_dialogFileMataData
@@ -75,6 +81,8 @@ private slots:
 
     void on_actionUpload_File_triggered();
 
+    void onGDrive_statusChanged(QAbstractOAuth::Status status);
+
 private:
     /// GDriveService Account Login
     void accountLogin();
@@ -82,12 +90,14 @@ private:
     void accountLogout();
     /// GDriveService Account get About message
     void accountAbout();
+
     /// GDriveService upload(Create) file Simple method
     void fileSimpleUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Create) file Multipart method
     void fileMultipartUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Create) file Resumable method
     void fileResumableUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
+
     /// GDriveService upload(Update) file Simple method
     void fileSimpleUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Multipart method

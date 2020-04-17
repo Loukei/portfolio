@@ -1,5 +1,5 @@
 #include "googledriveservice.h"
-#include <QOAuth2AuthorizationCodeFlow>
+//#include <QOAuth2AuthorizationCodeFlow>
 #include <QOAuthHttpServerReplyHandler>
 #include <QNetworkAccessManager>
 #include <QDesktopServices>
@@ -27,6 +27,8 @@ GDriveService::GDriveService(QObject *parent)
             this,&QDesktopServices::openUrl);
     connect(m_google,&QOAuth2AuthorizationCodeFlow::granted,
             this,&GDriveService::granted);
+    connect(m_google,&QOAuth2AuthorizationCodeFlow::statusChanged,
+            this,&GDriveService::statusChanged);
 }
 
 GDriveService::~GDriveService()
@@ -34,7 +36,7 @@ GDriveService::~GDriveService()
   /// delete none parent pointer here...
 }
 
-void GDriveService::start()
+void GDriveService::grant()
 {
     m_google->grant();
 }
@@ -45,11 +47,19 @@ void GDriveService::logout()
     m_google->setRefreshToken(QString());
 }
 
-QString GDriveService::receivedToken() const
+QString GDriveService::token() const
 {
-    QString msg;
-    msg += QString("Receive Token: %1\n").arg(m_google->token());
-    return msg;
+    return m_google->token();
+}
+
+void GDriveService::setToken(const QString &token)
+{
+    return m_google->setToken(token);
+}
+
+QAbstractOAuth::Status GDriveService::status() const
+{
+    return m_google->status();
 }
 
 GDriveAbout* GDriveService::getAbout(GDriveAbout::AboutArgs args)
@@ -87,14 +97,14 @@ GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &fil
     return new GDriveFileResumableUpdate(m_google,filepath,args);
 }
 
-GDriveFileGet *GDriveService::fileGet(const QString &fileId, const QString &fields)
+GDriveFileGet *GDriveService::fileGet(const FileGetArgs &args)
 {
-    return new GDriveFileGet(m_google,fileId,fields);
+    return new GDriveFileGet(m_google,args);
 }
 
-GDriveFileSearch *GDriveService::fileList(const QString &q, const QString &pageToken)
+GDriveFileSearch *GDriveService::fileList(const FileListArgs &args)
 {
-     return new GDriveFileSearch(m_google,q,pageToken);
+    return new GDriveFileSearch(m_google,args);
 }
 
 GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, QSharedPointer<QFile> file)

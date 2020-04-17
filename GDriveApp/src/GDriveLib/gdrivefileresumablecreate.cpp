@@ -101,7 +101,6 @@ QUrl GDrive::GDriveFileResumableCreate::setupInitialUrl()
     QUrlQuery query;
     //https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&access_token=%1
     query.addQueryItem("uploadType","resumable");
-    query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
     url.setQuery(query);
     return url;
@@ -132,7 +131,6 @@ QUrl GDrive::GDriveFileResumableCreate::setupInitialUrl(const GDrive::FileCreate
                            BooleanToString(args.useContentAsIndexableText()));
     }
 
-    query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
     url.setQuery(query);
 

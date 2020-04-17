@@ -30,6 +30,9 @@ public:
                                   const QString &fileId,
                                   const QString &fields,
                                   QSharedPointer<QFile> file);
+    explicit GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
+                                  const GDrive::FileGetArgs &args,
+                                  QSharedPointer<QFile> file);
     /// destructor
     ~GDriveFileDownloader() override;
     /// return GDriveFileResource
@@ -45,7 +48,9 @@ private:
 
 private:
     /// send download request
-    void request_Download(const QString &fileId,const QString &fields);
+    void request_Download(const GDrive::FileGetArgs &args);
+    /// Setup download url
+    QUrl setupUrl(const GDrive::FileGetArgs &args);
     /// Write data to mp_file;
     bool writeFile(QNetworkReply *reply);
     /// Parse Error message form reply

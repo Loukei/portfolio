@@ -21,10 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     //! Read Settings
-    m_settings = new QSettings("GDriveApp_Settings.ini",QSettings::IniFormat,this);
+    m_settings = new QSettings(QStringLiteral("GDriveApp_Settings.ini"),QSettings::IniFormat,this);
     m_settings->setIniCodec("UTF-8");
     this->setGeometry(Settings::MainWindow_Geometry(m_settings));
-    //!
+    //! Setup upload dialog
     m_dialogUpload = new UploadDialog(this,
                                       tr("Upload File"),
                                       Settings::Upload_FilePath(m_settings));
@@ -54,6 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_Drive = new GDriveService(this);
     connect(m_Drive,&GDriveService::granted,
             this,&MainWindow::onGDrive_granted);
+    connect(m_Drive,&GDriveService::statusChanged,
+            this,&MainWindow::onGDrive_statusChanged);
+    //!
+//    m_Drive->setToken(Settings::OAuth_CurrentToken(m_settings));
 }
 
 MainWindow::~MainWindow()
@@ -64,7 +68,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::accountLogin()
 {
-    m_Drive->start();   //! see MainWindow::onGDrive_granted after granted emit
+    return m_Drive->grant();   //! see MainWindow::onGDrive_granted after granted emit
 }
 
 void MainWindow::accountLogout()
@@ -212,6 +216,7 @@ void MainWindow::writeSettings()
     m_settings->setValue(Settings::key_FileGet_Fields,m_dialogFileMataData->getFields());
     m_settings->setValue(Settings::key_Update_FilePath,m_dialogUpdate->getFilePath());
     m_settings->setValue(Settings::key_Update_FileID,m_dialogUpdate->getFileID());
+    m_settings->setValue(Settings::key_OAuth_CurrentToken,m_Drive->token());
 }
 
 void MainWindow::updateModel(const QByteArray &json)
@@ -233,7 +238,7 @@ void MainWindow::on_actionLogin_account_triggered()
 
 void MainWindow::onGDrive_granted()
 {
-    ui->plainTextEdit->appendPlainText(m_Drive->receivedToken());
+    ui->plainTextEdit->appendPlainText(QStringLiteral("Receive Token: ") + m_Drive->token());
     //! Open other UI menu
     ui->actionAbout->setEnabled(true);
     ui->actionUpload_File->setEnabled(true);
@@ -283,10 +288,18 @@ void MainWindow::on_action_Search_file_folder_triggered()
     m_dialogSearch->exec();
 }
 
-void MainWindow::onSearchDialog_query(const QString &q, const QString &pageToken)
+void MainWindow::onSearchDialog_query(const QString &corpora,
+                                      const QString &driveId,
+                                      const QString &fields,
+                                      const QString &orderBy,
+                                      int pageSize,
+                                      const QString &pageToken,
+                                      const QString &q,
+                                      const QString &spaces)
 {
     qInfo() << Q_FUNC_INFO;
-    auto task = m_Drive->fileList(q,pageToken);
+    const GDrive::FileListArgs args = {corpora,driveId,fields,orderBy,pageSize,pageToken,q,spaces};
+    auto task = m_Drive->fileList(args);
     connect(task,&GDriveFileSearch::finished,
             m_dialogSearch,&SearchDialog::onFileSearch_finished);
 }
@@ -300,7 +313,8 @@ void MainWindow::on_actionGet_file_matadata_triggered()
 void MainWindow::onFileMataDataDialog_query(const QString &fileID, const QString &fields)
 {
     qInfo() << Q_FUNC_INFO;
-    auto task = m_Drive->fileGet(fileID,fields);
+    GDrive::FileGetArgs args = {fileID,false,fields};
+    auto task = m_Drive->fileGet(args);
     connect(task,&GDriveFileGet::finished,
             m_dialogFileMataData,&FileMataDataDialog::onFileGet_finished);
 }
@@ -311,15 +325,14 @@ void MainWindow::on_actionUpdate_file_triggered()
     if(m_dialogUpdate->exec() == QDialog::Accepted){
         clearModel();
         //! upload type in args doesnt infected here
-        GDrive::FileUpdateArgs args(m_dialogUpdate->getFileID(),
-                                    GDrive::UrlArgs::UploadType::MEDIA,
-                                    m_dialogUpdate->getAddParents(),
-                                    m_dialogUpdate->getEnforceSingleParent(),
-                                    m_dialogUpdate->getKeepRevisionForever(),
-                                    m_dialogUpdate->getOcrLanguage(),
-                                    m_dialogUpdate->getRemoveParents(),
-                                    m_dialogUpdate->getUseContentAsIndexableText());
-
+        const GDrive::FileUpdateArgs args = {m_dialogUpdate->getFileID(),
+                                             GDrive::UrlArgs::UploadType::MEDIA,
+                                             m_dialogUpdate->getAddParents(),
+                                             m_dialogUpdate->getEnforceSingleParent(),
+                                             m_dialogUpdate->getKeepRevisionForever(),
+                                             m_dialogUpdate->getOcrLanguage(),
+                                             m_dialogUpdate->getRemoveParents(),
+                                             m_dialogUpdate->getUseContentAsIndexableText()};
         int uploadtype = m_dialogUpdate->getUploadType();
         if(uploadtype == 0){
             fileSimpleUpdate(m_dialogUpdate->getFilePath(),args);
@@ -356,4 +369,24 @@ void MainWindow::on_actionUpload_File_triggered()
     }else {
         ui->plainTextEdit->appendPlainText("Upload cancled.\n");
     }
+}
+
+void MainWindow::onGDrive_statusChanged(QAbstractOAuth::Status status)
+{
+    QString info("Status: ");
+    switch (status) {
+    case QAbstractOAuth::Status::NotAuthenticated:
+        info += "NotAuthenticated";
+        break;
+    case QAbstractOAuth::Status::TemporaryCredentialsReceived:
+        info += "TemporaryCredentialsReceived";
+        break;
+    case QAbstractOAuth::Status::Granted:
+        info += "Granted";
+        break;
+    case QAbstractOAuth::Status::RefreshingToken:
+        info += "RefreshingToken";
+        break;
+    }
+    qInfo() << Q_FUNC_INFO << info;
 }

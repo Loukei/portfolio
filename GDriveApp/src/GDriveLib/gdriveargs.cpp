@@ -44,6 +44,7 @@ QString UrlArgs::UploadTypeToString(UrlArgs::UploadType value)
     case UploadType::RESUMABLE:
         return "resumable";
     }
+    return "media";
 }
 
 /*==========================class FileUpdateArgs======================================*/
@@ -140,8 +141,18 @@ void FileUpdateArgs::setUseContentAsIndexableText(bool useContentAsIndexableText
 
 /*==========================class FileCreateArgs======================================*/
 
-FileCreateArgs::FileCreateArgs(UploadType uploadType, bool enforceSingleParent, bool ignoreDefaultVisibility, bool keepRevisionForever, const QString &ocrLanguage, bool useContentAsIndexableText)
-    :UrlArgs (),m_enforceSingleParent(enforceSingleParent),m_ignoreDefaultVisibility(ignoreDefaultVisibility),m_keepRevisionForever(keepRevisionForever),m_ocrLanguage(ocrLanguage),m_useContentAsIndexableText(useContentAsIndexableText)
+FileCreateArgs::FileCreateArgs(UploadType uploadType,
+                               bool enforceSingleParent,
+                               bool ignoreDefaultVisibility,
+                               bool keepRevisionForever,
+                               const QString &ocrLanguage,
+                               bool useContentAsIndexableText)
+    :UrlArgs (),
+      m_enforceSingleParent(enforceSingleParent),
+      m_ignoreDefaultVisibility(ignoreDefaultVisibility),
+      m_keepRevisionForever(keepRevisionForever),
+      m_ocrLanguage(ocrLanguage),
+      m_useContentAsIndexableText(useContentAsIndexableText)
 {
     m_uploadType = UploadTypeToString(uploadType);
 }
@@ -241,4 +252,105 @@ QString FileGetArgs::fields() const
 void FileGetArgs::setFields(const QString &fields)
 {
     m_fields = fields;
+}
+
+/*==========================class FileListArgs======================================*/
+FileListArgs::FileListArgs(const QString &corpora,
+                           const QString &driveId,
+                           const QString &fields,
+                           const QString &orderBy,
+                           int pageSize,
+                           const QString &pageToken,
+                           const QString &q,
+                           const QString &spaces)
+    :m_corpora(corpora),
+      m_driveId(driveId),
+      m_fields(fields),
+      m_orderBy(orderBy),
+      m_pageSize(pageSize),
+      m_pageToken(pageToken),
+      m_q(q),
+      m_spaces(spaces)
+{
+
+}
+
+QString FileListArgs::corpora() const
+{
+    return m_corpora;
+}
+
+void FileListArgs::setCorpora(const QString &corpora)
+{
+    m_corpora = corpora;
+}
+
+QString FileListArgs::driveId() const
+{
+    return m_driveId;
+}
+
+void FileListArgs::setDriveId(const QString &driveId)
+{
+    m_driveId = driveId;
+}
+
+QString FileListArgs::fields() const
+{
+    return m_fields;
+}
+
+void FileListArgs::setFields(const QString &fields)
+{
+    m_fields = fields;
+}
+
+QString FileListArgs::orderBy() const
+{
+    return m_orderBy;
+}
+
+void FileListArgs::setOrderBy(const QString &orderBy)
+{
+    m_orderBy = orderBy;
+}
+
+int FileListArgs::pageSize() const
+{
+    return m_pageSize;
+}
+
+void FileListArgs::setPageSize(int pageSize)
+{
+    m_pageSize = pageSize;
+}
+
+QString FileListArgs::pageToken() const
+{
+    return m_pageToken;
+}
+
+void FileListArgs::setPageToken(const QString &pageToken)
+{
+    m_pageToken = pageToken;
+}
+
+QString FileListArgs::q() const
+{
+    return m_q;
+}
+
+void FileListArgs::setQ(const QString &q)
+{
+    m_q = q;
+}
+
+QString FileListArgs::spaces() const
+{
+    return m_spaces;
+}
+
+void FileListArgs::setSpaces(const QString &spaces)
+{
+    m_spaces = spaces;
 }

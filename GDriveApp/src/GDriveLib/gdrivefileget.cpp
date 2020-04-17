@@ -4,10 +4,18 @@
 
 GDrive::GDriveFileGet::GDriveFileGet(QOAuth2AuthorizationCodeFlow *parent,
                                      const QString &fileId,
-                                     const QString &fields):
-    GDriveFileTask (parent)
+                                     const QString &fields)
+    :GDriveFileTask (parent)
 {
-    request_FilesGet(fileId,fields);
+    const GDrive::FileGetArgs args = {fileId,false,fields};
+    request_FilesGet(args);
+}
+
+GDrive::GDriveFileGet::GDriveFileGet(QOAuth2AuthorizationCodeFlow *parent,
+                                     const GDrive::FileGetArgs &args)
+    :GDriveFileTask (parent)
+{
+    request_FilesGet(args);
 }
 
 GDrive::GDriveFileGet::~GDriveFileGet()
@@ -20,16 +28,9 @@ QByteArray GDrive::GDriveFileGet::getReplyString() const
     return m_replyData;
 }
 
-void GDrive::GDriveFileGet::request_FilesGet(const QString &fileId, const QString &fields)
+void GDrive::GDriveFileGet::request_FilesGet(const FileGetArgs &args)
 {
-    QUrlQuery query;
-    query.addQueryItem("key",mp_google->clientIdentifierSharedKey());
-    if(!fields.isEmpty()){
-        query.addQueryItem("field",fields);
-    }
-    query.addQueryItem("access_token",mp_google->token());
-    QUrl url("https://www.googleapis.com/drive/v3/files/" + fileId);
-    url.setQuery(query);
+    QUrl url = setupUrl(args);
     QNetworkRequest request(url);
     request.setRawHeader("Authorization",
                          QByteArray("Bearer " + mp_google->token().toLatin1()));
@@ -38,6 +39,21 @@ void GDrive::GDriveFileGet::request_FilesGet(const QString &fileId, const QStrin
             this,&GDriveFileGet::on_Request_FilesGet_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,&GDriveFileGet::on_Request_FilesGet_ReplyError);
+}
+
+QUrl GDrive::GDriveFileGet::setupUrl(const GDrive::FileGetArgs &args)
+{
+    QUrlQuery query;
+    query.addQueryItem("key",mp_google->clientIdentifierSharedKey());
+    if(!args.fields().isEmpty()){
+        query.addQueryItem("field",args.fields());
+    }
+//    if(args.acknowledgeAbuse()){
+//        query.addQueryItem("acknowledgeAbuse",BooleanToString(args.acknowledgeAbuse()));
+//    }
+    QUrl url("https://www.googleapis.com/drive/v3/files/" + args.fileId());
+    url.setQuery(query);
+    return url;
 }
 
 void GDrive::GDriveFileGet::on_Request_FilesGet_ReplyFinished()
@@ -49,9 +65,7 @@ void GDrive::GDriveFileGet::on_Request_FilesGet_ReplyFinished()
         return;
     }
     m_replyData = reply->readAll();
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -60,8 +74,6 @@ void GDrive::GDriveFileGet::on_Request_FilesGet_ReplyError(QNetworkReply::Networ
     qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
     m_replyData = reply->readAll();
-    m_isFailed = true;
-    m_isComplete = true;
-    emit finished();
+    taskFailed();
     reply->deleteLater();
 }

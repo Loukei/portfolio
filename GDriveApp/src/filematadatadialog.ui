@@ -23,7 +23,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_FileId">
         <property name="text">
-         <string>FileId</string>
+         <string>fileId</string>
         </property>
        </widget>
       </item>
@@ -33,7 +33,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_Fields">
         <property name="text">
-         <string>Fields</string>
+         <string>fields</string>
         </property>
        </widget>
       </item>

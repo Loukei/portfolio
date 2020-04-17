@@ -11,12 +11,16 @@ GDrive::GDriveFileDownloader::GDriveFileDownloader(QOAuth2AuthorizationCodeFlow 
         QSharedPointer<QFile> file)
     :GDriveFileTask (parent),mp_file(file)
 {
-    //! Initialization
-    m_replyData = QByteArray();
-    m_isFailed = false;
-    m_isComplete = false;
     //! Start download
-    request_Download(fileId,fields);
+    request_Download(GDrive::FileGetArgs(fileId,false,fields));
+}
+
+GDrive::GDriveFileDownloader::GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
+                                                   const GDrive::FileGetArgs &args,
+                                                   QSharedPointer<QFile> file)
+    :GDriveFileTask (parent),mp_file(file)
+{
+    request_Download(args);
 }
 
 GDrive::GDriveFileDownloader::~GDriveFileDownloader()
@@ -41,16 +45,9 @@ QByteArray GDrive::GDriveFileDownloader::getReplyString() const
     return m_replyData;
 }
 
-void GDrive::GDriveFileDownloader::request_Download(const QString &fileId, const QString &fields)
+void GDrive::GDriveFileDownloader::request_Download(const GDrive::FileGetArgs &args)
 {
-    QUrlQuery query;
-    query.addQueryItem("key",mp_google->clientIdentifierSharedKey());
-    query.addQueryItem("alt","media");
-    if(!fields.isEmpty()){
-        query.addQueryItem("field",fields);
-    }
-    QUrl url("https://www.googleapis.com/drive/v3/files/" + fileId);
-    url.setQuery(query);
+    QUrl url = setupUrl(args);
     QNetworkRequest request(url);
     request.setRawHeader("Authorization",
                          QByteArray("Bearer " + mp_google->token().toLatin1()));
@@ -59,6 +56,22 @@ void GDrive::GDriveFileDownloader::request_Download(const QString &fileId, const
             this,&GDriveFileDownloader::on_Download_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,&GDriveFileDownloader::on_Download_ReplyError);
+}
+
+QUrl GDrive::GDriveFileDownloader::setupUrl(const GDrive::FileGetArgs &args)
+{
+    QUrlQuery query;
+    query.addQueryItem("key",mp_google->clientIdentifierSharedKey());
+    query.addQueryItem("alt","media");
+    if(args.acknowledgeAbuse()){
+        query.addQueryItem("acknowledgeAbuse",BooleanToString(args.acknowledgeAbuse()));
+    }
+    if(!args.fields().isEmpty()){
+        query.addQueryItem("field",args.fields());
+    }
+    QUrl url("https://www.googleapis.com/drive/v3/files/" + args.fileId());
+    url.setQuery(query);
+    return url;
 }
 
 bool GDrive::GDriveFileDownloader::writeFile(QNetworkReply *reply)

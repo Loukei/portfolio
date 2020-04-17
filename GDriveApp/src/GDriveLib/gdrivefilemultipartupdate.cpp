@@ -108,7 +108,6 @@ QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID)
 {
     QUrlQuery query;
     query.addQueryItem("uploadType","multipart");
-    query.addQueryItem("access_token",mp_google->token());
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
     url.setQuery(query);
     return url;
@@ -140,7 +139,6 @@ QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const GDrive::FileUpdateArgs &a
         query.addQueryItem("useContentAsIndexableText",
                            GDrive::BooleanToString(args.useContentAsIndexableText()));
     }
-    query.addQueryItem("access_token",mp_google->token());
 
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + args.fileId());
     url.setQuery(query);

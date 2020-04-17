@@ -25,16 +25,13 @@ class GDriveFileSearch : public GDriveFileTask
 {
     Q_OBJECT
 public:
-    /// constructor with 4 parameter, deprecated.
-    explicit GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
-                              const QString &q,
-                              const QString &spaces,
-                              const QString &fields,
-                              const QString &pageToken);
     /// constructor with 2 parameter
     explicit GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
                               const QString &q,
                               const QString &pageToken);
+    /// constructor with optional parameter
+    explicit GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
+                              const GDrive::FileListArgs &args);
     /// destructor
     ~GDriveFileSearch() override;
     /// get search result to GDriveFileList data format
@@ -44,10 +41,9 @@ public:
 
 private:
     /// send network request to search file
-    void request_Search(const QString &q,
-                        const QString &spaces,
-                        const QString &fields,
-                        const QString &pageToken);
+    void request_Search(const GDrive::FileListArgs &args);
+    /// setup request url
+    QUrl setupUrl(const GDrive::FileListArgs &args);
 
 private slots:
     void on_Search_ReplyFinished();

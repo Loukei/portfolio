@@ -6,20 +6,18 @@
 
 GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
                                            const QString &q,
-                                           const QString &spaces,
-                                           const QString &fields,
                                            const QString &pageToken)
     :GDriveFileTask (parent)
 {
-    request_Search(q,spaces,fields,pageToken);
+    GDrive::FileListArgs args = {"","","","",100,pageToken,q,""};
+    request_Search(args);
 }
 
 GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
-                                           const QString &q,
-                                           const QString &pageToken)
+                                           const GDrive::FileListArgs &args)
     :GDriveFileTask (parent)
 {
-    request_Search(q,"drive","",pageToken);
+    request_Search(args);
 }
 
 GDrive::GDriveFileSearch::~GDriveFileSearch()
@@ -43,26 +41,9 @@ QByteArray GDrive::GDriveFileSearch::getReplyString() const
     return m_replyData;
 }
 
-void GDrive::GDriveFileSearch::request_Search(const QString &q,
-                                              const QString &spaces,
-                                              const QString &fields,
-                                              const QString &pageToken)
+void GDrive::GDriveFileSearch::request_Search(const GDrive::FileListArgs &args)
 {
-    QUrlQuery query;
-    query.addQueryItem("q",q);
-    if(!spaces.isEmpty()){
-        query.addQueryItem("spaces",spaces);
-    }
-    if(!fields.isEmpty()){
-        query.addQueryItem("fields",fields);
-    }
-    if(!pageToken.isEmpty()){
-        query.addQueryItem("pageToken",pageToken);
-    }
-    query.addQueryItem("access_token",mp_google->token());
-    QUrl url("https://www.googleapis.com/drive/v3/files");
-    url.setQuery(query);
-
+    QUrl url = setupUrl(args);
     QNetworkRequest request(url);
     const QString tokenHeader = QString("Bearer %1").arg(mp_google->token());
     request.setRawHeader(QByteArray("Authorization"),tokenHeader.toLatin1());
@@ -72,6 +53,40 @@ void GDrive::GDriveFileSearch::request_Search(const QString &q,
             this,&GDriveFileSearch::on_Search_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,&GDriveFileSearch::on_Search_ReplyFinished);
+}
+
+QUrl GDrive::GDriveFileSearch::setupUrl(const GDrive::FileListArgs &args)
+{
+    QUrlQuery query;
+    if(!args.corpora().isEmpty()){
+        query.addQueryItem("corpora",args.corpora());
+    }
+    if(!args.driveId().isEmpty()){
+        query.addQueryItem("driveId",args.driveId());
+    }
+    if(!args.fields().isEmpty()){
+        query.addQueryItem("fields",args.fields());
+    }
+    if(!args.orderBy().isEmpty()){
+        query.addQueryItem("orderBy",args.orderBy());
+    }
+    if(args.pageSize() > 0){
+        query.addQueryItem("pageSize",QString::number(args.pageSize()));
+    }
+    if(!args.pageToken().isEmpty()){
+        query.addQueryItem("pageToken",args.pageToken());
+    }
+    if(!args.q().isEmpty()){
+        query.addQueryItem("q",args.q());
+    }
+    if(!args.spaces().isEmpty()){
+        query.addQueryItem("spaces",args.spaces());
+    }
+
+    QUrl url("https://www.googleapis.com/drive/v3/files");
+    url.setQuery(query);
+
+    return url;
 }
 
 void GDrive::GDriveFileSearch::on_Search_ReplyFinished()

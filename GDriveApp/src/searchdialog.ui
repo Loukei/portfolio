@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>748</width>
-    <height>480</height>
+    <width>804</width>
+    <height>497</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <property name="whatsThis">
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the drive api to search file or folder.&lt;/p&gt;&lt;p&gt;Follow instruction here:&lt;a href=&quot;https://developers.google.com/drive/api/v3/search-files&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Search for files and folders&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,3">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,0">
    <item>
     <widget class="QTreeView" name="treeView"/>
    </item>
@@ -27,22 +27,62 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label_Q">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QLabel" name="label_corpora">
         <property name="text">
-         <string>Q</string>
+         <string>corpora</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_Q">
+       <widget class="QLineEdit" name="lineEdit_corpora"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_driveId">
         <property name="text">
-         <string>name = 'Untitled'</string>
+         <string>driveId</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_driveId"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_fields">
+        <property name="text">
+         <string>fields</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_fields"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_orderBy">
+        <property name="text">
+         <string>orderBy</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_orderBy"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_pageSize">
+        <property name="text">
+         <string>pageSize</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_pageSize">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>
@@ -63,24 +103,41 @@
        <widget class="QLineEdit" name="lineEdit_pageToken"/>
       </item>
       <item>
+       <widget class="QLabel" name="label_Q">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>q</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_Q">
+        <property name="text">
+         <string>name = 'Untitled'</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_spaces">
+        <property name="text">
+         <string>spaces</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_spaces"/>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButton_search">
         <property name="text">
          <string>Search</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>

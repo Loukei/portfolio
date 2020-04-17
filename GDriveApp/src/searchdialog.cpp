@@ -45,6 +45,12 @@ void SearchDialog::onFileSearch_finished()
 void SearchDialog::on_pushButton_search_clicked()
 {
     qInfo() << Q_FUNC_INFO;
-    emit query(ui->lineEdit_Q->text(),
-               ui->lineEdit_pageToken->text());
+    emit query(ui->lineEdit_corpora->text(),
+               ui->lineEdit_driveId->text(),
+               ui->lineEdit_fields->text(),
+               ui->lineEdit_orderBy->text(),
+               ui->spinBox_pageSize->value(),
+               ui->lineEdit_pageToken->text(),
+               ui->lineEdit_Q->text(),
+               ui->lineEdit_spaces->text());
 }

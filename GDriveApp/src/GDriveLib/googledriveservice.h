@@ -2,6 +2,7 @@
 #define TESTOAUTH_H
 
 #include <QObject>
+#include <QOAuth2AuthorizationCodeFlow>
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
 #include "gdrivefileresourcelist.h"
@@ -18,8 +19,6 @@
 #include "gdrivefileget.h"
 
 QT_BEGIN_NAMESPACE
-class QOAuth2AuthorizationCodeFlow;
-class QNetworkAccessManager;
 class QFile;
 QT_END_NAMESPACE
 
@@ -55,12 +54,17 @@ public:
     explicit GDriveService(QObject *parent = nullptr);
     /// destructor
     virtual ~GDriveService() final;
+
     /// start Authorization
-    void start();
+    void grant();
     /// logout account (depercated)
     void logout();
-    /// show OAuth 2.0 token
-    QString receivedToken() const;
+    /// return m_google token
+    QString token() const;
+    /// set m_google token
+    void setToken(const QString &token);
+    /// Returns the current authentication status.
+    QAbstractOAuth::Status status() const;
     /// send request to get About message, use deletelater to delete GDriveAbout
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
     /// simple upload create file
@@ -82,10 +86,9 @@ public:
     GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
                                                    const FileUpdateArgs &args);
     /// Gets a file's metadata by ID.
-    GDriveFileGet* fileGet(const QString &fileId,const QString &fields);
+    GDriveFileGet* fileGet(const GDrive::FileGetArgs &args);
     /// Search Files in drive
-    GDriveFileSearch* fileList(const QString &q,
-                               const QString &pageToken);
+    GDriveFileSearch* fileList(const GDrive::FileListArgs &args);
     /// Get File download by fileID
     GDriveFileDownloader* fileDownload(const QString &fileId,
                                        const QString &fields,
@@ -94,6 +97,8 @@ public:
 signals:
     /// This signal is emitted when the authorization flow finishes successfully.
     void granted();
+    /// Emit when current authentication status changed
+    void statusChanged(QAbstractOAuth::Status status);
 
 private:
     /// Qt Oauth2 Authorization
