@@ -1,7 +1,7 @@
 #include "googledriveservice.h"
-//#include <QOAuth2AuthorizationCodeFlow>
 #include <QOAuthHttpServerReplyHandler>
 #include <QNetworkAccessManager>
+#include <QUrlQuery>
 #include <QDesktopServices>
 #include <QDebug>
 #include "Secret/oauthglobal.h" // OAuth parameter
@@ -29,16 +29,30 @@ GDriveService::GDriveService(QObject *parent)
             this,&GDriveService::granted);
     connect(m_google,&QOAuth2AuthorizationCodeFlow::statusChanged,
             this,&GDriveService::statusChanged);
+    connect(m_google,&QOAuth2AuthorizationCodeFlow::expirationAtChanged,
+            this,&GDriveService::expirationAtChanged);
+    connect(m_google,&QOAuth2AuthorizationCodeFlow::error,
+            this,&GDriveService::error);
 }
 
 GDriveService::~GDriveService()
 {
-  /// delete none parent pointer here...
+    /// delete none parent pointer here...
+}
+
+QDateTime GDriveService::expirationAt() const
+{
+    return m_google->expirationAt();
 }
 
 void GDriveService::grant()
 {
-    m_google->grant();
+    return m_google->grant();
+}
+
+void GDriveService::refreshAccessToken()
+{
+    return m_google->refreshAccessToken();
 }
 
 void GDriveService::logout()
@@ -60,6 +74,16 @@ void GDriveService::setToken(const QString &token)
 QAbstractOAuth::Status GDriveService::status() const
 {
     return m_google->status();
+}
+
+QString GDriveService::refreshToken() const
+{
+    return m_google->refreshToken();
+}
+
+void GDriveService::setRefreshToken(const QString &refreshToken)
+{
+    return m_google->setRefreshToken(refreshToken);
 }
 
 GDriveAbout* GDriveService::getAbout(GDriveAbout::AboutArgs args)

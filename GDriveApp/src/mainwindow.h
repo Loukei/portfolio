@@ -83,6 +83,8 @@ private slots:
 
     void onGDrive_statusChanged(QAbstractOAuth::Status status);
 
+    void on_action_Refresh_token_triggered();
+
 private:
     /// GDriveService Account Login
     void accountLogin();

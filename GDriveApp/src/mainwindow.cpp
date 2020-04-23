@@ -390,3 +390,9 @@ void MainWindow::onGDrive_statusChanged(QAbstractOAuth::Status status)
     }
     qInfo() << Q_FUNC_INFO << info;
 }
+
+void MainWindow::on_action_Refresh_token_triggered()
+{
+    m_Drive->refreshAccessToken();
+//    qDebug() << m_Drive->refreshToken();
+}

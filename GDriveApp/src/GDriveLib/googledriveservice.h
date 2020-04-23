@@ -55,8 +55,8 @@ public:
     /// destructor
     virtual ~GDriveService() final;
 
-    /// start Authorization
-    void grant();
+    /// return the expiration time of the current access token.
+    QDateTime expirationAt() const;
     /// logout account (depercated)
     void logout();
     /// return m_google token
@@ -65,6 +65,11 @@ public:
     void setToken(const QString &token);
     /// Returns the current authentication status.
     QAbstractOAuth::Status status() const;
+    /// Gets the current refresh token.
+    QString refreshToken() const;
+    /// Sets the new refresh token refreshToken to be used.
+    void setRefreshToken(const QString &refreshToken);
+
     /// send request to get About message, use deletelater to delete GDriveAbout
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
     /// simple upload create file
@@ -93,12 +98,25 @@ public:
     GDriveFileDownloader* fileDownload(const QString &fileId,
                                        const QString &fields,
                                        QSharedPointer<QFile> file);
+public slots:
+    /// Starts the authentication flow as described in The OAuth 2.0 Authorization Framework
+    void grant();
+    /// Call this function to refresh the token.
+    /// Access tokens are not permanent.
+    /// After a time specified along with the access token when it was obtained, the access token will become invalid.
+    void refreshAccessToken();
 
 signals:
     /// This signal is emitted when the authorization flow finishes successfully.
     void granted();
-    /// Emit when current authentication status changed
+    /// emit when current authentication status changed
     void statusChanged(QAbstractOAuth::Status status);
+    /// emit when expiration time changed
+    void expirationAtChanged(const QDateTime &expiration);
+    /// Signal emitted when the server responds to the request with an error:
+    /// error is the name of the error;
+    /// errorDescription describes the error and uri is an optional URI containing more information about the error.
+    void error(const QString &error, const QString &errorDescription, const QUrl &uri);
 
 private:
     /// Qt Oauth2 Authorization

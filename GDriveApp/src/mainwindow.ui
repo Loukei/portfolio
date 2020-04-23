@@ -69,6 +69,7 @@
     <addaction name="actionLogin_account"/>
     <addaction name="action_Logout_Account"/>
     <addaction name="actionAbout"/>
+    <addaction name="action_Refresh_token"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="enabled">
@@ -116,24 +117,6 @@
     <string>Download file</string>
    </property>
   </action>
-  <action name="actionSimple_Upload">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Simple Upload</string>
-   </property>
-  </action>
-  <action name="actionMultipart_Upload">
-   <property name="text">
-    <string>Multipart Upload</string>
-   </property>
-  </action>
-  <action name="actionResumable_Upload">
-   <property name="text">
-    <string>Resumable Upload</string>
-   </property>
-  </action>
   <action name="action_Logout_Account">
    <property name="enabled">
     <bool>false</bool>
@@ -147,7 +130,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>&amp;Search file&amp;folder</string>
+    <string>&amp;Search file / folder</string>
    </property>
   </action>
   <action name="actionGet_file_matadata">
@@ -172,6 +155,11 @@
    </property>
    <property name="text">
     <string>&amp;Upload File...</string>
+   </property>
+  </action>
+  <action name="action_Refresh_token">
+   <property name="text">
+    <string>&amp;Refresh token</string>
    </property>
   </action>
  </widget>

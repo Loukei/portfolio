@@ -42,6 +42,7 @@ SOURCES += \
         GDriveLib/gdrivefilesimplecreate.cpp \
         GDriveLib/gdrivefilesimpleupdate.cpp \
         GDriveLib/gdrivefiletask.cpp \
+        GDriveLib/googleauthorizationcodeflow.cpp \
         GDriveLib/googledriveservice.cpp \
         QJsonModel/qjsonmodel.cpp \
         downloaddialog.cpp \
@@ -70,6 +71,7 @@ HEADERS += \
         GDriveLib/gdrivefilesimplecreate.h \
         GDriveLib/gdrivefilesimpleupdate.h \
         GDriveLib/gdrivefiletask.h \
+        GDriveLib/googleauthorizationcodeflow.h \
         GDriveLib/googledriveservice.h \
         QJsonModel/qjsonmodel.h \
         Secret/oauthglobal.h \
