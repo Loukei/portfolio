@@ -2,7 +2,8 @@
 #define TESTOAUTH_H
 
 #include <QObject>
-#include <QOAuth2AuthorizationCodeFlow>
+//#include <QOAuth2AuthorizationCodeFlow>
+#include "googleauthorizationcodeflow.h"
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
 #include "gdrivefileresourcelist.h"
@@ -61,8 +62,6 @@ public:
     void logout();
     /// return m_google token
     QString token() const;
-    /// set m_google token
-    void setToken(const QString &token);
     /// Returns the current authentication status.
     QAbstractOAuth::Status status() const;
     /// Gets the current refresh token.
@@ -120,7 +119,8 @@ signals:
 
 private:
     /// Qt Oauth2 Authorization
-    QOAuth2AuthorizationCodeFlow *m_google = nullptr;
+//    QOAuth2AuthorizationCodeFlow *m_google = nullptr;
+    GoogleAuthorizationCodeFlow *m_google = nullptr;
     /// networkmanager
     QNetworkAccessManager *m_manager = nullptr;
 };

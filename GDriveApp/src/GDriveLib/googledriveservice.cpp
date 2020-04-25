@@ -13,25 +13,27 @@ GDriveService::GDriveService(QObject *parent)
 {
     //! set google app OAuth2 setting
     m_manager = new QNetworkAccessManager(this);
-    m_google = new QOAuth2AuthorizationCodeFlow(m_manager,this);
+    m_google = new GoogleAuthorizationCodeFlow(m_manager,this);
     m_google->setScope(OAuth::keyScope());
     m_google->setAuthorizationUrl(OAuth::keyAuthUri());
     m_google->setClientIdentifier(OAuth::keyClientId());
     m_google->setAccessTokenUrl(OAuth::keyTokenUri());
     m_google->setClientIdentifierSharedKey(OAuth::keyClientSecert());
+    m_google->setAccess_type("offline");
+    m_google->setPrompt("consent");
 
     auto replyHandler = new QOAuthHttpServerReplyHandler(OAuth::keyRedirectPort(), this);
     m_google->setReplyHandler(replyHandler);
 
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
+    connect(m_google,&GoogleAuthorizationCodeFlow::authorizeWithBrowser,
             this,&QDesktopServices::openUrl);
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::granted,
+    connect(m_google,&GoogleAuthorizationCodeFlow::granted,
             this,&GDriveService::granted);
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::statusChanged,
+    connect(m_google,&GoogleAuthorizationCodeFlow::statusChanged,
             this,&GDriveService::statusChanged);
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::expirationAtChanged,
+    connect(m_google,&GoogleAuthorizationCodeFlow::expirationAtChanged,
             this,&GDriveService::expirationAtChanged);
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::error,
+    connect(m_google,&GoogleAuthorizationCodeFlow::error,
             this,&GDriveService::error);
 }
 
@@ -64,11 +66,6 @@ void GDriveService::logout()
 QString GDriveService::token() const
 {
     return m_google->token();
-}
-
-void GDriveService::setToken(const QString &token)
-{
-    return m_google->setToken(token);
 }
 
 QAbstractOAuth::Status GDriveService::status() const

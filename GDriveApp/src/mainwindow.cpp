@@ -57,7 +57,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_Drive,&GDriveService::statusChanged,
             this,&MainWindow::onGDrive_statusChanged);
     //!
-//    m_Drive->setToken(Settings::OAuth_CurrentToken(m_settings));
 }
 
 MainWindow::~MainWindow()
@@ -238,7 +237,9 @@ void MainWindow::on_actionLogin_account_triggered()
 
 void MainWindow::onGDrive_granted()
 {
-    ui->plainTextEdit->appendPlainText(QStringLiteral("Receive Token: ") + m_Drive->token());
+    QString loginInfo = QString("Receive Token: %1\n"
+                                "Refresh Token: %2\n").arg(m_Drive->token()).arg(m_Drive->refreshToken());
+    ui->plainTextEdit->appendPlainText(loginInfo);
     //! Open other UI menu
     ui->actionAbout->setEnabled(true);
     ui->actionUpload_File->setEnabled(true);
@@ -394,5 +395,4 @@ void MainWindow::onGDrive_statusChanged(QAbstractOAuth::Status status)
 void MainWindow::on_action_Refresh_token_triggered()
 {
     m_Drive->refreshAccessToken();
-//    qDebug() << m_Drive->refreshToken();
 }
