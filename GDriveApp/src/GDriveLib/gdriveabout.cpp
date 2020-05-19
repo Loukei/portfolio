@@ -12,7 +12,7 @@ GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, AboutArgs args)
     :QObject(parent),m_data(QByteArray())
 {
     //! send request to get data member, use signal received(true) to get data
-    QNetworkReply *reply = parent->get(aboutArgToUrl(args));
+    QNetworkReply *reply = parent->get(buildRequestUrl(args));
     connect(reply,&QNetworkReply::finished,
             this,&GDriveAbout::onReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
@@ -21,7 +21,7 @@ GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, AboutArgs args)
 
 GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, const QString &fields)
 {
-    QNetworkReply *reply = parent->get(fields);
+    QNetworkReply *reply = parent->get(buildRequestUrl(fields));
     connect(reply,&QNetworkReply::finished,
             this,&GDriveAbout::onReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
@@ -59,7 +59,13 @@ bool GDriveAbout::isFailed() const
     return m_isFailed;
 }
 
-QUrl GDriveAbout::aboutArgToUrl(const AboutArgs& args) const
+QUrl GDriveAbout::buildRequestUrl(const QString &field) const
+{
+    QString str = key_AboutUrl + QString("?fields=%1").arg(field);
+    return QUrl(str);
+}
+
+QUrl GDriveAbout::buildRequestUrl(const AboutArgs& args) const
 {
     QString userargs;
     switch (args) {
@@ -88,7 +94,8 @@ QUrl GDriveAbout::aboutArgToUrl(const AboutArgs& args) const
         userargs = QString("user(displayName,emailAddress,permissionId)");
         break;
     }
-    return QUrl("https://www.googleapis.com/drive/v3/about?fields=" + userargs);
+    QString urlStr = key_AboutUrl + QString("?fields=%1").arg(userargs);
+    return QUrl(urlStr);
 }
 
 void GDriveAbout::onReplyFinished()
@@ -99,7 +106,6 @@ void GDriveAbout::onReplyFinished()
         m_isComplete = true;
         m_isFailed = false;
         emit finished();
-//        emit received(true);
     }
     reply->deleteLater();
 }
@@ -112,6 +118,5 @@ void GDriveAbout::onReplyError(QNetworkReply::NetworkError)
     m_isComplete = true;
     m_isFailed = true;
     emit finished();
-//    emit received(false);
     reply->deleteLater();
 }

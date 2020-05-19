@@ -15,51 +15,54 @@ const QString key_FileGet_FileID = QStringLiteral("MainWindow/DialogFileMataData
 const QString key_FileGet_Fields = QStringLiteral("MainWindow/DialogFileMataData/Fields");
 const QString key_Update_FilePath = QStringLiteral("MainWindow/DialogUpdate/FilePath");
 const QString key_Update_FileID = QStringLiteral("MainWindow/DialogUpdate/FileID");
-const QString key_OAuth_CurrentToken = QStringLiteral("MainWindow/OAuth/token");
+const QString key_OAuth_UserEmail = QStringLiteral("MainWindow/OAuth/UserEmail");
+const QString key_OAuth_IsRememberMe = QStringLiteral("MainWindow/OAuth/IsRememberMe");
+const QString key_OAuth_RefreshToken = QStringLiteral("MainWindow/OAuth/RefreshToken");
 
-inline QRect MainWindow_Geometry(QSettings *settings)
-{
+/*Settings reader function*/
+inline QRect MainWindow_Geometry(const QSettings *settings){
     return settings->value(key_Geometry,QRect(0,0,630,495)).toRect();
 }
 
-inline QString Upload_FilePath(QSettings *settings)
-{
+inline QString Upload_FilePath(const QSettings *settings){
     return settings->value(key_Upload_FilePath,QStringLiteral("/home")).toString();
 }
 
-inline QString Download_FilePath(QSettings *settings)
-{
+inline QString Download_FilePath(const QSettings *settings){
     return settings->value(key_Download_FilePath,QStringLiteral("/home")).toString();
 }
 
-inline QString Download_FileID(QSettings *settings)
-{
+inline QString Download_FileID(const QSettings *settings){
     return settings->value(key_Download_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
 }
 
-inline QString FileGet_FileID(QSettings *settings)
-{
+inline QString FileGet_FileID(const QSettings *settings){
     return settings->value(key_FileGet_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
 }
 
-inline QString FileGet_Fields(QSettings *settings)
-{
+inline QString FileGet_Fields(const QSettings *settings){
     return settings->value(key_FileGet_Fields,QStringLiteral("YOUR_FILE_ID")).toString();
 }
 
-inline QString Update_FilePath(QSettings *settings)
-{
+inline QString Update_FilePath(const QSettings *settings){
     return settings->value(key_Update_FilePath,QStringLiteral("/home")).toString();
 }
 
-inline QString Update_FileID(QSettings *settings)
-{
+inline QString Update_FileID(const QSettings *settings){
     return settings->value(key_Update_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
 }
 
-inline QString OAuth_CurrentToken(QSettings *settings){
-    return settings->value(key_OAuth_CurrentToken,QString()).toString();
+inline QString OAuth_UserID(const QSettings *settings){
+    return settings->value(key_OAuth_UserEmail,QString()).toString();
 }
+
+inline QString OAuth_RefreshToken(const QSettings *settings){
+    return settings->value(key_OAuth_RefreshToken,QString()).toString();
 }
+
+inline bool OAuth_IsRememberMe(const QSettings *settings){
+    return settings->value(key_OAuth_IsRememberMe,QVariant(false)).toBool();
+}
+} // Settings
 
 #endif // MAINWINDOW_SETTINGS_H

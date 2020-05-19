@@ -18,38 +18,30 @@
     <normaloff>:/Icon/Icon/Icon_main.png</normaloff>:/Icon/Icon/Icon_main.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,3">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,0,2">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="label_UserName">
-        <property name="text">
-         <string>Account:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QLabel" name="label_CurrentReply">
+      <property name="text">
+       <string>Current reply</string>
+      </property>
+     </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_CurrentReply">
-        <property name="text">
-         <string>Current reply</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTreeView" name="treeView_Reply"/>
-      </item>
-     </layout>
+     <widget class="QTreeView" name="treeView_Reply"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Console</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -66,10 +58,10 @@
     <property name="title">
      <string>Account</string>
     </property>
-    <addaction name="actionLogin_account"/>
-    <addaction name="action_Logout_Account"/>
-    <addaction name="actionAbout"/>
-    <addaction name="action_Refresh_token"/>
+    <addaction name="action_Login"/>
+    <addaction name="action_Logout"/>
+    <addaction name="action_Remember_me"/>
+    <addaction name="action_Refresh_Token"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="enabled">
@@ -84,7 +76,14 @@
     <addaction name="actionGet_file_matadata"/>
     <addaction name="actionUpdate_file"/>
    </widget>
+   <widget class="QMenu" name="menu_About">
+    <property name="title">
+     <string>&amp;About</string>
+    </property>
+    <addaction name="action_About_User"/>
+   </widget>
    <addaction name="menuAcount"/>
+   <addaction name="menu_About"/>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -96,33 +95,12 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionLogin_account">
-   <property name="text">
-    <string>Login account</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>About...</string>
-   </property>
-  </action>
   <action name="actionDownload_file">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string>Download file</string>
-   </property>
-  </action>
-  <action name="action_Logout_Account">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Logout Account</string>
    </property>
   </action>
   <action name="action_Search_file_folder">
@@ -157,9 +135,44 @@
     <string>&amp;Upload File...</string>
    </property>
   </action>
-  <action name="action_Refresh_token">
+  <action name="action_Login">
    <property name="text">
-    <string>&amp;Refresh token</string>
+    <string>&amp;Login</string>
+   </property>
+  </action>
+  <action name="action_Refresh_Token">
+   <property name="text">
+    <string>&amp;Refresh Token</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_Logout">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Logout</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_Remember_me">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Remember me</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_About_User">
+   <property name="text">
+    <string>&amp;About User</string>
    </property>
   </action>
  </widget>

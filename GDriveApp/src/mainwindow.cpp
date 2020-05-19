@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
 #include "uploaddialog.h"
 #include "downloaddialog.h"
 #include "searchdialog.h"
 #include "filematadatadialog.h"
 #include "updatedialog.h"
+#include <QWidgetAction>
+#include "accountwidget.h"
+
 #include "GDriveLib/googledriveservice.h"
 #include "QJsonModel/qjsonmodel.h"
 #include "mainwindow_settings.h" // namespace Settings
@@ -47,16 +51,23 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dialogUpdate = new UpdateDialog(this,
                                       Settings::Update_FileID(m_settings),
                                       Settings::Update_FilePath(m_settings));
+    //! Setup User widget
+    m_userWidget = new AccountWidget(ui->menuAcount);
+    QWidgetAction *act = new QWidgetAction(ui->menuAcount);
+    act->setDefaultWidget(m_userWidget);
+    ui->menuAcount->insertAction(ui->action_Login,act);
     //! Setup Reply TreeView and model
     m_model = new QJsonModel(this);
     ui->treeView_Reply->setModel(m_model);
     //! Create Google Drive Serviece instance
     m_Drive = new GDriveService(this);
+    loadUserAccount(*m_settings);
     connect(m_Drive,&GDriveService::granted,
             this,&MainWindow::onGDrive_granted);
-    connect(m_Drive,&GDriveService::statusChanged,
-            this,&MainWindow::onGDrive_statusChanged);
-    //!
+    connect(m_Drive,&GDriveService::error,
+            this,&MainWindow::onGDrive_error);
+    connect(m_Drive,&GDriveService::tokenChanged,
+            this,&MainWindow::onGDrive_tokenChanged);
 }
 
 MainWindow::~MainWindow()
@@ -65,28 +76,34 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::accountLogin()
+void MainWindow::UpdateUserWidget()
 {
-    return m_Drive->grant();   //! see MainWindow::onGDrive_granted after granted emit
-}
-
-void MainWindow::accountLogout()
-{
-    m_Drive->logout();
+    GDriveAbout* userAbout = m_Drive->getAbout(QStringLiteral("user"));
+    auto onAboutFinished = [userAbout,this](){
+        if(userAbout->isComplete() && !userAbout->isFailed()){
+            GDriveAboutResource resource = userAbout->getResource();
+            m_userWidget->setDisplayName(resource.user_displayName());
+            m_userWidget->setEmailAddress(resource.user_emailAddress());
+            m_userWidget->loadNetworkImage(resource.user_photoLink());
+        }else {
+            m_userWidget->resetUI();
+            ui->plainTextEdit->appendPlainText("About message Error.\n");
+        }
+        m_model->loadJson(userAbout->getReplyString());
+        userAbout->deleteLater();
+    };
+    connect(userAbout,&GDriveAbout::finished,
+            this,onAboutFinished);
 }
 
 void MainWindow::accountAbout()
 {
     GDriveAbout* userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
     auto onAboutFinished = [userAbout,this](){
-        if(userAbout->isComplete() && !userAbout->isFailed()){
-            GDriveAboutResource resource = userAbout->getResource();
-            ui->label_UserName->setText("Account: " + resource.user_displayName());
-        }else {
-            ui->label_UserName->setText("Unknown");
+        if((!userAbout->isComplete()) | userAbout->isFailed()){
             ui->plainTextEdit->appendPlainText("About message Error.\n");
         }
-        updateModel(userAbout->getReplyString());
+        m_model->loadJson(userAbout->getReplyString());
         userAbout->deleteLater();
     };
     connect(userAbout,&GDriveAbout::finished,
@@ -102,7 +119,7 @@ void MainWindow::fileSimpleUpload(const QString &filepath, const FileCreateArgs 
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Simple Upload error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -118,7 +135,7 @@ void MainWindow::fileMultipartUpload(const QString &filepath, const FileCreateAr
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Upload error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -134,7 +151,7 @@ void MainWindow::fileResumableUpload(const QString &filepath, const FileCreateAr
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Upload error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -150,7 +167,7 @@ void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs 
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Update error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -166,7 +183,7 @@ void MainWindow::fileMultipartUpdate(const QString &filepath, const FileUpdateAr
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Multipart Update error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -182,7 +199,7 @@ void MainWindow::fileResumableUpdate(const QString &filepath, const FileUpdateAr
         }else {
             ui->plainTextEdit->appendPlainText(filepath + " Resumable Update error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
     connect(task,&GDriveFileTask::finished,
@@ -200,7 +217,7 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
         }else {
             ui->plainTextEdit->appendPlainText(downloadFilePath + " Download error:" + task->errorString());
         }
-        updateModel(task->getReplyString());
+        m_model->loadJson(task->getReplyString());
         task->deleteLater();
     });
 }
@@ -215,12 +232,25 @@ void MainWindow::writeSettings()
     m_settings->setValue(Settings::key_FileGet_Fields,m_dialogFileMataData->getFields());
     m_settings->setValue(Settings::key_Update_FilePath,m_dialogUpdate->getFilePath());
     m_settings->setValue(Settings::key_Update_FileID,m_dialogUpdate->getFileID());
-    m_settings->setValue(Settings::key_OAuth_CurrentToken,m_Drive->token());
+    if(ui->action_Remember_me->isChecked()){
+        m_settings->setValue(Settings::key_OAuth_UserEmail,m_userWidget->emailAddress());
+        m_settings->setValue(Settings::key_OAuth_RefreshToken,m_Drive->refreshToken());
+    }else {
+        m_settings->remove(Settings::key_OAuth_UserEmail);
+        m_settings->remove(Settings::key_OAuth_RefreshToken);
+    }
 }
 
-void MainWindow::updateModel(const QByteArray &json)
+void MainWindow::loadUserAccount(const QSettings &settings)
 {
-    m_model->loadJson(json);
+    qDebug() << Q_FUNC_INFO; // "Status: NotAuthenticated"
+    const QString refreshToken = Settings::OAuth_RefreshToken(&settings);
+    if(!refreshToken.isEmpty())
+    {
+        qInfo() << "Login by previous Refresh Token...";
+        m_Drive->setRefreshToken(refreshToken);
+        m_Drive->refreshAccessToken(); // use refresh token to login
+    }
 }
 
 void MainWindow::clearModel()
@@ -228,43 +258,85 @@ void MainWindow::clearModel()
     m_model->loadJson("{}");
 }
 
-void MainWindow::on_actionLogin_account_triggered()
+void MainWindow::on_action_Login_triggered()
 {
-    qInfo() << Q_FUNC_INFO;
-    clearModel();
-    accountLogin();
+    qInfo() << Q_FUNC_INFO << "Login form browser...";
+    m_Drive->grant();
 }
 
 void MainWindow::onGDrive_granted()
 {
-    QString loginInfo = QString("Receive Token: %1\n"
-                                "Refresh Token: %2\n").arg(m_Drive->token()).arg(m_Drive->refreshToken());
-    ui->plainTextEdit->appendPlainText(loginInfo);
-    //! Open other UI menu
-    ui->actionAbout->setEnabled(true);
-    ui->actionUpload_File->setEnabled(true);
-    ui->actionUpdate_file->setEnabled(true);
-    ui->actionDownload_file->setEnabled(true);
-    ui->action_Search_file_folder->setEnabled(true);
-    ui->actionGet_file_matadata->setEnabled(true);
+    qDebug() << Q_FUNC_INFO;
+    // request user info
+    QString info = QString("Token: %1\nRefresh Token: %2\n")
+            .arg(m_Drive->token()).arg(m_Drive->refreshToken());
+    ui->plainTextEdit->appendPlainText(info);
 }
 
-void MainWindow::on_action_Logout_Account_triggered()
+void MainWindow::on_action_Logout_triggered()
 {
     qInfo() << Q_FUNC_INFO;
+    m_Drive->logout();
     clearModel();
-    accountLogout();
-    ui->label_UserName->clear();
-    ui->plainTextEdit->appendPlainText("Account logout.\n");
-    ui->actionAbout->setEnabled(false);
+    m_userWidget->resetUI();
+    ui->action_Login->setEnabled(true);
+    ui->action_Login->setVisible(true);
+    ui->action_Logout->setVisible(false);
+    ui->action_Remember_me->setVisible(false);
+    ui->action_Remember_me->setChecked(false);
+    ui->action_Refresh_Token->setVisible(false);
     ui->actionUpload_File->setEnabled(false);
     ui->actionUpdate_file->setEnabled(false);
     ui->actionDownload_file->setEnabled(false);
     ui->action_Search_file_folder->setEnabled(false);
     ui->actionGet_file_matadata->setEnabled(false);
+    ui->plainTextEdit->appendPlainText("Account logout.\n");
 }
 
-void MainWindow::on_actionAbout_triggered()
+void MainWindow::on_action_Refresh_Token_triggered()
+{
+    /// refresh token menu is only enable when user has login, no need to update UI
+    qDebug() << Q_FUNC_INFO;
+    m_Drive->refreshAccessToken();
+}
+
+void MainWindow::onGDrive_tokenChanged(const QString &token)
+{
+    /// m_currentOAuthToken = {}, token = "..." => login
+    /// m_currentOAuthToken = "a...", token = "b..." => refresh token or switch account
+    /// m_currentOAuthToken = "...", token = {} => logout
+    qDebug() << Q_FUNC_INFO;
+    if(token.isEmpty()){
+        qDebug() << "token isEmpty -> logout";
+    }else if (m_currentOAuthToken.isEmpty()) {
+        qDebug() << "m_currentOAuthToken isEmpty() && token !isEmpty() -> login";
+        ui->action_Login->setVisible(false);
+        ui->action_Logout->setVisible(true);
+        ui->action_Refresh_Token->setVisible(true);
+        ui->action_Remember_me->setVisible(true);
+        ui->action_Remember_me->setChecked(true);
+        ui->actionUpload_File->setEnabled(true);
+        ui->actionUpdate_file->setEnabled(true);
+        ui->actionDownload_file->setEnabled(true);
+        ui->action_Search_file_folder->setEnabled(true);
+        ui->actionGet_file_matadata->setEnabled(true);
+        UpdateUserWidget();
+    }else if (token != m_currentOAuthToken) {
+        qDebug() << "token != m_currentOAuthToken -> refresh or switch account";
+    }
+    m_currentOAuthToken = token;
+}
+
+void MainWindow::onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri)
+{
+    QVariantMap info;
+    info.insert(QStringLiteral("Error"),error);
+    info.insert(QStringLiteral("Description"),errorDescription);
+    info.insert(QStringLiteral("Uri"),uri);
+    qDebug() << Q_FUNC_INFO << info;
+}
+
+void MainWindow::on_action_About_User_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     clearModel();
@@ -372,7 +444,7 @@ void MainWindow::on_actionUpload_File_triggered()
     }
 }
 
-void MainWindow::onGDrive_statusChanged(QAbstractOAuth::Status status)
+QString MainWindow::StatusToStr(QAbstractOAuth::Status status)
 {
     QString info("Status: ");
     switch (status) {
@@ -389,10 +461,5 @@ void MainWindow::onGDrive_statusChanged(QAbstractOAuth::Status status)
         info += "RefreshingToken";
         break;
     }
-    qInfo() << Q_FUNC_INFO << info;
-}
-
-void MainWindow::on_action_Refresh_token_triggered()
-{
-    m_Drive->refreshAccessToken();
+    return info;
 }

@@ -64,6 +64,12 @@ signals:
     /// emit when error occured or task complete
     void finished();
 
+protected:
+    const QString key_AboutUrl = "https://www.googleapis.com/drive/v3/about";
+    /// Turn fields to request Url
+    QUrl buildRequestUrl(const QString &field) const;
+    QUrl buildRequestUrl(const AboutArgs& args) const;
+
 private:
     /// save reply data
     QByteArray m_data = QByteArray();
@@ -71,8 +77,7 @@ private:
     bool m_isFailed = false;
     /// Does task complete
     bool m_isComplete = false;
-    /// Turn AboutArgs to request Url
-    QUrl aboutArgToUrl(const AboutArgs& args) const;
+
 
 private slots:
     /// process network reply finish

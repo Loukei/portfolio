@@ -42,9 +42,9 @@ SOURCES += \
         GDriveLib/gdrivefilesimplecreate.cpp \
         GDriveLib/gdrivefilesimpleupdate.cpp \
         GDriveLib/gdrivefiletask.cpp \
-        GDriveLib/googleauthorizationcodeflow.cpp \
         GDriveLib/googledriveservice.cpp \
         QJsonModel/qjsonmodel.cpp \
+        accountwidget.cpp \
         downloaddialog.cpp \
         filematadatadialog.cpp \
         main.cpp \
@@ -71,10 +71,10 @@ HEADERS += \
         GDriveLib/gdrivefilesimplecreate.h \
         GDriveLib/gdrivefilesimpleupdate.h \
         GDriveLib/gdrivefiletask.h \
-        GDriveLib/googleauthorizationcodeflow.h \
         GDriveLib/googledriveservice.h \
         QJsonModel/qjsonmodel.h \
         Secret/oauthglobal.h \
+        accountwidget.h \
         downloaddialog.h \
         filematadatadialog.h \
         mainwindow.h \
@@ -84,6 +84,7 @@ HEADERS += \
         uploaddialog.h
 
 FORMS += \
+        accountwidget.ui \
         downloaddialog.ui \
         filematadatadialog.ui \
         mainwindow.ui \
@@ -98,6 +99,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 ## add Oauth network
 QT += network networkauth
+
+## add OAuth private
+#QT += networkauth-private
 
 RESOURCES += \
     resources.qrc

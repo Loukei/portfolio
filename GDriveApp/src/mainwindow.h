@@ -8,6 +8,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class AccountWidget;
 class UploadDialog;
 class UpdateDialog;
 class SearchDialog;
@@ -32,7 +33,9 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    /// Download Dialog
+    /// A widget to display User info
+    AccountWidget *m_userWidget;
+    /// A dialog to set Download file
     DownloadDialog *m_dialogDownload;
     /// A dialog to provide search drive files
     SearchDialog *m_dialogSearch;
@@ -48,16 +51,24 @@ private:
     QJsonModel *m_model;
     /// Google Drive Api serviece
     GDrive::GDriveService *m_Drive;
+    /// the previous access token received, use to determine Login/Refresh/Logout
+    QString m_currentOAuthToken = QString();
 
 private slots:
-    /// Click menu login
-    void on_actionLogin_account_triggered();
+    /// Click menu Login
+    void on_action_Login_triggered();
     /// when m_Drive grant succeed, show info and allow other operation
     void onGDrive_granted();
     /// Click menu Logout
-    void on_action_Logout_Account_triggered();
+    void on_action_Logout_triggered();
+    /// click menu Refersh token
+    void on_action_Refresh_Token_triggered();
+    /// change UI when token changed
+    void onGDrive_tokenChanged(const QString &token);
+    ///
+    void onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri);
     /// Click menu Account About
-    void on_actionAbout_triggered();
+    void on_action_About_User_triggered();
     /// Click menu Download file
     void on_actionDownload_file_triggered();
     /// Click menu Search file&folder
@@ -74,22 +85,18 @@ private slots:
     /// Click menu Get file matadata
     void on_actionGet_file_matadata_triggered();
     /// Receive FileMataDataDialog::query, then return GDriveFileGet to m_dialogFileMataData
-    void onFileMataDataDialog_query(const QString &fileID,
-                                    const QString &fields);
-
+    void onFileMataDataDialog_query(const QString &fileID,const QString &fields);
+    /// open update file dialog
     void on_actionUpdate_file_triggered();
-
+    /// open upload file dialog
     void on_actionUpload_File_triggered();
 
-    void onGDrive_statusChanged(QAbstractOAuth::Status status);
-
-    void on_action_Refresh_token_triggered();
-
 private:
-    /// GDriveService Account Login
-    void accountLogin();
-    /// GDriveService Account Logout
-    void accountLogout();
+    /// A convert function to turn QAbstractOAuth::Status to Readable String
+    static QString StatusToStr(QAbstractOAuth::Status status);
+
+    /// request User about message and refresh the UI(m_userWidget)
+    void UpdateUserWidget();
     /// GDriveService Account get About message
     void accountAbout();
 
@@ -99,7 +106,6 @@ private:
     void fileMultipartUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
     /// GDriveService upload(Create) file Resumable method
     void fileResumableUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
-
     /// GDriveService upload(Update) file Simple method
     void fileSimpleUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService upload(Update) file Multipart method
@@ -108,12 +114,14 @@ private:
     void fileResumableUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
+
     /// write settings to ini file
     void writeSettings();
-    /// take Google Drive Api response show on Treeview
-    void updateModel(const QByteArray &json);
+    /// read Settings refresh token.
+    /// If refersh token exist,then set Refersh token and request access token
+    /// If No refersh token doesnt exist, then do nothing
+    void loadUserAccount(const QSettings &settings);
     /// claer Json model, used for UI update treeView
     void clearModel();
 };
-
 #endif // MAINWINDOW_H

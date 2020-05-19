@@ -63,6 +63,11 @@ QString GDrive::GDriveAboutResource::user_permissionId() const
     return user()["permissionId"].toString();
 }
 
+QString GDrive::GDriveAboutResource::user_emailAddress() const
+{
+    return user()["emailAddress"].toString();
+}
+
 QJsonObject GDrive::GDriveAboutResource::storageQuota() const
 {
     return m_object["storageQuota"].toObject();

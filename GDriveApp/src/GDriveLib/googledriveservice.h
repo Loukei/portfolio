@@ -2,8 +2,7 @@
 #define TESTOAUTH_H
 
 #include <QObject>
-//#include <QOAuth2AuthorizationCodeFlow>
-#include "googleauthorizationcodeflow.h"
+#include <QOAuth2AuthorizationCodeFlow>
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
 #include "gdrivefileresourcelist.h"
@@ -37,6 +36,8 @@ namespace GDrive {
  * - 除了登入帳號外，其他method都使用factory pattern操作。
  * - 每執行一項操作都會回傳一個以`m_google`為parent的物件，我稱之為Task。
  * Task在建立時就會立刻執行，以建構子的參數處理對應的請求，並在完成時發出信號通知
+ * - Google 的OAuth操作比起標準多了一些，想要修改需要使用`QAbstractOAuth::ModifyParametersFunction`這項設置，
+ * Qt提供有限度的參數修正，例如請求Refersh Token、更新access token等
  *
  * ## Note
  * QNetworkreply其中readyRead()信號繼承自QIODevice類，每當有新的數據可以讀取時，都會發射該信號；
@@ -46,6 +47,8 @@ namespace GDrive {
  *
  * ## Reference
  * - [Introduction to Google Drive API](https://developers.google.com/drive/api/v3/about-sdk)
+ * - [QOAuth2AuthorizationCodeFlow class](https://code.woboq.org/qt5/qtnetworkauth/src/oauth/qoauth2authorizationcodeflow.cpp.html)
+ * - [enum QAbstractOAuth::Stage](https://doc.qt.io/qt-5/qabstractoauth.html#Stage-enum)
  */
 class GDriveService : public QObject
 {
@@ -68,9 +71,14 @@ public:
     QString refreshToken() const;
     /// Sets the new refresh token refreshToken to be used.
     void setRefreshToken(const QString &refreshToken);
+    /// Returns the current network access manager used to send the requests to the server during
+    /// authentication flows or to make authentication calls.
+    QNetworkAccessManager* networkAccessManager() const;
 
-    /// send request to get About message, use deletelater to delete GDriveAbout
+    /// send request to get About resource
     GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
+    /// send request to get About resource
+    GDrive::GDriveAbout* getAbout(const QString &fields);
     /// simple upload create file
     GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath,
                                              const FileCreateArgs &args);
@@ -116,11 +124,20 @@ signals:
     /// error is the name of the error;
     /// errorDescription describes the error and uri is an optional URI containing more information about the error.
     void error(const QString &error, const QString &errorDescription, const QUrl &uri);
+    /// emit when refreshToken changed
+    void refreshTokenChanged(const QString &refreshToken);
+
+    void tokenChanged(const QString &token);
+
+protected:
+    /// This function is used to customize the parameters sent to the server during a specified authorization stage.
+    /// The number of calls to this function depends on the flow used during the authentication.
+    /// see `QAbstractOAuth::ModifyParametersFunction`
+    static void oAuthModifyParametersFunction(QAbstractOAuth::Stage stage, QVariantMap *parameters);
 
 private:
     /// Qt Oauth2 Authorization
-//    QOAuth2AuthorizationCodeFlow *m_google = nullptr;
-    GoogleAuthorizationCodeFlow *m_google = nullptr;
+    QOAuth2AuthorizationCodeFlow *m_google = nullptr;
     /// networkmanager
     QNetworkAccessManager *m_manager = nullptr;
 };
