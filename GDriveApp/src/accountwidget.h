@@ -36,6 +36,9 @@ public:
     static QPixmap DrawImage(const QString &text);
 
 protected:
+    /// reimplment QWidget::resizeEvent(), resize usericon
+//    void resizeEvent(QResizeEvent *event) override;
+    /// send network request to get url image and save to m_icon
     void requestUserIcon(const QUrl &url);
 
 protected slots:
@@ -44,7 +47,7 @@ protected slots:
 
 private:
     Ui::AccountWidget *ui;
-    QPixmap m_defaultUserIcon;
+    const QPixmap m_defaultUserIcon;
 
     QNetworkAccessManager *m_manager;
     QPixmap m_icon;

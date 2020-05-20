@@ -3,17 +3,17 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#define DefaultSize QSize(64,64)
+
 AccountWidget::AccountWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AccountWidget)
+    ui(new Ui::AccountWidget),
+    m_defaultUserIcon(QPixmap(":/Icon/Icon/iconfinder_user_close_103746.png").scaled(DefaultSize))
 {
     ui->setupUi(this);
-    m_defaultUserIcon = QPixmap(":/Icon/Icon/iconfinder_user_close_103746.png");
-    m_defaultUserIcon.scaled(QSize(64,64));
     ui->label_UserIcon->setPixmap(m_defaultUserIcon);
     ui->label_DisplayName->hide();
     ui->label_EmailAddress->hide();
-
     m_manager = new QNetworkAccessManager(this);
 }
 
@@ -88,10 +88,20 @@ QPixmap AccountWidget::DrawImage(const QString &text)
     painter.setPen(QPen(Qt::black));
     painter.drawText(QRect(100,100,200,100),"Text you want to draw...");
     image.save("testImage.png");
-    // https://stackoverflow.com/questions/41904610/how-to-create-a-simple-image-qimage-with-text-and-colors-in-qt-and-save-it-as
+    // https://stackoverflow.com/questions/41904610/
+how-to-create-a-simple-image-qimage-with-text-and-colors-in-qt-and-save-it-as
     */
     return QPixmap();
 }
+
+//void AccountWidget::resizeEvent(QResizeEvent *event)
+//{
+//    const QPixmap *currentIcon = ui->label_UserIcon->pixmap();
+//    qInfo() << Q_FUNC_INFO
+//            << "label size:"<< ui->label_UserIcon->size()
+//            << "\tCurrent icon size:" << currentIcon->size();
+//    QWidget::resizeEvent(event);
+//}
 
 void AccountWidget::requestUserIcon(const QUrl &url)
 {
@@ -109,7 +119,7 @@ void AccountWidget::on_requestUserIcon_finished()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error() == QNetworkReply::NetworkError::NoError){
         m_icon.loadFromData(reply->readAll());
-        setUserIcon(m_icon);
+        ui->label_UserIcon->setPixmap(m_icon.scaled(DefaultSize));
     }
     reply->deleteLater();
 }
