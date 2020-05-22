@@ -1,33 +1,36 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "accountwidgetacts.h"
 #include "uploaddialog.h"
 #include "downloaddialog.h"
 #include "searchdialog.h"
 #include "filematadatadialog.h"
 #include "updatedialog.h"
-#include <QWidgetAction>
-#include "accountwidget.h"
 
 #include "GDriveLib/googledriveservice.h"
 #include "QJsonModel/qjsonmodel.h"
+#include "networkimgloader.h" // load image from url
 #include "mainwindow_settings.h" // namespace Settings
-#include <QSettings>
 #include <QDebug>
 #include <QFile>
-#include <QFileDialog>
 
 using namespace GDrive;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_accountActs(new AccountWidgetActs)
 {
     ui->setupUi(this);
+    ui->mainToolBar->setVisible(false);
     //! Read Settings
     m_settings = new QSettings(QStringLiteral("GDriveApp_Settings.ini"),QSettings::IniFormat,this);
     m_settings->setIniCodec("UTF-8");
     this->setGeometry(Settings::MainWindow_Geometry(m_settings));
+    //! Initialize Account widget actions
+    m_accountActs->setupUi(ui->menu_Acount);
+    ui->menu_Acount->insertActions(ui->action_Login,m_accountActs->actions());
     //! Setup upload dialog
     m_dialogUpload = new UploadDialog(this,
                                       tr("Upload File"),
@@ -51,11 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dialogUpdate = new UpdateDialog(this,
                                       Settings::Update_FileID(m_settings),
                                       Settings::Update_FilePath(m_settings));
-    //! Setup User widget
-    m_userWidget = new AccountWidget(ui->menuAcount);
-    QWidgetAction *act = new QWidgetAction(ui->menuAcount);
-    act->setDefaultWidget(m_userWidget);
-    ui->menuAcount->insertAction(ui->action_Login,act);
     //! Setup Reply TreeView and model
     m_model = new QJsonModel(this);
     ui->treeView_Reply->setModel(m_model);
@@ -74,19 +72,22 @@ MainWindow::~MainWindow()
 {
     writeSettings();
     delete ui;
+    delete m_accountActs;
 }
 
-void MainWindow::UpdateUserWidget()
+void MainWindow::updateAccountActs()
 {
     GDriveAbout* userAbout = m_Drive->getAbout(QStringLiteral("user"));
     auto onAboutFinished = [userAbout,this](){
         if(userAbout->isComplete() && !userAbout->isFailed()){
             GDriveAboutResource resource = userAbout->getResource();
-            m_userWidget->setDisplayName(resource.user_displayName());
-            m_userWidget->setEmailAddress(resource.user_emailAddress());
-            m_userWidget->loadNetworkImage(resource.user_photoLink());
+            m_accountActs->setUserName(resource.user_displayName());
+            m_accountActs->setEmailAddress(resource.user_emailAddress());
+            m_accountActs->action_UserName->setVisible(true);
+            m_accountActs->action_UserEmail->setVisible(true);
+            loadUserIcon(m_accountActs,resource.user_photoLink(),m_Drive->networkAccessManager());
         }else {
-            m_userWidget->resetUI();
+            m_accountActs->resetUi();
             ui->plainTextEdit->appendPlainText("About message Error.\n");
         }
         m_model->loadJson(userAbout->getReplyString());
@@ -233,7 +234,7 @@ void MainWindow::writeSettings()
     m_settings->setValue(Settings::key_Update_FilePath,m_dialogUpdate->getFilePath());
     m_settings->setValue(Settings::key_Update_FileID,m_dialogUpdate->getFileID());
     if(ui->action_Remember_me->isChecked()){
-        m_settings->setValue(Settings::key_OAuth_UserEmail,m_userWidget->emailAddress());
+        m_settings->setValue(Settings::key_OAuth_UserEmail,m_accountActs->emailAddress());
         m_settings->setValue(Settings::key_OAuth_RefreshToken,m_Drive->refreshToken());
     }else {
         m_settings->remove(Settings::key_OAuth_UserEmail);
@@ -247,9 +248,9 @@ void MainWindow::loadUserAccount(const QSettings &settings)
     const QString refreshToken = Settings::OAuth_RefreshToken(&settings);
     if(!refreshToken.isEmpty())
     {
-        qInfo() << "Login by previous Refresh Token...";
         m_Drive->setRefreshToken(refreshToken);
         m_Drive->refreshAccessToken(); // use refresh token to login
+        this->statusBar()->showMessage(tr("Login by previous Refresh Token..."));
     }
 }
 
@@ -260,17 +261,19 @@ void MainWindow::clearModel()
 
 void MainWindow::on_action_Login_triggered()
 {
-    qInfo() << Q_FUNC_INFO << "Login form browser...";
+    qInfo() << Q_FUNC_INFO;
     m_Drive->grant();
+    this->statusBar()->showMessage(tr("Login from browser..."));
 }
 
 void MainWindow::onGDrive_granted()
 {
     qDebug() << Q_FUNC_INFO;
     // request user info
-    QString info = QString("Token: %1\nRefresh Token: %2\n")
+    const QString info = QString("Token: %1\nRefresh Token: %2\n")
             .arg(m_Drive->token()).arg(m_Drive->refreshToken());
     ui->plainTextEdit->appendPlainText(info);
+    this->statusBar()->showMessage(tr("Access Token received."));
 }
 
 void MainWindow::on_action_Logout_triggered()
@@ -278,19 +281,18 @@ void MainWindow::on_action_Logout_triggered()
     qInfo() << Q_FUNC_INFO;
     m_Drive->logout();
     clearModel();
-    m_userWidget->resetUI();
+    /*Set ui->menu_Acount to logout*/
+    m_accountActs->resetUi();
     ui->action_Login->setEnabled(true);
     ui->action_Login->setVisible(true);
     ui->action_Logout->setVisible(false);
     ui->action_Remember_me->setVisible(false);
     ui->action_Remember_me->setChecked(false);
     ui->action_Refresh_Token->setVisible(false);
-    ui->actionUpload_File->setEnabled(false);
-    ui->actionUpdate_file->setEnabled(false);
-    ui->actionDownload_file->setEnabled(false);
-    ui->action_Search_file_folder->setEnabled(false);
-    ui->actionGet_file_matadata->setEnabled(false);
-    ui->plainTextEdit->appendPlainText("Account logout.\n");
+    /*Close all OAuth actions*/
+    ui->menu_About->setEnabled(false);
+    ui->menu_File->setEnabled(false);
+    this->statusBar()->showMessage(tr("Account logout."));
 }
 
 void MainWindow::on_action_Refresh_Token_triggered()
@@ -298,6 +300,7 @@ void MainWindow::on_action_Refresh_Token_triggered()
     /// refresh token menu is only enable when user has login, no need to update UI
     qDebug() << Q_FUNC_INFO;
     m_Drive->refreshAccessToken();
+    this->statusBar()->showMessage(tr("Refresh token..."));
 }
 
 void MainWindow::onGDrive_tokenChanged(const QString &token)
@@ -310,17 +313,14 @@ void MainWindow::onGDrive_tokenChanged(const QString &token)
         qDebug() << "token isEmpty -> logout";
     }else if (m_currentOAuthToken.isEmpty()) {
         qDebug() << "m_currentOAuthToken isEmpty() && token !isEmpty() -> login";
+        updateAccountActs();
         ui->action_Login->setVisible(false);
         ui->action_Logout->setVisible(true);
         ui->action_Refresh_Token->setVisible(true);
         ui->action_Remember_me->setVisible(true);
         ui->action_Remember_me->setChecked(true);
-        ui->actionUpload_File->setEnabled(true);
-        ui->actionUpdate_file->setEnabled(true);
-        ui->actionDownload_file->setEnabled(true);
-        ui->action_Search_file_folder->setEnabled(true);
-        ui->actionGet_file_matadata->setEnabled(true);
-        UpdateUserWidget();
+        ui->menu_About->setEnabled(true);
+        ui->menu_File->setEnabled(true);
     }else if (token != m_currentOAuthToken) {
         qDebug() << "token != m_currentOAuthToken -> refresh or switch account";
     }
@@ -343,7 +343,7 @@ void MainWindow::on_action_About_User_triggered()
     accountAbout();
 }
 
-void MainWindow::on_actionDownload_file_triggered()
+void MainWindow::on_action_Download_file_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     if(m_dialogDownload->exec() == QDialog::Accepted){
@@ -377,7 +377,7 @@ void MainWindow::onSearchDialog_query(const QString &corpora,
             m_dialogSearch,&SearchDialog::onFileSearch_finished);
 }
 
-void MainWindow::on_actionGet_file_matadata_triggered()
+void MainWindow::on_action_Get_file_matadata_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     m_dialogFileMataData->exec();
@@ -392,7 +392,7 @@ void MainWindow::onFileMataDataDialog_query(const QString &fileID, const QString
             m_dialogFileMataData,&FileMataDataDialog::onFileGet_finished);
 }
 
-void MainWindow::on_actionUpdate_file_triggered()
+void MainWindow::on_action_Update_file_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     if(m_dialogUpdate->exec() == QDialog::Accepted){
@@ -419,7 +419,7 @@ void MainWindow::on_actionUpdate_file_triggered()
     }
 }
 
-void MainWindow::on_actionUpload_File_triggered()
+void MainWindow::on_action_Upload_File_triggered()
 {
     qInfo() << Q_FUNC_INFO;
     if(m_dialogUpload->exec() == QDialog::Accepted){
@@ -444,22 +444,12 @@ void MainWindow::on_actionUpload_File_triggered()
     }
 }
 
-QString MainWindow::StatusToStr(QAbstractOAuth::Status status)
+void MainWindow::loadUserIcon(AccountWidgetActs *accountActs, const QUrl &url, QNetworkAccessManager *manager)
 {
-    QString info("Status: ");
-    switch (status) {
-    case QAbstractOAuth::Status::NotAuthenticated:
-        info += "NotAuthenticated";
-        break;
-    case QAbstractOAuth::Status::TemporaryCredentialsReceived:
-        info += "TemporaryCredentialsReceived";
-        break;
-    case QAbstractOAuth::Status::Granted:
-        info += "Granted";
-        break;
-    case QAbstractOAuth::Status::RefreshingToken:
-        info += "RefreshingToken";
-        break;
-    }
-    return info;
+    NetworkImgLoader *loader = new NetworkImgLoader(url,manager);
+    connect(loader,&NetworkImgLoader::dataReceived,
+            this,[accountActs,loader](){
+       accountActs->loadUserIconFromData(loader->data());
+       loader->deleteLater();
+    });
 }

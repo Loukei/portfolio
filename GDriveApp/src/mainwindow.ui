@@ -30,7 +30,7 @@
      <widget class="QTreeView" name="treeView_Reply"/>
     </item>
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="label_Console">
       <property name="text">
        <string>Console</string>
       </property>
@@ -54,37 +54,41 @@
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAcount">
+   <widget class="QMenu" name="menu_Acount">
     <property name="title">
      <string>Account</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="action_Login"/>
     <addaction name="action_Logout"/>
     <addaction name="action_Remember_me"/>
     <addaction name="action_Refresh_Token"/>
    </widget>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menu_File">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionUpload_File"/>
-    <addaction name="actionDownload_file"/>
+    <addaction name="action_Upload_File"/>
+    <addaction name="action_Download_file"/>
     <addaction name="action_Search_file_folder"/>
-    <addaction name="actionGet_file_matadata"/>
-    <addaction name="actionUpdate_file"/>
+    <addaction name="action_Get_file_matadata"/>
+    <addaction name="action_Update_file"/>
    </widget>
    <widget class="QMenu" name="menu_About">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;About</string>
     </property>
     <addaction name="action_About_User"/>
    </widget>
-   <addaction name="menuAcount"/>
+   <addaction name="menu_Acount"/>
    <addaction name="menu_About"/>
-   <addaction name="menuFile"/>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -95,41 +99,41 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionDownload_file">
+  <action name="action_Download_file">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Download file</string>
+    <string>&amp;Download file</string>
    </property>
   </action>
   <action name="action_Search_file_folder">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>&amp;Search file / folder</string>
    </property>
   </action>
-  <action name="actionGet_file_matadata">
+  <action name="action_Get_file_matadata">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>Get file matadata...</string>
+    <string>&amp;Get file matadata...</string>
    </property>
   </action>
-  <action name="actionUpdate_file">
+  <action name="action_Update_file">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>&amp;Update File</string>
    </property>
   </action>
-  <action name="actionUpload_File">
+  <action name="action_Upload_File">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>&amp;Upload File...</string>

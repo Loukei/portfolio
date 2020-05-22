@@ -8,7 +8,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class AccountWidget;
+class AccountWidgetActs;
 class UploadDialog;
 class UpdateDialog;
 class SearchDialog;
@@ -17,6 +17,7 @@ class FileMataDataDialog;
 class QJsonModel;
 QT_BEGIN_NAMESPACE
 class QSettings;
+class QLabel;
 QT_END_NAMESPACE
 
 /*!
@@ -33,8 +34,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    /// A widget to display User info
-    AccountWidget *m_userWidget;
+    /// A class to store QWidgetAction for Account menu
+    AccountWidgetActs *m_accountActs;
     /// A dialog to set Download file
     DownloadDialog *m_dialogDownload;
     /// A dialog to provide search drive files
@@ -45,6 +46,7 @@ private:
     UpdateDialog *m_dialogUpdate;
     /// A dialog to upload file
     UploadDialog *m_dialogUpload;
+
     /// Save settings
     QSettings *m_settings;
     /// save m_Drive Operation reply
@@ -70,7 +72,7 @@ private slots:
     /// Click menu Account About
     void on_action_About_User_triggered();
     /// Click menu Download file
-    void on_actionDownload_file_triggered();
+    void on_action_Download_file_triggered();
     /// Click menu Search file&folder
     void on_action_Search_file_folder_triggered();
     /// Receive SearchDialog::query, then return search result to m_DialogSearch
@@ -83,20 +85,19 @@ private slots:
                               const QString &q,
                               const QString &spaces);
     /// Click menu Get file matadata
-    void on_actionGet_file_matadata_triggered();
+    void on_action_Get_file_matadata_triggered();
     /// Receive FileMataDataDialog::query, then return GDriveFileGet to m_dialogFileMataData
     void onFileMataDataDialog_query(const QString &fileID,const QString &fields);
     /// open update file dialog
-    void on_actionUpdate_file_triggered();
+    void on_action_Update_file_triggered();
     /// open upload file dialog
-    void on_actionUpload_File_triggered();
+    void on_action_Upload_File_triggered();
 
 private:
-    /// A convert function to turn QAbstractOAuth::Status to Readable String
-    static QString StatusToStr(QAbstractOAuth::Status status);
-
-    /// request User about message and refresh the UI(m_userWidget)
-    void UpdateUserWidget();
+    ///
+    void loadUserIcon(AccountWidgetActs *accountActs,const QUrl &url,QNetworkAccessManager *manager);
+    /// request User about message and refresh the UI
+    void updateAccountActs();
     /// GDriveService Account get About message
     void accountAbout();
 

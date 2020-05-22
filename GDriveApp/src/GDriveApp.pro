@@ -44,11 +44,11 @@ SOURCES += \
         GDriveLib/gdrivefiletask.cpp \
         GDriveLib/googledriveservice.cpp \
         QJsonModel/qjsonmodel.cpp \
-        accountwidget.cpp \
         downloaddialog.cpp \
         filematadatadialog.cpp \
         main.cpp \
         mainwindow.cpp \
+        networkimgloader.cpp \
         searchdialog.cpp \
         updatedialog.cpp \
         uploaddialog.cpp
@@ -74,17 +74,17 @@ HEADERS += \
         GDriveLib/googledriveservice.h \
         QJsonModel/qjsonmodel.h \
         Secret/oauthglobal.h \
-        accountwidget.h \
+        accountwidgetacts.h \
         downloaddialog.h \
         filematadatadialog.h \
         mainwindow.h \
         mainwindow_settings.h \
+        networkimgloader.h \
         searchdialog.h \
         updatedialog.h \
         uploaddialog.h
 
 FORMS += \
-        accountwidget.ui \
         downloaddialog.ui \
         filematadatadialog.ui \
         mainwindow.ui \
