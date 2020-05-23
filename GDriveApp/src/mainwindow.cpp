@@ -12,6 +12,7 @@
 #include "QJsonModel/qjsonmodel.h"
 #include "networkimgloader.h" // load image from url
 #include "mainwindow_settings.h" // namespace Settings
+#include "Ecrypt/simplecrypt.h" //ecrtpt token
 #include <QDebug>
 #include <QFile>
 
@@ -235,7 +236,9 @@ void MainWindow::writeSettings()
     m_settings->setValue(Settings::key_Update_FileID,m_dialogUpdate->getFileID());
     if(ui->action_Remember_me->isChecked()){
         m_settings->setValue(Settings::key_OAuth_UserEmail,m_accountActs->emailAddress());
-        m_settings->setValue(Settings::key_OAuth_RefreshToken,m_Drive->refreshToken());
+        SimpleCrypt crypto(m_ecryptKey);
+        m_settings->setValue(Settings::key_OAuth_RefreshToken,
+                             crypto.encryptToString(m_Drive->refreshToken()));
     }else {
         m_settings->remove(Settings::key_OAuth_UserEmail);
         m_settings->remove(Settings::key_OAuth_RefreshToken);
@@ -245,7 +248,8 @@ void MainWindow::writeSettings()
 void MainWindow::loadUserAccount(const QSettings &settings)
 {
     qDebug() << Q_FUNC_INFO; // "Status: NotAuthenticated"
-    const QString refreshToken = Settings::OAuth_RefreshToken(&settings);
+    SimpleCrypt crypto(m_ecryptKey);
+    const QString refreshToken = crypto.decryptToString(Settings::OAuth_RefreshToken(&settings));
     if(!refreshToken.isEmpty())
     {
         m_Drive->setRefreshToken(refreshToken);

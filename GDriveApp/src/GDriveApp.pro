@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        Ecrypt/simplecrypt.cpp \
         GDriveLib/gdriveabout.cpp \
         GDriveLib/gdriveaboutresource.cpp \
         GDriveLib/gdriveargs.cpp \
@@ -54,6 +55,7 @@ SOURCES += \
         uploaddialog.cpp
 
 HEADERS += \
+        Ecrypt/simplecrypt.h \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
         GDriveLib/gdriveargs.h \

@@ -6,7 +6,8 @@
  * \namespace Settings
  * \brief Settings is used for collect all settings key and read settings
  */
-namespace Settings {
+namespace Settings
+{
 const QString key_Geometry = QStringLiteral("MainWindow/Geometry");
 const QString key_Upload_FilePath = QStringLiteral("MainWindow/DialogUpload/FilePath");
 const QString key_Download_FilePath = QStringLiteral("MainWindow/DialogDownload/FilePath");

@@ -55,6 +55,8 @@ private:
     GDrive::GDriveService *m_Drive;
     /// the previous access token received, use to determine Login/Refresh/Logout
     QString m_currentOAuthToken = QString();
+    /// Ecrypt key to save User refresh token
+    const quint64 m_ecryptKey = Q_UINT64_C(0x0c2ad4a4acb9f023);
 
 private slots:
     /// Click menu Login
