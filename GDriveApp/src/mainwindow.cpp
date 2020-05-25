@@ -10,7 +10,6 @@
 
 #include "GDriveLib/googledriveservice.h"
 #include "QJsonModel/qjsonmodel.h"
-#include "networkimgloader.h" // load image from url
 #include "mainwindow_settings.h" // namespace Settings
 #include "Ecrypt/simplecrypt.h" //ecrtpt token
 #include <QDebug>
@@ -82,11 +81,10 @@ void MainWindow::updateAccountActs()
     auto onAboutFinished = [userAbout,this](){
         if(userAbout->isComplete() && !userAbout->isFailed()){
             GDriveAboutResource resource = userAbout->getResource();
-            m_accountActs->setUserName(resource.user_displayName());
-            m_accountActs->setEmailAddress(resource.user_emailAddress());
-            m_accountActs->action_UserName->setVisible(true);
-            m_accountActs->action_UserEmail->setVisible(true);
-            loadUserIcon(m_accountActs,resource.user_photoLink(),m_Drive->networkAccessManager());
+            m_accountActs->updateUi(resource.user_displayName(),
+                                    resource.user_emailAddress(),
+                                    resource.user_photoLink(),
+                                    m_Drive->networkAccessManager());
         }else {
             m_accountActs->resetUi();
             ui->plainTextEdit->appendPlainText("About message Error.\n");
@@ -226,6 +224,7 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 
 void MainWindow::writeSettings()
 {
+    m_settings->setValue(Settings::key_AppVersion,QCoreApplication::applicationVersion());
     m_settings->setValue(Settings::key_Geometry,this->geometry());
     m_settings->setValue(Settings::key_Download_FileID,m_dialogDownload->getFileId());
     m_settings->setValue(Settings::key_Download_FilePath,m_dialogDownload->getDownloadFilePath());
@@ -309,9 +308,9 @@ void MainWindow::on_action_Refresh_Token_triggered()
 
 void MainWindow::onGDrive_tokenChanged(const QString &token)
 {
-    /// m_currentOAuthToken = {}, token = "..." => login
-    /// m_currentOAuthToken = "a...", token = "b..." => refresh token or switch account
-    /// m_currentOAuthToken = "...", token = {} => logout
+    /* m_currentOAuthToken = {}, token = "..." => login
+     * m_currentOAuthToken = "a...", token = "b..." => refresh token or switch account
+     * m_currentOAuthToken = "...", token = {} => logout */
     qDebug() << Q_FUNC_INFO;
     if(token.isEmpty()){
         qDebug() << "token isEmpty -> logout";
@@ -328,7 +327,7 @@ void MainWindow::onGDrive_tokenChanged(const QString &token)
     }else if (token != m_currentOAuthToken) {
         qDebug() << "token != m_currentOAuthToken -> refresh or switch account";
     }
-    m_currentOAuthToken = token;
+    m_currentOAuthToken = token; /*change current token*/
 }
 
 void MainWindow::onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri)
@@ -446,14 +445,4 @@ void MainWindow::on_action_Upload_File_triggered()
     }else {
         ui->plainTextEdit->appendPlainText("Upload cancled.\n");
     }
-}
-
-void MainWindow::loadUserIcon(AccountWidgetActs *accountActs, const QUrl &url, QNetworkAccessManager *manager)
-{
-    NetworkImgLoader *loader = new NetworkImgLoader(url,manager);
-    connect(loader,&NetworkImgLoader::dataReceived,
-            this,[accountActs,loader](){
-       accountActs->loadUserIconFromData(loader->data());
-       loader->deleteLater();
-    });
 }

@@ -96,8 +96,6 @@ private slots:
     void on_action_Upload_File_triggered();
 
 private:
-    ///
-    void loadUserIcon(AccountWidgetActs *accountActs,const QUrl &url,QNetworkAccessManager *manager);
     /// request User about message and refresh the UI
     void updateAccountActs();
     /// GDriveService Account get About message

@@ -7,7 +7,8 @@
 #include <QAction>
 #include <QPixmap>
 
-#include <QPainter>
+#include <QPainter>  // To paint text Icon
+#include "networkimgloader.h" // load image from url
 class AccountWidgetActs{
 public:
     AccountWidgetActs() = default;
@@ -17,7 +18,7 @@ public:
 
 #define IconSize QSize(64,64)
     const QPixmap icon_default = QPixmap(":/Icon/Icon/iconfinder_user_close_103746.png");
-    QPixmap icon_current;
+    QPixmap icon_current; //an icon to current user,QLabel doesn't handle storage
     QLabel *label_UserIcon;
     QLabel *label_UserName;
     QLabel *label_UserEmail;
@@ -65,6 +66,18 @@ public:
         return {action_UserIcon,action_UserName,action_UserEmail};
     }
 
+    void updateUi(const QString &username,const QString &email,const QString &photolink,QNetworkAccessManager *manager)
+    {
+        label_UserName->setText(username);
+        label_UserEmail->setText(email);
+        /* If user doesnt have icon, use username to draw one */
+        if(photolink.isEmpty()) { loadTextIcon(username); }
+        else                    { loadNetworkIcon(photolink,manager);}
+        /* Beaware,the order of setVisiable change the label size calculate*/
+        this->action_UserName->setVisible(true);
+        this->action_UserEmail->setVisible(true);
+    }
+
     /// load pixmap from input data,then update label_UserIcon
     inline void loadUserIconFromData(const QByteArray &data)
     {
@@ -95,17 +108,38 @@ public:
     static QPixmap drawTextIcon(const QString &text)
     {
         QPixmap icon(IconSize);
-        icon.fill(QColor(255,255,255,0));
+//        icon.fill(QColor(255,255,255,0));
+        icon.fill(Qt::darkGreen);
         QPainter painter(&icon);
         /*Background*/
-        painter.setBackgroundMode(Qt::TransparentMode);
+//        painter.setBackgroundMode(Qt::TransparentMode);
         /*Draw Rect fram*/
-        painter.setPen(QPen(Qt::green,1));
-        painter.drawRect(0,0,64,64);
+//        painter.setPen(QPen(Qt::green,1));
+//        painter.drawRect(0,0,64,64);
         /*Draw Text*/
-        painter.setPen(Qt::black);
+        QFont font("Helvetica");
+        font.setBold(true);
+        painter.setFont(font);
+        painter.setPen(Qt::white);
         painter.drawText(QRect(1,1,63,63),Qt::AlignCenter,text);
         return icon;
+    }
+
+    void loadNetworkIcon(const QUrl &url, QNetworkAccessManager *manager)
+    {
+        NetworkImgLoader *loader = new NetworkImgLoader(url,manager);
+        /* Since "this" is not QObject,connect signal need another way*/
+        QObject::connect(loader,&NetworkImgLoader::dataReceived,
+                        label_UserIcon,[this,loader](){
+            this->loadUserIconFromData(loader->data());
+            loader->deleteLater();
+        });
+    }
+
+    void loadTextIcon(const QString &text)
+    {
+        icon_current = drawTextIcon(text);
+        label_UserIcon->setPixmap(icon_current);
     }
 }; // AccountWidgetActs
 #endif // ACCOUNTWIDGETACTS_H
