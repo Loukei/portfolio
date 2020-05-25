@@ -49,6 +49,7 @@ namespace GDrive {
  * - [Introduction to Google Drive API](https://developers.google.com/drive/api/v3/about-sdk)
  * - [QOAuth2AuthorizationCodeFlow class](https://code.woboq.org/qt5/qtnetworkauth/src/oauth/qoauth2authorizationcodeflow.cpp.html)
  * - [enum QAbstractOAuth::Stage](https://doc.qt.io/qt-5/qabstractoauth.html#Stage-enum)
+ * - [Refreshing an access token (offline access)](https://developers.google.com/identity/protocols/oauth2/web-server#httprest_7)
  */
 class GDriveService : public QObject
 {
@@ -132,7 +133,7 @@ signals:
 protected:
     /// This function is used to customize the parameters sent to the server during a specified authorization stage.
     /// The number of calls to this function depends on the flow used during the authentication.
-    /// see `QAbstractOAuth::ModifyParametersFunction`
+    /// see `QAbstractOAuth::ModifyParametersFun## Reference
     static void oAuthModifyParametersFunction(QAbstractOAuth::Stage stage, QVariantMap *parameters);
 
 private:

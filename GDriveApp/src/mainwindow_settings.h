@@ -8,6 +8,7 @@
  */
 namespace Settings
 {
+const QString key_AppVersion = QStringLiteral("App/Version");
 const QString key_Geometry = QStringLiteral("MainWindow/Geometry");
 const QString key_Upload_FilePath = QStringLiteral("MainWindow/DialogUpload/FilePath");
 const QString key_Download_FilePath = QStringLiteral("MainWindow/DialogDownload/FilePath");
@@ -16,11 +17,15 @@ const QString key_FileGet_FileID = QStringLiteral("MainWindow/DialogFileMataData
 const QString key_FileGet_Fields = QStringLiteral("MainWindow/DialogFileMataData/Fields");
 const QString key_Update_FilePath = QStringLiteral("MainWindow/DialogUpdate/FilePath");
 const QString key_Update_FileID = QStringLiteral("MainWindow/DialogUpdate/FileID");
-const QString key_OAuth_UserEmail = QStringLiteral("MainWindow/OAuth/UserEmail");
-const QString key_OAuth_IsRememberMe = QStringLiteral("MainWindow/OAuth/IsRememberMe");
-const QString key_OAuth_RefreshToken = QStringLiteral("MainWindow/OAuth/RefreshToken");
+const QString key_OAuth_UserEmail = QStringLiteral("OAuth/UserEmail");
+const QString key_OAuth_IsRememberMe = QStringLiteral("OAuth/IsRememberMe");
+const QString key_OAuth_RefreshToken = QStringLiteral("OAuth/RefreshToken");
 
 /*Settings reader function*/
+inline QString App_Version(const QSettings *settings){
+    return settings->value(key_AppVersion,QStringLiteral("0.0.0")).toString();
+}
+
 inline QRect MainWindow_Geometry(const QSettings *settings){
     return settings->value(key_Geometry,QRect(0,0,630,495)).toRect();
 }
