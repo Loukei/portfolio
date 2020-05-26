@@ -34,10 +34,10 @@
 
 1. 下載程式碼(src)
 2. 安裝Qt5.13或更高版本，建議使用Qt creater
-3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝Qt WebEngine與Qt NetWork Authorization模組
+3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝[Qt WebEngine](https://doc.qt.io/qt-5/qtwebengine-index.html)與[Qt NetWork Authorization](https://doc.qt.io/qt-5/qtnetworkauth-index.html)模組
 4. 要開發OAuth 2 App，您應該[向google申請自己的一組App](https://support.google.com/a/answer/162106?hl=zh-Hant)，並在[Google Api Console](https://console.developers.google.com/apis)下載Client_secret.json
-5. 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入oauthglobal.h
-6. 修改程式碼，在`googledriveservice.cpp`中include`oauthglobal.h`
+5. 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h](https://github.com/Loukei/portfolio/blob/master/GDriveApp/oauthglobal.h)
+6. 修改程式碼，在[googledriveservice.cpp](https://github.com/Loukei/portfolio/blob/master/GDriveApp/src/GDriveLib/googledriveservice.cpp)中include `oauthglobal.h`
 7. 執行編譯
 
 參數名稱(.json)     | 對應函數(.h)          | 說明
@@ -55,7 +55,7 @@ redirect_uris       | keyRedirectUri()      | 網頁重新導向的路徑位址
 ### 宣告類別實體
 
 - 為了使用GDrive Api,在你的MainWindow中添加`GDrive::GDriveService class`
-- 當您創建了一個`GDriveService`實體，它會立即依照`keyRedirectPort()`監聽對應的port，並在執行使用者登入的時候打開瀏覽器。
+- 當您創建了一個`GDriveService`實體，它會立即依照`OAuth::keyRedirectPort()`監聽對應的port，並在執行使用者登入的時候打開瀏覽器。
 
 ``` c++
 // mainwindow.h
@@ -74,21 +74,22 @@ MainWindow::MainWindow(QWidget *parent){
 ``` c++
 //! Step1: 建立一個取得認證後的slot函數
 void MainWindow::onGDrive_granted(){
-    QString msg = m_Drive->showInfo(); //回傳token
+    const QString token = m_Drive->token(); //回傳token
+    const QString refreshToken = m_Drive->refreshToken(); //回傳Refresh token
     // 其他UI操作...
 }
 //! Step2: 連接GDriveService::granted()信號
 connect(m_Drive,&GDriveService::granted,
         this,&MainWindow::onGDrive_granted);
-//! Step3: 在適當時機使用GDriveService::start()
+//! Step3: 在適當時機使用GDriveService::start()，如QPushButton::clicked()
 m_Drive->start();
 ```
 
 ### 取得使用者名稱
 
 ``` c++
-//! 1.使用getAbout()取得使用者資訊，在這裡是取得使用者名稱與email帳號
-GDriveAbout* userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
+//! 1.使用getAbout()取得使用者資訊
+GDriveAbout* userAbout = m_Drive->getAbout(QString("user"));
 //! 2.發出命令後，等待GDriveAbout發出received信號
 connect(userAbout,&GDriveAbout::received,
         [userAbout,this](bool success){
@@ -96,8 +97,9 @@ connect(userAbout,&GDriveAbout::received,
         //! 3.透過GDriveAbout取得實際內容
         GDriveAboutResource resource = userAbout->getResource();
         ui->label->setText("Account: " + resource.displayName());
+        //! 4.你也可以使用getReplyString()取得完整的Json回傳，自行處理
+        QByteArray reply = userAbout->getReplyString();
     }else {
-        ui->label->setText("Unknown");
         ui->plainTextEdit->appendPlainText("About message Error.\n");
     }
     userAbout->deleteLater();
@@ -204,21 +206,16 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 q           | 過濾搜尋的內容
 pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內容
 
-## 未完成功能
+## 編譯環境 My compile environment
 
-- 記憶上次登入的帳號
-- 斷點續傳功能
-- 瀏覽google drive 文件目錄
-
-## 編譯環境
-
-- C++ 11
-- Qt5.13.0 MinGW 32bit
-- win7 32bit
+- C++ ver: C++ 11
+- Qt kits: Qt5.13.0 MinGW 32bit
+- OS: win7 32bit
 
 ## Credit
 
 [QJsonModel](https://github.com/dridk/QJsonModel)
+[SimpleCrypt](https://wiki.qt.io/Simple_encryption_with_SimpleCrypt)
 
 ## 參考 Reference
 
@@ -232,12 +229,12 @@ pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內
 
 5. [Search for files and folders](https://developers.google.com/drive/api/v3/search-files)
 
-[Demo_mainwindow.png]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_mainwindow.png
+[Demo_mainwindow.png]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_mainwindow(Login).png
 
 [Demo_Login.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Login.gif
 
-[Demo_Upload.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Upload.gif
+[Demo_Upload.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_UploadFile.gif
 
-[Demo_Download.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Download.gif
+[Demo_Download.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_DownloadFile.gif
 
-[Demo_Search.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Search.gif
+[Demo_Search.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_SearchFile.gif
