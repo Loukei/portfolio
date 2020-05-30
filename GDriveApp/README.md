@@ -4,7 +4,7 @@
 
 ## 簡介 Introduction
 
-目前Google Drive Api並沒有官方支援的C++ Lib，雖然網路上也有一些不錯的專案比如[googleQt](https://github.com/osoftteam/googleQt)或是[o2](https://github.com/pipacs/o2)等...。
+目前Google Drive Api並沒有官方支援的C++ Lib，雖然網路上也有一些不錯的專案比如[googleQt][]或是[o2][]等...。
 
 一方面我們不能滿足於都用別人寫好的工具，另一方面我也想透過這個專案學習親手操作網路Api。
 
@@ -12,32 +12,36 @@
 
 ## 螢幕截圖 Screenshot
 
-![image][Demo_mainwindow.png]
+<img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_mainwindow(Login).png" width="400" height="300" />
 
 ## 功能 Features
 
 - OAuth2 帳號登入(須開啟瀏覽器)
-![image][Demo_Login.gif]
 
 - 取得使用者名稱與email
 
+<img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Login.gif" width="400" height="300" />
+
 - 上傳檔案
-![image][Demo_Upload.gif]
+
+<img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_UploadFile.gif" width="400" height="300" />
 
 - 下載檔案，需要輸入fileID
-![image][Demo_Download.gif]
+
+<img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_DownloadFile.gif" width="400" height="300" />
 
 - 搜尋，取得檔案fileID
-![image][Demo_Search.gif]
+
+<img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_SearchFile.gif" width="400" height="300" />
 
 ## 自行編譯 Building App
 
 1. 下載程式碼(src)
 2. 安裝Qt5.13或更高版本，建議使用Qt creater
-3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝[Qt WebEngine](https://doc.qt.io/qt-5/qtwebengine-index.html)與[Qt NetWork Authorization](https://doc.qt.io/qt-5/qtnetworkauth-index.html)模組
-4. 要開發OAuth 2 App，您應該[向google申請自己的一組App](https://support.google.com/a/answer/162106?hl=zh-Hant)，並在[Google Api Console](https://console.developers.google.com/apis)下載Client_secret.json
-5. 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h](https://github.com/Loukei/portfolio/blob/master/GDriveApp/oauthglobal.h)
-6. 修改程式碼，在[googledriveservice.cpp](https://github.com/Loukei/portfolio/blob/master/GDriveApp/src/GDriveLib/googledriveservice.cpp)中include `oauthglobal.h`
+3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝[Qt WebEngine][]與[Qt NetWork Authorization][]模組
+4. 要開發OAuth 2 App，您應該[向google申請自己的一組App][Enable the Drive API]，並在[Google Api Console][]下載Client_secret.json
+5. 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h][]
+6. 修改程式碼，在[googledriveservice.cpp][]加入 `#include "oauthglobal.h"`
 7. 執行編譯
 
 參數名稱(.json)     | 對應函數(.h)          | 說明
@@ -55,7 +59,7 @@ redirect_uris       | keyRedirectUri()      | 網頁重新導向的路徑位址
 ### 宣告類別實體
 
 - 為了使用GDrive Api,在你的MainWindow中添加`GDrive::GDriveService class`
-- 當您創建了一個`GDriveService`實體，它會立即依照`OAuth::keyRedirectPort()`監聽對應的port，並在執行使用者登入的時候打開瀏覽器。
+- 創建一個`GDriveService`實體，它會立即依照`OAuth::keyRedirectPort()`監聽對應的port，並在執行使用者登入的時候打開瀏覽器。
 
 ``` c++
 // mainwindow.h
@@ -72,36 +76,39 @@ MainWindow::MainWindow(QWidget *parent){
 ### 執行認證
 
 ``` c++
-//! Step1: 建立一個取得認證後的slot函數
+// Step1: 建立一個取得認證後的slot函數
 void MainWindow::onGDrive_granted(){
     const QString token = m_Drive->token(); //回傳token
     const QString refreshToken = m_Drive->refreshToken(); //回傳Refresh token
     // 其他UI操作...
 }
-//! Step2: 連接GDriveService::granted()信號
+// Step2: 連接GDriveService::granted() signal
 connect(m_Drive,&GDriveService::granted,
         this,&MainWindow::onGDrive_granted);
-//! Step3: 在適當時機使用GDriveService::start()，如QPushButton::clicked()
+// Step3: 在適當時機使用GDriveService::start()，觸發GDriveService::granted() signal
 m_Drive->start();
 ```
 
 ### 取得使用者名稱
 
 ``` c++
-//! 1.使用getAbout()取得使用者資訊
+// 1.使用getAbout()取得使用者資訊
 GDriveAbout* userAbout = m_Drive->getAbout(QString("user"));
-//! 2.發出命令後，等待GDriveAbout發出received信號
+// 2.發出命令後，等待GDriveAbout發出received信號
 connect(userAbout,&GDriveAbout::received,
         [userAbout,this](bool success){
     if(success){
-        //! 3.透過GDriveAbout取得實際內容
+        // 3.透過GDriveAbout取得實際內容
         GDriveAboutResource resource = userAbout->getResource();
-        ui->label->setText("Account: " + resource.displayName());
-        //! 4.你也可以使用getReplyString()取得完整的Json回傳，自行處理
+        const QString displayName = resource.user_displayName();
+        const QString emailAddress = resource.user_emailAddress();
+        const QString photoLink = resource.user_photoLink();
+        // 3.2. 你也可以使用getReplyString()取得完整的Json回傳，自行處理
         QByteArray reply = userAbout->getReplyString();
     }else {
         ui->plainTextEdit->appendPlainText("About message Error.\n");
     }
+    // 4. 使用deleteLater()刪除任務
     userAbout->deleteLater();
 });
 ```
@@ -214,8 +221,9 @@ pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內
 
 ## Credit
 
-[QJsonModel](https://github.com/dridk/QJsonModel)
-[SimpleCrypt](https://wiki.qt.io/Simple_encryption_with_SimpleCrypt)
+- [QJsonModel](https://github.com/dridk/QJsonModel)
+
+- [SimpleCrypt](https://wiki.qt.io/Simple_encryption_with_SimpleCrypt)
 
 ## 參考 Reference
 
@@ -229,12 +237,18 @@ pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內
 
 5. [Search for files and folders](https://developers.google.com/drive/api/v3/search-files)
 
-[Demo_mainwindow.png]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_mainwindow(Login).png
+[googleQt]: https://github.com/osoftteam/googleQt
 
-[Demo_Login.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_Login.gif
+[o2]: https://github.com/pipacs/o2
 
-[Demo_Upload.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_UploadFile.gif
+[Qt WebEngine]: https://doc.qt.io/qt-5/qtwebengine-index.html
 
-[Demo_Download.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_DownloadFile.gif
+[Qt NetWork Authorization]: https://doc.qt.io/qt-5/qtnetworkauth-index.html
 
-[Demo_Search.gif]: https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_SearchFile.gif
+[Enable the Drive API]: https://developers.google.com/drive/api/v3/enable-drive-api
+
+[Google Api Console]: https://console.developers.google.com/apis
+
+[oauthglobal.h]: https://github.com/Loukei/portfolio/blob/master/GDriveApp/oauthglobal.h
+
+[googledriveservice.cpp]: https://github.com/Loukei/portfolio/blob/master/GDriveApp/src/GDriveLib/googledriveservice.cpp

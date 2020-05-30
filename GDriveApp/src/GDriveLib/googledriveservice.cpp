@@ -11,7 +11,7 @@ using namespace GDrive;
 GDriveService::GDriveService(QObject *parent)
     : QObject(parent)
 {
-    //! set google app OAuth2 setting
+    /* Set google app OAuth2 setting */
     m_manager = new QNetworkAccessManager(this);
     m_google = new QOAuth2AuthorizationCodeFlow(m_manager,this);
     m_google->setScope(OAuth::keyScope());
@@ -19,7 +19,7 @@ GDriveService::GDriveService(QObject *parent)
     m_google->setClientIdentifier(OAuth::keyClientId());
     m_google->setAccessTokenUrl(OAuth::keyTokenUri());
     m_google->setClientIdentifierSharedKey(OAuth::keyClientSecert());
-    // reset Oauth parameter to fit Google OAuth situation
+    /* reset Oauth parameter to fit Google OAuth situation */
     m_google->setModifyParametersFunction(oAuthModifyParametersFunction);
 
     auto replyHandler = new QOAuthHttpServerReplyHandler(OAuth::keyRedirectPort(), this);
@@ -64,7 +64,7 @@ void GDriveService::refreshAccessToken()
 void GDriveService::oAuthModifyParametersFunction(QAbstractOAuth::Stage stage, QVariantMap *parameters)
 {
     if(stage == QAbstractOAuth::Stage::RequestingAuthorization){
-        /* setup Authoriation Url here*/
+        /* setup Authoriation Url here */
         parameters->insert("access_type","offline");
         parameters->insert("prompt","consent");
     }
