@@ -4,33 +4,36 @@
 #include <QUrlQuery>
 #include <QDesktopServices>
 #include <QDebug>
-#include "Secret/oauthglobal.h" // OAuth parameter
 
 using namespace GDrive;
 
-GDriveService::GDriveService(QObject *parent)
+GDriveService::GDriveService(const QUrl &authorizationUrl,
+                             const QUrl &accessTokenUrl,
+                             const QString &clientIdentifier,
+                             const QString &clientIdentifierSharedKey,
+                             const QString &scope,
+                             quint16 port,
+                             QObject *parent)
     : QObject(parent)
 {
     /* Set google app OAuth2 setting */
     m_manager = new QNetworkAccessManager(this);
     m_google = new QOAuth2AuthorizationCodeFlow(m_manager,this);
-    m_google->setScope(OAuth::keyScope());
-    m_google->setAuthorizationUrl(OAuth::keyAuthUri());
-    m_google->setClientIdentifier(OAuth::keyClientId());
-    m_google->setAccessTokenUrl(OAuth::keyTokenUri());
-    m_google->setClientIdentifierSharedKey(OAuth::keyClientSecert());
+    m_google->setScope(scope);
+    m_google->setAuthorizationUrl(authorizationUrl);
+    m_google->setClientIdentifier(clientIdentifier);
+    m_google->setAccessTokenUrl(accessTokenUrl);
+    m_google->setClientIdentifierSharedKey(clientIdentifierSharedKey);
     /* reset Oauth parameter to fit Google OAuth situation */
-    m_google->setModifyParametersFunction(oAuthModifyParametersFunction);
+    m_google->setModifyParametersFunction(buildModifyParametersFunction());
 
-    auto replyHandler = new QOAuthHttpServerReplyHandler(OAuth::keyRedirectPort(), this);
+    auto replyHandler = new QOAuthHttpServerReplyHandler(port, this);
     m_google->setReplyHandler(replyHandler);
 
     connect(m_google,&QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
             this,&QDesktopServices::openUrl);
     connect(m_google,&QOAuth2AuthorizationCodeFlow::granted,
             this,&GDriveService::granted);
-    connect(m_google,&QOAuth2AuthorizationCodeFlow::statusChanged,
-            this,&GDriveService::statusChanged);
     connect(m_google,&QOAuth2AuthorizationCodeFlow::tokenChanged,
             this,&GDriveService::tokenChanged);
     connect(m_google,&QOAuth2AuthorizationCodeFlow::refreshTokenChanged,
@@ -43,7 +46,7 @@ GDriveService::GDriveService(QObject *parent)
 
 GDriveService::~GDriveService()
 {
-    /// delete none parent pointer here...
+    /* delete none parent pointer here... */
 }
 
 QDateTime GDriveService::expirationAt() const
@@ -61,17 +64,22 @@ void GDriveService::refreshAccessToken()
     return m_google->refreshAccessToken();
 }
 
-void GDriveService::oAuthModifyParametersFunction(QAbstractOAuth::Stage stage, QVariantMap *parameters)
+QAbstractOAuth::ModifyParametersFunction GDriveService::buildModifyParametersFunction()
 {
-    if(stage == QAbstractOAuth::Stage::RequestingAuthorization){
-        /* setup Authoriation Url here */
-        parameters->insert("access_type","offline");
-        parameters->insert("prompt","consent");
-    }
-    if(stage == QAbstractOAuth::Stage::RefreshingAccessToken){
-        parameters->insert("client_id",OAuth::keyClientId());
-        parameters->insert("client_secret",OAuth::keyClientSecert());
-    }
+    const QUrl clientIdentifier = m_google->clientIdentifier();
+    const QUrl clientIdentifierSharedKey = m_google->clientIdentifierSharedKey();
+    return [clientIdentifier,clientIdentifierSharedKey]
+            (QAbstractOAuth::Stage stage, QVariantMap *parameters){
+        if(stage == QAbstractOAuth::Stage::RequestingAuthorization){
+            /* setup Authoriation Url here */
+            parameters->insert("access_type","offline"); /* Request refresh token*/
+            parameters->insert("prompt","consent"); /* force user check scope again */
+        }
+        if(stage == QAbstractOAuth::Stage::RefreshingAccessToken){
+            parameters->insert("client_id",clientIdentifier);
+            parameters->insert("client_secret",clientIdentifierSharedKey);
+        }
+    };
 }
 
 void GDriveService::logout()
@@ -83,11 +91,6 @@ void GDriveService::logout()
 QString GDriveService::token() const
 {
     return m_google->token();
-}
-
-QAbstractOAuth::Status GDriveService::status() const
-{
-    return m_google->status();
 }
 
 QString GDriveService::refreshToken() const

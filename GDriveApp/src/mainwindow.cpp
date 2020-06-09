@@ -8,10 +8,11 @@
 #include "filematadatadialog.h"
 #include "updatedialog.h"
 
+#include "Secret/oauthglobal.h" /* Oauth parameter */
 #include "GDriveLib/googledriveservice.h"
 #include "QJsonModel/qjsonmodel.h"
-#include "mainwindow_settings.h" // namespace Settings
-#include "Ecrypt/simplecrypt.h" //ecrtpt token
+#include "mainwindow_settings.h" /* namespace Settings */
+#include "Ecrypt/simplecrypt.h" /* ecrtpt token */
 #include <QDebug>
 #include <QFile>
 
@@ -58,7 +59,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_model = new QJsonModel(this);
     ui->treeView_Reply->setModel(m_model);
     //! Create Google Drive Serviece instance
-    m_Drive = new GDriveService(this);
+    m_Drive = new GDriveService(OAuth::keyAuthUri(),
+                                OAuth::keyTokenUri(),
+                                OAuth::keyClientId(),
+                                OAuth::keyClientSecert(),
+                                OAuth::keyScope(),
+                                OAuth::keyRedirectPort(),this);
     loadUserAccount(*m_settings);
     connect(m_Drive,&GDriveService::granted,
             this,&MainWindow::onGDrive_granted);
@@ -273,7 +279,8 @@ void MainWindow::onGDrive_granted()
 {
     qDebug() << Q_FUNC_INFO;
     // request user info
-    const QString info = QString("Token: %1\nRefresh Token: %2\n")
+    const QString info
+            = QString("Token: %1\nRefresh Token: %2\n")
             .arg(m_Drive->token()).arg(m_Drive->refreshToken());
     ui->plainTextEdit->appendPlainText(info);
     this->statusBar()->showMessage(tr("Access Token received."));

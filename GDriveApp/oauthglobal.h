@@ -21,19 +21,18 @@ inline const QUrl keyRedirectUri(){
 inline quint16 keyRedirectPort(){
     return static_cast<quint16>(keyRedirectUri().port());
 }
-
+///file scope only able to download file form api uploaded
 inline const QString keyScope(){
-    //! file scope only able to download file form api uploaded
-    //! refernece: https://developers.google.com/drive/api/v3/about-auth
+    /* https://developers.google.com/drive/api/v3/about-auth#select_scopes_for_a_new_app */
     return "https://www.googleapis.com/auth/drive.file";
 }
 ///auth_uri
-inline const QString keyAuthUri(){
-    return "https://accounts.google.com/o/oauth2/auth";
+inline const QUrl keyAuthUri(){
+    return QUrl("https://accounts.google.com/o/oauth2/auth");
 }
 ///token_uri
-inline const QString keyTokenUri(){
-    return "https://oauth2.googleapis.com/token";
+inline const QUrl keyTokenUri(){
+    return QUrl("https://oauth2.googleapis.com/token");
 }
 } //namespace OAuth
 #endif // OAUTHGLOBAL_H

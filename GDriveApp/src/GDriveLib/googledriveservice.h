@@ -38,6 +38,9 @@ namespace GDrive {
  * Task在建立時就會立刻執行，以建構子的參數處理對應的請求，並在完成時發出信號通知
  * - Google 的OAuth操作比起標準多了一些，想要修改需要使用`QAbstractOAuth::ModifyParametersFunction`這項設置，
  * Qt提供有限度的參數修正，例如請求Refersh Token、更新access token等
+ * - QAbstractOAuth::Status 用來表達任證的狀態，但是Qt設計上並未提供登出的選擇，
+ * 所以`QAbstractOAuth::Status::NotAuthenticated`的狀態只有在grant()之前或是refreshToken()發出請求取得新token之間的空窗期
+ * - 想要正確處理logout狀態，使用tokenChanged()或refreshTokenChanged()更好
  *
  * ## Note
  * QNetworkreply其中readyRead()信號繼承自QIODevice類，每當有新的數據可以讀取時，都會發射該信號；
@@ -56,18 +59,19 @@ class GDriveService : public QObject
     Q_OBJECT
 public:
     /// constructor of serviece
-    explicit GDriveService(QObject *parent = nullptr);
+    explicit GDriveService(const QUrl &authorizationUrl,
+                           const QUrl &accessTokenUrl,
+                           const QString &clientIdentifier,
+                           const QString &clientIdentifierSharedKey,
+                           const QString &scope,
+                           quint16 port,
+                           QObject *parent = nullptr);
     /// destructor
     virtual ~GDriveService() final;
-
     /// return the expiration time of the current access token.
     QDateTime expirationAt() const;
-    /// logout account (depercated)
-    void logout();
     /// return m_google token
     QString token() const;
-    /// Returns the current authentication status.
-    QAbstractOAuth::Status status() const;
     /// Gets the current refresh token.
     QString refreshToken() const;
     /// Sets the new refresh token refreshToken to be used.
@@ -109,6 +113,8 @@ public:
 public slots:
     /// Starts the authentication flow as described in The OAuth 2.0 Authorization Framework
     void grant();
+    /// logout account (depercated)
+    void logout();
     /// Call this function to refresh the token.
     /// Access tokens are not permanent.
     /// After a time specified along with the access token when it was obtained, the access token will become invalid.
@@ -117,8 +123,6 @@ public slots:
 signals:
     /// This signal is emitted when the authorization flow finishes successfully.
     void granted();
-    /// emit when current authentication status changed
-    void statusChanged(QAbstractOAuth::Status status);
     /// emit when expiration time changed
     void expirationAtChanged(const QDateTime &expiration);
     /// Signal emitted when the server responds to the request with an error:
@@ -133,8 +137,8 @@ signals:
 protected:
     /// This function is used to customize the parameters sent to the server during a specified authorization stage.
     /// The number of calls to this function depends on the flow used during the authentication.
-    /// see `QAbstractOAuth::ModifyParametersFun## Reference
-    static void oAuthModifyParametersFunction(QAbstractOAuth::Stage stage, QVariantMap *parameters);
+    /// see `QAbstractOAuth::ModifyParametersFunction
+    QAbstractOAuth::ModifyParametersFunction buildModifyParametersFunction();
 
 private:
     /// Qt Oauth2 Authorization

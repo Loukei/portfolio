@@ -40,9 +40,8 @@
 2. 安裝Qt5.13或更高版本，建議使用Qt creater
 3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝[Qt WebEngine][]與[Qt NetWork Authorization][]模組
 4. 要開發OAuth 2 App，您應該[向google申請自己的一組App][Enable the Drive API]，並在[Google Api Console][]下載Client_secret.json
-5. 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h][]
-6. 修改程式碼，在[googledriveservice.cpp][]加入 `#include "oauthglobal.h"`
-7. 執行編譯
+5. 將`src/GDriveLib`資料夾加入你的專案
+[可選] 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h][]，用來初始化
 
 參數名稱(.json)     | 對應函數(.h)          | 說明
 --------------------|:---------------------:|:---------------------
@@ -250,5 +249,3 @@ pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內
 [Google Api Console]: https://console.developers.google.com/apis
 
 [oauthglobal.h]: https://github.com/Loukei/portfolio/blob/master/GDriveApp/oauthglobal.h
-
-[googledriveservice.cpp]: https://github.com/Loukei/portfolio/blob/master/GDriveApp/src/GDriveLib/googledriveservice.cpp

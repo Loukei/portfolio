@@ -30,13 +30,18 @@ action_UserName->setVisible(false);
 action_UserEmail->setVisible(false);
 ```
 
+## 6/9
+修改`GDriveService`類別，
+
 ## Todo
 
-* 上傳/下載等動作要提供進度支援
-* 對任務新增abort方法
 * 在GDriveServiece開一個口，方便設定OAuth變數
+* 提供一個簡短的example比落落長的說明更好
+* 使用login/logot signal取代 tokenchanged
+* 對任務提供progress/abort/pause 方法
 * 考慮修改xxxArg的輸入方式，使用QUrlQuery或QVariantMap會更好
 * 把Dialog裡的treeview結合到MainWindow裡
+* 考慮提供[sync方法]:https://www.devbean.net/2013/11/qt-study-road-2-access-network-4/
 * Login的按鈕在等待認證時應該暫時鎖住，直到認證通過/不通過才回復，觀察一下是否有對應的signal
 
 ## Reference
