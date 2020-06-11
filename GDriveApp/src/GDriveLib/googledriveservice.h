@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QOAuth2AuthorizationCodeFlow>
+#include <QUrlQuery>
 #include "gdriveaboutresource.h"
 #include "gdrivefileresource.h"
 #include "gdrivefileresourcelist.h"
@@ -81,35 +82,34 @@ public:
     QNetworkAccessManager* networkAccessManager() const;
 
     /// send request to get About resource
-    GDrive::GDriveAbout* getAbout(GDriveAbout::AboutArgs args);
-    /// send request to get About resource
     GDrive::GDriveAbout* getAbout(const QString &fields);
     /// simple upload create file
-    GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath,
-                                             const FileCreateArgs &args);
+    GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath);
+    GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath,const QUrlQuery &args);
     /// multipart upload create file
-    GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath,
-                                                   const FileCreateArgs &args);
+    GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath);
+    GDriveFileMultipartCreate* fileMultipartCreate(const QString &filepath,const QUrlQuery &args);
     /// resumable upload create file
-    GDriveFileResumableCreate* fileResumableCreate(const QString &filepath,
-                                                   const FileCreateArgs &args);
+    GDriveFileResumableCreate* fileResumableCreate(const QString &filepath);
+    GDriveFileResumableCreate* fileResumableCreate(const QString &filepath,const QUrlQuery &args);
     /// simple upload update file
-    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,
-                                             const FileUpdateArgs &args);
+    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,const QString &fileID);
+    GDriveFileSimpleUpdate* fileSimpleUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// multipart upload update file
-    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,
-                                                   const FileUpdateArgs &args);
+    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,const QString &fileID);
+    GDriveFileMultipartUpdate* fileMultipartUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// resumable upload update file
-    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,
-                                                   const FileUpdateArgs &args);
+    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,const QString& fileID);
+    GDriveFileResumableUpdate* fileResumableUpdate(const QString &filepath,const QString& fileID,const QUrlQuery &args);
     /// Gets a file's metadata by ID.
-    GDriveFileGet* fileGet(const GDrive::FileGetArgs &args);
-    /// Search Files in drive
-    GDriveFileSearch* fileList(const GDrive::FileListArgs &args);
+    GDriveFileGet* fileGet(const QString &fileId,const QUrlQuery &args);
+    GDriveFileGet* fileGet(const QString &fileId,const QString &fields);
+    /// Lists or searches files
+    GDriveFileSearch* fileList(const QUrlQuery &args);
     /// Get File download by fileID
-    GDriveFileDownloader* fileDownload(const QString &fileId,
-                                       const QString &fields,
-                                       QSharedPointer<QFile> file);
+    GDriveFileDownloader* fileDownload(const QString &fileId,const QString &fields,QSharedPointer<QFile> file);
+    GDriveFileDownloader* fileDownload(const QString &fileId,const QUrlQuery &args,QSharedPointer<QFile> file);
+
 public slots:
     /// Starts the authentication flow as described in The OAuth 2.0 Authorization Framework
     void grant();

@@ -9,9 +9,8 @@
 #include <QJsonParseError>
 #include <QJsonDocument>
 
-GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
-                                                             const QString &fileID):
+GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &filepath,
+                                                             const QString &fileID, QOAuth2AuthorizationCodeFlow *parent):
     GDriveFileTask (parent)
 {
     //! check file exist
@@ -24,14 +23,13 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2Authorizatio
     //! Initial file
     m_file = new QFile(filepath,this);
     /// Setup Url
-    m_url = setupUrl(fileID);
+    m_url = buildUrl(fileID,"multipart");
     //! Upload file
     request_UploadStart();
 }
 
-GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
-                                                             const FileUpdateArgs &args)
+GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &filepath, const QString &fileID,
+                                                             const QUrlQuery &args, QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent)
 {
     //! check file exist
@@ -44,7 +42,7 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(QOAuth2Authorizatio
     //! Initial file
     m_file = new QFile(filepath,this);
     /// Setup Url
-    m_url = setupUrl(args);
+    m_url = buildUrl(fileID,"multipart",args);
     //! Upload file
     request_UploadStart();
 }
@@ -68,6 +66,44 @@ GDrive::GDriveFileResource GDrive::GDriveFileMultipartUpdate::getResource() cons
 QByteArray GDrive::GDriveFileMultipartUpdate::getReplyString() const
 {
     return m_replyData;
+}
+
+QUrlQuery GDrive::GDriveFileMultipartUpdate::buildUrlArgs(const QString &addParents,
+                                                          const bool enforceSingleParent,
+                                                          const bool keepRevisionForever,
+                                                          const QString &ocrLanguage,
+                                                          const QString &removeParents,
+                                                          const bool supportsAllDrives,
+                                                          const bool useContentAsIndexableText)
+{
+    QUrlQuery args;
+    //! Set optional parameters
+    if(!addParents.isEmpty()){
+        args.addQueryItem("addParents",addParents);
+    }
+    if(enforceSingleParent){
+        args.addQueryItem("enforceSingleParent",
+                          QVariant(enforceSingleParent).toString());
+    }
+    if(keepRevisionForever){
+        args.addQueryItem("keepRevisionForever",
+                          QVariant(keepRevisionForever).toString());
+    }
+    if(!ocrLanguage.isEmpty()){
+        args.addQueryItem("ocrLanguage",ocrLanguage);
+    }
+    if(!removeParents.isEmpty()){
+        args.addQueryItem("removeParents",removeParents);
+    }
+    if(supportsAllDrives){
+        args.addQueryItem("supportsAllDrives",
+                          QVariant(supportsAllDrives).toString());
+    }
+    if(useContentAsIndexableText){
+        args.addQueryItem("useContentAsIndexableText",
+                          QVariant(useContentAsIndexableText).toString());
+    }
+    return args;
 }
 
 void GDrive::GDriveFileMultipartUpdate::request_UploadStart()
@@ -104,44 +140,23 @@ void GDrive::GDriveFileMultipartUpdate::request_UploadStart()
             this,&GDriveFileMultipartUpdate::on_UploadStart_ReplyError);
 }
 
-QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const QString &fileID)
+QUrl GDrive::GDriveFileMultipartUpdate::buildUrl(const QString &fileID,
+                                                 const QString &uploadType) const
 {
     QUrlQuery query;
-    query.addQueryItem("uploadType","multipart");
+    query.addQueryItem("uploadType",uploadType);
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
     url.setQuery(query);
     return url;
 }
 
-QUrl GDrive::GDriveFileMultipartUpdate::setupUrl(const GDrive::FileUpdateArgs &args)
+QUrl GDrive::GDriveFileMultipartUpdate::buildUrl(const QString &fileID,
+                                                 const QString &uploadType,
+                                                 QUrlQuery args) const
 {
-    QUrlQuery query;
-    query.addQueryItem("uploadType","multipart");
-    //! Set optional parameters
-    if(!args.addParents().isEmpty()){
-        query.addQueryItem("addParents",args.addParents());
-    }
-    if(args.enforceSingleParent()){
-        query.addQueryItem("enforceSingleParent",
-                           GDrive::BooleanToString(args.enforceSingleParent()));
-    }
-    if(args.keepRevisionForever()){
-        query.addQueryItem("keepRevisionForever",
-                           GDrive::BooleanToString(args.keepRevisionForever()));
-    }
-    if(!args.ocrLanguage().isEmpty()){
-        query.addQueryItem("ocrLanguage",args.ocrLanguage());
-    }
-    if(!args.removeParents().isEmpty()){
-        query.addQueryItem("removeParents",args.removeParents());
-    }
-    if(args.useContentAsIndexableText()){
-        query.addQueryItem("useContentAsIndexableText",
-                           GDrive::BooleanToString(args.useContentAsIndexableText()));
-    }
-
-    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + args.fileId());
-    url.setQuery(query);
+    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
+    args.addQueryItem("uploadType",uploadType);
+    url.setQuery(args);
     return url;
 }
 

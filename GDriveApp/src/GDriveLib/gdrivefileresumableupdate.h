@@ -30,19 +30,28 @@ class GDriveFileResumableUpdate : public GDriveFileTask
     Q_OBJECT
 public:
     /// constructor
-    explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString& filepath,
-                                       const QString& fileID);
+    explicit GDriveFileResumableUpdate(const QString& filepath,
+                                       const QString& fileID,
+                                       QOAuth2AuthorizationCodeFlow *parent);
     ///
-    explicit GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString& filepath,
-                                       const FileUpdateArgs &args);
+    explicit GDriveFileResumableUpdate(const QString& filepath,
+                                       const QString& fileID,
+                                       const QUrlQuery &args,
+                                       QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileResumableUpdate() override;
     /// return File resource
     GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
+
+    static QUrlQuery buildUrlArgs(const QString &addParents,
+                                  const bool enforceSingleParent,
+                                  const bool keepRevisionForever,
+                                  const QString &ocrLanguage,
+                                  const QString &removeParents,
+                                  const bool supportsAllDrives,
+                                  const bool useContentAsIndexableText);
 
 private:
     /// Start resumable upload session, first step to get session Uri
@@ -54,9 +63,8 @@ private:
     /// Resume upload when interrupt form offset position
     void request_UploadResume(const qint64 offset);
     /// return QUrl by fileID
-    QUrl setupUrl(const QString &fileID);
-    /// return QUrl by args
-    QUrl setupUrl(const FileUpdateArgs &args);
+    QUrl buildUrl(const QString &fileID,const QString &uploadType) const;
+    QUrl buildUrl(const QString &fileID,const QString &uploadType,QUrlQuery args) const;
 
 private slots:
     /// process request_InitialSession reply finished

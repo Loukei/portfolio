@@ -9,8 +9,8 @@
 #include <QJsonParseError>
 #include <QJsonDocument>
 
-GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath)
+GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(const QString &filepath,
+                                                             QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent),m_replyData("")
 {
     //! check file exist
@@ -21,16 +21,16 @@ GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2Authorizatio
         return;
     }
     //! Build url
-    m_url = setupUrl();
+    m_url = buildUrl("multipart");
     //! Initial file
     m_file = new QFile(filepath,this);
     //! Upload file
     request_UploadStart();
 }
 
-GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
-                                                             const GDrive::FileCreateArgs &args)
+GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(const QString &filepath,
+                                                             const QUrlQuery &args,
+                                                             QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent),m_replyData("")
 {
     //! check file exist
@@ -41,7 +41,7 @@ GDrive::GDriveFileMultipartCreate::GDriveFileMultipartCreate(QOAuth2Authorizatio
         return;
     }
     //! Build url
-    m_url = setupUrl(args);
+    m_url = buildUrl("multipart",args);
     //! Initial file
     m_file = new QFile(filepath,this);
     //! Upload file
@@ -67,6 +67,40 @@ GDrive::GDriveFileResource GDrive::GDriveFileMultipartCreate::getResource() cons
 QByteArray GDrive::GDriveFileMultipartCreate::getReplyString() const
 {
     return m_replyData;
+}
+
+QUrlQuery GDrive::GDriveFileMultipartCreate::buildUrlArgs(const bool enforceSingleParent,
+                                                          const bool ignoreDefaultVisibility,
+                                                          const bool keepRevisionForever,
+                                                          const QString &ocrLanguage,
+                                                          const bool supportsAllDrives,
+                                                          const bool useContentAsIndexableText)
+{
+    QUrlQuery args;
+    if(enforceSingleParent){
+        args.addQueryItem("enforceSingleParent",
+                          QVariant(enforceSingleParent).toString());
+    }
+    if(ignoreDefaultVisibility){
+        args.addQueryItem("ignoreDefaultVisibility",
+                          QVariant(ignoreDefaultVisibility).toString());
+    }
+    if(keepRevisionForever){
+        args.addQueryItem("keepRevisionForever",
+                          QVariant(keepRevisionForever).toString());
+    }
+    if(!ocrLanguage.isEmpty()){
+        args.addQueryItem("ocrLanguage",ocrLanguage);
+    }
+    if(supportsAllDrives){
+        args.addQueryItem("supportsAllDrives",
+                          QVariant(supportsAllDrives).toString());
+    }
+    if(useContentAsIndexableText){
+        args.addQueryItem("useContentAsIndexableText",
+                          QVariant(useContentAsIndexableText).toString());
+    }
+    return args;
 }
 
 void GDrive::GDriveFileMultipartCreate::request_UploadStart()
@@ -103,42 +137,20 @@ void GDrive::GDriveFileMultipartCreate::request_UploadStart()
             this,&GDriveFileMultipartCreate::on_UploadStart_ReplyError);
 }
 
-QUrl GDrive::GDriveFileMultipartCreate::setupUrl()
+QUrl GDrive::GDriveFileMultipartCreate::buildUrl(const QString &uploadType/*, const QString &access_token*/) const
 {
     QUrlQuery query;
-    query.addQueryItem("uploadType","multipart");
+    query.addQueryItem("uploadType",uploadType);
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
     url.setQuery(query);
     return url;
 }
 
-QUrl GDrive::GDriveFileMultipartCreate::setupUrl(const GDrive::FileCreateArgs &args)
+QUrl GDrive::GDriveFileMultipartCreate::buildUrl(const QString &uploadType/*,const QString &access_token*/,QUrlQuery args) const
 {
-    QUrlQuery query;
-    query.addQueryItem("uploadType","multipart");
-
-    if(args.enforceSingleParent()){
-        query.addQueryItem("enforceSingleParent",
-                           BooleanToString(args.enforceSingleParent()));
-    }
-    if(args.ignoreDefaultVisibility()){
-        query.addQueryItem("ignoreDefaultVisibility",
-                           BooleanToString(args.ignoreDefaultVisibility()));
-    }
-    if(args.keepRevisionForever()){
-        query.addQueryItem("keepRevisionForever",
-                           BooleanToString(args.keepRevisionForever()));
-    }
-    if(!args.ocrLanguage().isEmpty()){
-        query.addQueryItem("ocrLanguage",args.ocrLanguage());
-    }
-    if(args.useContentAsIndexableText()){
-        query.addQueryItem("useContentAsIndexableText",
-                           BooleanToString(args.useContentAsIndexableText()));
-    }
-
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files");
-    url.setQuery(query);
+    args.addQueryItem("uploadType",uploadType);
+    url.setQuery(args);
     return url;
 }
 

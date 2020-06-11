@@ -108,57 +108,93 @@ QNetworkAccessManager *GDriveService::networkAccessManager() const
     return m_google->networkAccessManager();
 }
 
-GDriveAbout* GDriveService::getAbout(GDriveAbout::AboutArgs args)
-{
-    return new GDriveAbout(m_google,args);
-}
-
 GDriveAbout *GDriveService::getAbout(const QString &fields)
 {
     return new GDriveAbout(m_google,fields);
 }
 
-GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath, const FileCreateArgs &args)
+GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath)
 {
-    return new GDriveFileSimpleCreate(m_google,filepath,args);
+    return new GDriveFileSimpleCreate(filepath,m_google);
 }
 
-GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath, const FileCreateArgs &args)
+GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath, const QUrlQuery &args)
 {
-    return new GDriveFileMultipartCreate(m_google,filepath,args);
+    return new GDriveFileSimpleCreate(filepath,args,m_google);
 }
 
-GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath, const FileCreateArgs &args)
+GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath)
 {
-    return new GDriveFileResumableCreate(m_google,filepath,args);
+    return new GDriveFileMultipartCreate(filepath,m_google);
 }
 
-GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
+GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath, const QUrlQuery &args)
 {
-    return new GDriveFileSimpleUpdate(m_google,filepath,args);
+    return new GDriveFileMultipartCreate(filepath,args,m_google);
 }
 
-GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const FileUpdateArgs &args)
+GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath)
 {
-    return new GDriveFileMultipartUpdate(m_google,filepath,args);
+    return new GDriveFileResumableCreate(filepath,m_google);
 }
 
-GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
+GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath, const QUrlQuery &args)
 {
-    return new GDriveFileResumableUpdate(m_google,filepath,args);
+    return new GDriveFileResumableCreate(filepath,args,m_google);
 }
 
-GDriveFileGet *GDriveService::fileGet(const FileGetArgs &args)
+GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const QString &fileID)
 {
-    return new GDriveFileGet(m_google,args);
+    return new GDriveFileSimpleUpdate(filepath,fileID,m_google);
 }
 
-GDriveFileSearch *GDriveService::fileList(const FileListArgs &args)
+GDriveFileSimpleUpdate *GDriveService::fileSimpleUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
 {
-    return new GDriveFileSearch(m_google,args);
+    return new GDriveFileSimpleUpdate(filepath,fileID,args,m_google);
+}
+
+GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const QString &fileID)
+{
+    return new GDriveFileMultipartUpdate(filepath,fileID,m_google);
+}
+
+GDriveFileMultipartUpdate *GDriveService::fileMultipartUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
+{
+    return new GDriveFileMultipartUpdate(filepath,fileID,args,m_google);
+}
+
+GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const QString &fileID)
+{
+    return new GDriveFileResumableUpdate(filepath,fileID,m_google);
+}
+
+GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
+{
+    return new GDriveFileResumableUpdate(filepath,fileID,args,m_google);
+}
+
+GDriveFileGet *GDriveService::fileGet(const QString &fileId,
+                                      const QUrlQuery &args)
+{
+    return new GDriveFileGet(fileId,args,m_google);
+}
+
+GDriveFileGet *GDriveService::fileGet(const QString &fileId, const QString &fields)
+{
+    return new GDriveFileGet(fileId,fields,m_google);
+}
+
+GDriveFileSearch *GDriveService::fileList(const QUrlQuery &args)
+{
+    return new GDriveFileSearch(args,m_google);
 }
 
 GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, QSharedPointer<QFile> file)
 {
-    return new GDriveFileDownloader(m_google,fileId,fields,file);
+    return new GDriveFileDownloader(fileId,fields,file,m_google);
+}
+
+GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QUrlQuery &args, QSharedPointer<QFile> file)
+{
+    return new GDriveFileDownloader(fileId,args,file,m_google);
 }

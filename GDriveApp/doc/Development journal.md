@@ -35,7 +35,6 @@ action_UserEmail->setVisible(false);
 
 ## Todo
 
-* 在GDriveServiece開一個口，方便設定OAuth變數
 * 提供一個簡短的example比落落長的說明更好
 * 使用login/logot signal取代 tokenchanged
 * 對任務提供progress/abort/pause 方法

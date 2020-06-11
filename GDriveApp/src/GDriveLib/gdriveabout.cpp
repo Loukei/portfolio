@@ -1,23 +1,13 @@
 #include "gdriveabout.h"
 #include <QOAuth2AuthorizationCodeFlow>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QEventLoop>
 
 using namespace GDrive;
-
-GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, AboutArgs args)
-    :QObject(parent),m_data(QByteArray())
-{
-    //! send request to get data member, use signal received(true) to get data
-    QNetworkReply *reply = parent->get(buildRequestUrl(args));
-    connect(reply,&QNetworkReply::finished,
-            this,&GDriveAbout::onReplyFinished);
-    connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-            this,&GDriveAbout::onReplyError);
-}
 
 GDriveAbout::GDriveAbout(QOAuth2AuthorizationCodeFlow *parent, const QString &fields)
 {
@@ -61,41 +51,11 @@ bool GDriveAbout::isFailed() const
 
 QUrl GDriveAbout::buildRequestUrl(const QString &field) const
 {
-    QString str = key_AboutUrl + QString("?fields=%1").arg(field);
-    return QUrl(str);
-}
-
-QUrl GDriveAbout::buildRequestUrl(const AboutArgs& args) const
-{
-    QString userargs;
-    switch (args) {
-    case 0x01: //DISPLAYNAME
-        userargs = QString("user(displayName)");
-        break;
-    case 0x02: //EMAILADDRESS
-        userargs = QString("user(emailAddress)");
-        break;
-    case 0x04: //PERMISSIONID
-        userargs = QString("user(permissionId)");
-        break;
-    case 0x03 : //DISPLAYNAME|EMAILADDRESS
-        userargs = QString("user(displayName,emailAddress)");
-        break;
-    case 0x06: //EMAILADDRESS|PERMISSIONID
-        userargs = QString("user(emailAddress,permissionId)");
-        break;
-    case 0x05: //DISPLAYNAME|PERMISSIONID
-        userargs = QString("user(displayName,permissionId)");
-        break;
-    case 0x07: //DISPLAYNAME|EMAILADDRESS|PERMISSIONID
-        userargs = QString("user(displayName,emailAddress,permissionId)");
-        break;
-    default:   //DISPLAYNAME|EMAILADDRESS|PERMISSIONID
-        userargs = QString("user(displayName,emailAddress,permissionId)");
-        break;
-    }
-    QString urlStr = key_AboutUrl + QString("?fields=%1").arg(userargs);
-    return QUrl(urlStr);
+    QUrl url(key_AboutUrl);
+    QUrlQuery query;
+    query.addQueryItem("fields",field);
+    url.setQuery(query);
+    return url;
 }
 
 void GDriveAbout::onReplyFinished()

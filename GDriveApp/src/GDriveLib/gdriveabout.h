@@ -35,18 +35,6 @@ class GDriveAbout : public QObject
 {
     Q_OBJECT
 public:
-    /*!
-     * \enum AboutArg
-     * \brief The AboutArg enum is a convience flag to request particular element of user info
-     */
-    enum AboutArg{
-        DISPLAYNAME = 0x01,
-        EMAILADDRESS = 0x02,
-        PERMISSIONID = 0x04
-    };
-    Q_DECLARE_FLAGS(AboutArgs,AboutArg)
-    /// Constructor,the parent object use to send request
-    explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,AboutArgs args);
     /// Constructor,use direct url to send request
     explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,const QString &fields);
     /// Destructor
@@ -68,7 +56,6 @@ protected:
     const QString key_AboutUrl = "https://www.googleapis.com/drive/v3/about";
     /// Turn fields to request Url
     QUrl buildRequestUrl(const QString &field) const;
-    QUrl buildRequestUrl(const AboutArgs& args) const;
 
 private:
     /// save reply data
@@ -85,6 +72,5 @@ private slots:
     /// process network reply error
     void onReplyError(QNetworkReply::NetworkError);
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(GDriveAbout::AboutArgs)
 }
 #endif // GDRIVEABOUT_H

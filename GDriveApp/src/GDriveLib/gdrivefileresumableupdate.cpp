@@ -8,9 +8,9 @@
 #include <QJsonParseError>
 #include <QJsonDocument>
 
-GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
-                                                             const QString &fileID)
+GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(const QString &filepath,
+                                                             const QString &fileID,
+                                                             QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent)
 {
     //! check file exist
@@ -23,20 +23,28 @@ GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2Authorizatio
     //! Initial file
     m_file = new QFile(filepath,this);
     //! Setup request url
-    m_url = setupUrl(fileID);
+    m_url = buildUrl(fileID,"resumable");
     //! request session URI
     request_InitialSession();
 }
 
-GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                                             const QString &filepath,
-                                                             const GDrive::FileUpdateArgs &args)
+GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(const QString &filepath,
+                                                             const QString &fileID,
+                                                             const QUrlQuery &args,
+                                                             QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent)
 {
+    //! check file exist
+    if(!QFile::exists(filepath)){
+        qWarning() << "file doesnt exist " << filepath;
+        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
+        taskFailed();
+        return;
+    }
     //! Initial file
     m_file = new QFile(filepath,this);
     //! Setup request url
-    m_url = setupUrl(args);
+    m_url = buildUrl(fileID,"resumable",args);
     //! request session URI
     request_InitialSession();
 }
@@ -62,6 +70,44 @@ QByteArray GDrive::GDriveFileResumableUpdate::getReplyString() const
     return m_replyData;
 }
 
+QUrlQuery GDrive::GDriveFileResumableUpdate::buildUrlArgs(const QString &addParents,
+                                                          const bool enforceSingleParent,
+                                                          const bool keepRevisionForever,
+                                                          const QString &ocrLanguage,
+                                                          const QString &removeParents,
+                                                          const bool supportsAllDrives,
+                                                          const bool useContentAsIndexableText)
+{
+    QUrlQuery args;
+    //! Set optional parameters
+    if(!addParents.isEmpty()){
+        args.addQueryItem("addParents",addParents);
+    }
+    if(enforceSingleParent){
+        args.addQueryItem("enforceSingleParent",
+                          QVariant(enforceSingleParent).toString());
+    }
+    if(keepRevisionForever){
+        args.addQueryItem("keepRevisionForever",
+                          QVariant(keepRevisionForever).toString());
+    }
+    if(!ocrLanguage.isEmpty()){
+        args.addQueryItem("ocrLanguage",ocrLanguage);
+    }
+    if(!removeParents.isEmpty()){
+        args.addQueryItem("removeParents",removeParents);
+    }
+    if(supportsAllDrives){
+        args.addQueryItem("supportsAllDrives",
+                          QVariant(supportsAllDrives).toString());
+    }
+    if(useContentAsIndexableText){
+        args.addQueryItem("useContentAsIndexableText",
+                          QVariant(useContentAsIndexableText).toString());
+    }
+    return args;
+}
+
 void GDrive::GDriveFileResumableUpdate::request_InitialSession()
 {
     /// reference:
@@ -82,7 +128,6 @@ void GDrive::GDriveFileResumableUpdate::request_InitialSession()
     request.setRawHeader("X-Upload-Content-Type",fileMimeType.toLatin1());
     request.setRawHeader("X-Upload-Content-Length",QByteArray::number(fileSize));
     //! Send request
-//    auto reply = mp_google->networkAccessManager()->post(request,body);
     auto reply = mp_google->networkAccessManager()->sendCustomRequest(request,"PATCH",body);
     connect(reply,&QNetworkReply::finished,
             this,&GDriveFileResumableUpdate::on_InitialSession_ReplyFinished);
@@ -155,46 +200,24 @@ void GDrive::GDriveFileResumableUpdate::request_UploadResume(const qint64 offset
             this,&GDriveFileResumableUpdate::on_UploadResume_ReplyError);
 }
 
-QUrl GDrive::GDriveFileResumableUpdate::setupUrl(const QString &fileID)
+QUrl GDrive::GDriveFileResumableUpdate::buildUrl(const QString &fileID,
+                                                 const QString &uploadType) const
 {
     //https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&access_token=%1
     QUrlQuery query;
-    query.addQueryItem("uploadType","resumable");
+    query.addQueryItem("uploadType",uploadType);
     auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
     url.setQuery(query);
     return url;
 }
 
-QUrl GDrive::GDriveFileResumableUpdate::setupUrl(const GDrive::FileUpdateArgs &args)
+QUrl GDrive::GDriveFileResumableUpdate::buildUrl(const QString &fileID,
+                                                 const QString &uploadType,
+                                                 QUrlQuery args) const
 {
-    //https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&access_token=%1
-    QUrlQuery query;
-    query.addQueryItem("uploadType","resumable");
-    //! Set optional parameters
-    if(!args.addParents().isEmpty()){
-        query.addQueryItem("addParents",args.addParents());
-    }
-    if(args.enforceSingleParent()){
-        query.addQueryItem("enforceSingleParent",
-                           GDrive::BooleanToString(args.enforceSingleParent()));
-    }
-    if(args.keepRevisionForever()){
-        query.addQueryItem("keepRevisionForever",
-                           GDrive::BooleanToString(args.keepRevisionForever()));
-    }
-    if(!args.ocrLanguage().isEmpty()){
-        query.addQueryItem("ocrLanguage",args.ocrLanguage());
-    }
-    if(!args.removeParents().isEmpty()){
-        query.addQueryItem("removeParents",args.removeParents());
-    }
-    if(args.useContentAsIndexableText()){
-        query.addQueryItem("useContentAsIndexableText",
-                           GDrive::BooleanToString(args.useContentAsIndexableText()));
-    }
-
-    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + args.fileId());
-    url.setQuery(query);
+    auto url = QUrl("https://www.googleapis.com/upload/drive/v3/files/" + fileID);
+    args.addQueryItem("uploadType",uploadType);
+    url.setQuery(args);
     return url;
 }
 

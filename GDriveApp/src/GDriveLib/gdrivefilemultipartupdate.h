@@ -30,12 +30,13 @@ class GDriveFileMultipartUpdate : public GDriveFileTask
     Q_OBJECT
 public:
     /// constructor
-    explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString &filepath,
-                                       const QString &fileID);
-    explicit GDriveFileMultipartUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString &filepath,
-                                       const FileUpdateArgs &args);
+    explicit GDriveFileMultipartUpdate(const QString &filepath,
+                                       const QString &fileID,
+                                       QOAuth2AuthorizationCodeFlow *parent);
+    explicit GDriveFileMultipartUpdate(const QString &filepath,
+                                       const QString &fileID,
+                                       const QUrlQuery &args,
+                                       QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileMultipartUpdate() override;
     /// return GDriveFileResource as upload response
@@ -43,13 +44,20 @@ public:
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 
+    static QUrlQuery buildUrlArgs(const QString &addParents,
+                                  const bool enforceSingleParent,
+                                  const bool keepRevisionForever,
+                                  const QString &ocrLanguage,
+                                  const QString &removeParents,
+                                  const bool supportsAllDrives,
+                                  const bool useContentAsIndexableText);
+
 private:
     /// send Multipart upload request
     void request_UploadStart();
     /// return QUrl by fileID
-    QUrl setupUrl(const QString &fileID);
-    /// return QUrl by fileID and optional parameter
-    QUrl setupUrl(const FileUpdateArgs &args);
+    QUrl buildUrl(const QString &fileID,const QString &uploadType/*,const QString &access_token*/) const;
+    QUrl buildUrl(const QString &fileID,const QString &uploadType,QUrlQuery args) const;
     /// retry upload
     void retry();
 

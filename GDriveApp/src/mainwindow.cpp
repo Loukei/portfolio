@@ -104,7 +104,7 @@ void MainWindow::updateAccountActs()
 
 void MainWindow::accountAbout()
 {
-    GDriveAbout* userAbout = m_Drive->getAbout(GDriveAbout::DISPLAYNAME|GDriveAbout::EMAILADDRESS);
+    GDriveAbout* userAbout = m_Drive->getAbout(QStringLiteral("user(displayName,photoLink,emailAddress)"));
     auto onAboutFinished = [userAbout,this](){
         if((!userAbout->isComplete()) | userAbout->isFailed()){
             ui->plainTextEdit->appendPlainText("About message Error.\n");
@@ -116,7 +116,7 @@ void MainWindow::accountAbout()
             this,onAboutFinished);
 }
 
-void MainWindow::fileSimpleUpload(const QString &filepath, const FileCreateArgs &args)
+void MainWindow::fileSimpleUpload(const QString &filepath, const QUrlQuery &args)
 {
     auto task = m_Drive->fileSimpleCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
@@ -132,7 +132,7 @@ void MainWindow::fileSimpleUpload(const QString &filepath, const FileCreateArgs 
             this,onUploadreceive);
 }
 
-void MainWindow::fileMultipartUpload(const QString &filepath, const FileCreateArgs &args)
+void MainWindow::fileMultipartUpload(const QString &filepath, const QUrlQuery &args)
 {
     auto task = m_Drive->fileMultipartCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
@@ -148,7 +148,7 @@ void MainWindow::fileMultipartUpload(const QString &filepath, const FileCreateAr
             this,onUploadreceive);
 }
 
-void MainWindow::fileResumableUpload(const QString &filepath, const FileCreateArgs &args)
+void MainWindow::fileResumableUpload(const QString &filepath, const QUrlQuery &args)
 {
     auto task = m_Drive->fileResumableCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
@@ -164,9 +164,9 @@ void MainWindow::fileResumableUpload(const QString &filepath, const FileCreateAr
             this,onUploadreceive);
 }
 
-void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs &args)
+void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
 {
-    auto task = m_Drive->fileSimpleUpdate(filepath,args);
+    auto task = m_Drive->fileSimpleUpdate(filepath,fileID,args);
     auto onUpdatereceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Simple Update Success.\n");
@@ -180,9 +180,9 @@ void MainWindow::fileSimpleUpdate(const QString &filepath, const FileUpdateArgs 
             this,onUpdatereceive);
 }
 
-void MainWindow::fileMultipartUpdate(const QString &filepath, const FileUpdateArgs &args)
+void MainWindow::fileMultipartUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args)
 {
-    auto task = m_Drive->fileMultipartUpdate(filepath,args);
+    auto task = m_Drive->fileMultipartUpdate(filepath,fileID,args);
     auto onUpdatereceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Multipart Update Success.\n");
@@ -196,9 +196,9 @@ void MainWindow::fileMultipartUpdate(const QString &filepath, const FileUpdateAr
             this,onUpdatereceive);
 }
 
-void MainWindow::fileResumableUpdate(const QString &filepath, const FileUpdateArgs &args)
+void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
 {
-    auto task = m_Drive->fileResumableUpdate(filepath,args);
+    auto task = m_Drive->fileResumableUpdate(filepath,fileID,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
             ui->plainTextEdit->appendPlainText(filepath + " Resumable Update Success.\n");
@@ -381,7 +381,7 @@ void MainWindow::onSearchDialog_query(const QString &corpora,
                                       const QString &spaces)
 {
     qInfo() << Q_FUNC_INFO;
-    const GDrive::FileListArgs args = {corpora,driveId,fields,orderBy,pageSize,pageToken,q,spaces};
+    const QUrlQuery args = GDriveFileSearch::buildUrlArgs(corpora,driveId,fields,false,orderBy,pageSize,pageToken,q,spaces,false);
     auto task = m_Drive->fileList(args);
     connect(task,&GDriveFileSearch::finished,
             m_dialogSearch,&SearchDialog::onFileSearch_finished);
@@ -396,8 +396,7 @@ void MainWindow::on_action_Get_file_matadata_triggered()
 void MainWindow::onFileMataDataDialog_query(const QString &fileID, const QString &fields)
 {
     qInfo() << Q_FUNC_INFO;
-    GDrive::FileGetArgs args = {fileID,false,fields};
-    auto task = m_Drive->fileGet(args);
+    auto task = m_Drive->fileGet(fileID,fields);
     connect(task,&GDriveFileGet::finished,
             m_dialogFileMataData,&FileMataDataDialog::onFileGet_finished);
 }
@@ -408,21 +407,21 @@ void MainWindow::on_action_Update_file_triggered()
     if(m_dialogUpdate->exec() == QDialog::Accepted){
         clearModel();
         //! upload type in args doesnt infected here
-        const GDrive::FileUpdateArgs args = {m_dialogUpdate->getFileID(),
-                                             GDrive::UrlArgs::UploadType::MEDIA,
-                                             m_dialogUpdate->getAddParents(),
-                                             m_dialogUpdate->getEnforceSingleParent(),
-                                             m_dialogUpdate->getKeepRevisionForever(),
-                                             m_dialogUpdate->getOcrLanguage(),
-                                             m_dialogUpdate->getRemoveParents(),
-                                             m_dialogUpdate->getUseContentAsIndexableText()};
+        const QUrlQuery args =GDriveFileSimpleUpdate::buildUrlArgs(
+                    m_dialogUpdate->getAddParents(),
+                    m_dialogUpdate->getEnforceSingleParent(),
+                    m_dialogUpdate->getKeepRevisionForever(),
+                    m_dialogUpdate->getOcrLanguage(),
+                    m_dialogUpdate->getRemoveParents(),
+                    false,
+                    m_dialogUpdate->getUseContentAsIndexableText());
         int uploadtype = m_dialogUpdate->getUploadType();
         if(uploadtype == 0){
-            fileSimpleUpdate(m_dialogUpdate->getFilePath(),args);
+            fileSimpleUpdate(m_dialogUpdate->getFilePath(),m_dialogUpdate->getFileID(),args);
         }else if (uploadtype ==1) {
-            fileMultipartUpdate(m_dialogUpdate->getFilePath(),args);
+            fileMultipartUpdate(m_dialogUpdate->getFilePath(),m_dialogUpdate->getFileID(),args);
         }else if (uploadtype == 2) {
-            fileResumableUpdate(m_dialogUpdate->getFilePath(),args);
+            fileResumableUpdate(m_dialogUpdate->getFilePath(),m_dialogUpdate->getFileID(),args);
         }
     }else {
         ui->plainTextEdit->appendPlainText("Update cancled.\n");
@@ -434,13 +433,14 @@ void MainWindow::on_action_Upload_File_triggered()
     qInfo() << Q_FUNC_INFO;
     if(m_dialogUpload->exec() == QDialog::Accepted){
         clearModel();
+        const QUrlQuery args = GDriveFileSimpleCreate::buildUrlArgs(
+                    m_dialogUpload->getEnforceSingleParent(),
+                    m_dialogUpload->getIgnoreDefaultVisibility(),
+                    m_dialogUpload->getKeepRevisionForever(),
+                    m_dialogUpload->getOcrLanguage(),
+                    false,
+                    m_dialogUpload->getUseContentAsIndexableText());
 
-        GDrive::FileCreateArgs args = { GDrive::UrlArgs::UploadType::MEDIA,
-                                      m_dialogUpload->getEnforceSingleParent(),
-                                      m_dialogUpload->getIgnoreDefaultVisibility(),
-                                      m_dialogUpload->getKeepRevisionForever(),
-                                      m_dialogUpload->getOcrLanguage(),
-                                      m_dialogUpload->getUseContentAsIndexableText()};
         int uploadtype = m_dialogUpload->getUploadType();
         if(uploadtype == 0){
             fileSimpleUpload(m_dialogUpload->getFilePath(),args);

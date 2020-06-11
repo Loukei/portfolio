@@ -26,19 +26,24 @@ class GDriveFileDownloader : public GDriveFileTask
 public:
     /// Download file form fileID, write file when finished().
     /// GDriveFileDownloader doesnt take ownership of file
-    explicit GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
-                                  const QString &fileId,
+    explicit GDriveFileDownloader(const QString &fileId,
                                   const QString &fields,
-                                  QSharedPointer<QFile> file);
-    explicit GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
-                                  const GDrive::FileGetArgs &args,
-                                  QSharedPointer<QFile> file);
+                                  QSharedPointer<QFile> file,
+                                  QOAuth2AuthorizationCodeFlow *parent);
+    explicit GDriveFileDownloader(const QString &fileId,
+                                  const QUrlQuery &args,
+                                  QSharedPointer<QFile> file,
+                                  QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileDownloader() override;
     /// return GDriveFileResource
 //    GDriveFileResource getResource() const;
     /// return network reply
     QByteArray getReplyString() const;
+
+    static QUrlQuery buildUrlArgs(bool acknowledgeAbuse = false,
+                                  const QString &fields = QString(),
+                                  bool supportsAllDrives = false);
 
 private:
     /// pointer to Shared QFile ready to write,DELETE by owner
@@ -48,9 +53,10 @@ private:
 
 private:
     /// send download request
-    void request_Download(const GDrive::FileGetArgs &args);
+    void request_Download(const QUrl &url);
     /// Setup download url
-    QUrl setupUrl(const GDrive::FileGetArgs &args);
+    QUrl buildUrl(const QString &fileId,const QString &fields,const QString &key) const;
+    QUrl buildUrl(const QString &fileId,const QString &alt,const QString &key,QUrlQuery args) const;
     /// Write data to mp_file;
     bool writeFile(QNetworkReply *reply);
     /// Parse Error message form reply

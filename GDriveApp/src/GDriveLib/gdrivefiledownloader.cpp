@@ -5,22 +5,24 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-GDrive::GDriveFileDownloader::GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
-        const QString &fileId,
-        const QString &fields,
-        QSharedPointer<QFile> file)
+GDrive::GDriveFileDownloader::GDriveFileDownloader(const QString &fileId,
+                                                   const QString &fields,
+                                                   QSharedPointer<QFile> file,
+                                                   QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent),mp_file(file)
 {
-    //! Start download
-    request_Download(GDrive::FileGetArgs(fileId,false,fields));
+    QUrl url = buildUrl(fileId,fields,mp_google->clientIdentifierSharedKey());
+    request_Download(url);
 }
 
-GDrive::GDriveFileDownloader::GDriveFileDownloader(QOAuth2AuthorizationCodeFlow *parent,
-                                                   const GDrive::FileGetArgs &args,
-                                                   QSharedPointer<QFile> file)
+GDrive::GDriveFileDownloader::GDriveFileDownloader(const QString &fileId,
+                                                   const QUrlQuery &args,
+                                                   QSharedPointer<QFile> file,
+                                                   QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent),mp_file(file)
 {
-    request_Download(args);
+    QUrl url = buildUrl(fileId,"media",mp_google->clientIdentifierSharedKey(),args);
+    request_Download(url);
 }
 
 GDrive::GDriveFileDownloader::~GDriveFileDownloader()
@@ -45,9 +47,23 @@ QByteArray GDrive::GDriveFileDownloader::getReplyString() const
     return m_replyData;
 }
 
-void GDrive::GDriveFileDownloader::request_Download(const GDrive::FileGetArgs &args)
+QUrlQuery GDrive::GDriveFileDownloader::buildUrlArgs(bool acknowledgeAbuse, const QString &fields, bool supportsAllDrives)
 {
-    QUrl url = setupUrl(args);
+    QUrlQuery args;
+    if(acknowledgeAbuse){
+        args.addQueryItem("acknowledgeAbuse",QVariant(acknowledgeAbuse).toString());
+    }
+    if(!fields.isEmpty()){
+        args.addQueryItem("field",fields);
+    }
+    if(supportsAllDrives){
+        args.addQueryItem("supportsAllDrives",QVariant(supportsAllDrives).toString());
+    }
+    return args;
+}
+
+void GDrive::GDriveFileDownloader::request_Download(const QUrl &url)
+{
     QNetworkRequest request(url);
     request.setRawHeader("Authorization",
                          QByteArray("Bearer " + mp_google->token().toLatin1()));
@@ -58,19 +74,30 @@ void GDrive::GDriveFileDownloader::request_Download(const GDrive::FileGetArgs &a
             this,&GDriveFileDownloader::on_Download_ReplyError);
 }
 
-QUrl GDrive::GDriveFileDownloader::setupUrl(const GDrive::FileGetArgs &args)
+QUrl GDrive::GDriveFileDownloader::buildUrl(const QString &fileId,
+                                            const QString &fields,
+                                            const QString &key) const
 {
     QUrlQuery query;
-    query.addQueryItem("key",mp_google->clientIdentifierSharedKey());
     query.addQueryItem("alt","media");
-    if(args.acknowledgeAbuse()){
-        query.addQueryItem("acknowledgeAbuse",BooleanToString(args.acknowledgeAbuse()));
+    if(!fields.isEmpty()){
+        query.addQueryItem("fields",fields);
     }
-    if(!args.fields().isEmpty()){
-        query.addQueryItem("field",args.fields());
-    }
-    QUrl url("https://www.googleapis.com/drive/v3/files/" + args.fileId());
+    query.addQueryItem("key",key);
+    QUrl url("https://www.googleapis.com/drive/v3/files/" + fileId);
     url.setQuery(query);
+    return url;
+}
+
+QUrl GDrive::GDriveFileDownloader::buildUrl(const QString &fileId,
+                                            const QString &alt,
+                                            const QString &key,
+                                            QUrlQuery args) const
+{
+    args.addQueryItem("alt",alt);
+    args.addQueryItem("key",key);
+    QUrl url("https://www.googleapis.com/drive/v3/files/" + fileId);
+    url.setQuery(args);
     return url;
 }
 

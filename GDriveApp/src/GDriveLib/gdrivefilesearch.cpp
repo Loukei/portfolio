@@ -4,20 +4,23 @@
 #include <QJsonParseError>
 #include <QJsonDocument>
 
-GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
-                                           const QString &q,
-                                           const QString &pageToken)
+GDrive::GDriveFileSearch::GDriveFileSearch(const QString &q,
+                                           const QString &pageToken,
+                                           QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent)
 {
-    GDrive::FileListArgs args = {"","","","",100,pageToken,q,""};
-    request_Search(args);
+
+    QUrl url = buildUrl(
+                buildUrlArgs("","","",false,"",100,pageToken,q,"",false));
+    request_Search(url);
 }
 
-GDrive::GDriveFileSearch::GDriveFileSearch(QOAuth2AuthorizationCodeFlow *parent,
-                                           const GDrive::FileListArgs &args)
-    :GDriveFileTask (parent)
+GDrive::GDriveFileSearch::GDriveFileSearch(const QUrlQuery &args,
+                                           QOAuth2AuthorizationCodeFlow *parent)
+    :GDriveFileTask(parent)
 {
-    request_Search(args);
+    QUrl url = buildUrl(args);
+    request_Search(url);
 }
 
 GDrive::GDriveFileSearch::~GDriveFileSearch()
@@ -41,9 +44,55 @@ QByteArray GDrive::GDriveFileSearch::getReplyString() const
     return m_replyData;
 }
 
-void GDrive::GDriveFileSearch::request_Search(const GDrive::FileListArgs &args)
+QUrlQuery GDrive::GDriveFileSearch::buildUrlArgs(const QString &corpora,
+                                                 const QString &driveId,
+                                                 const QString &fields,
+                                                 const bool includeItemsFromAllDrives,
+                                                 const QString &orderBy,
+                                                 const int pageSize,
+                                                 const QString &pageToken,
+                                                 const QString &q,
+                                                 const QString &spaces,
+                                                 const bool supportsAllDrives)
 {
-    QUrl url = setupUrl(args);
+    QUrlQuery args;
+    if(!corpora.isEmpty()){
+        args.addQueryItem("corpora",corpora);
+    }
+    if(!driveId.isEmpty()){
+        args.addQueryItem("driveId",driveId);
+    }
+    if(!fields.isEmpty()){
+        args.addQueryItem("fields",fields);
+    }
+    if(includeItemsFromAllDrives){
+        args.addQueryItem("includeItemsFromAllDrives",
+                           QVariant(includeItemsFromAllDrives).toString());
+    }
+    if(!orderBy.isEmpty()){
+        args.addQueryItem("orderBy",orderBy);
+    }
+    if(pageSize > 0){
+        args.addQueryItem("pageSize",QString::number(pageSize));
+    }
+    if(!pageToken.isEmpty()){
+        args.addQueryItem("pageToken",pageToken);
+    }
+    if(!q.isEmpty()){
+        args.addQueryItem("q",q);
+    }
+    if(!spaces.isEmpty()){
+        args.addQueryItem("spaces",spaces);
+    }
+    if(supportsAllDrives){
+        args.addQueryItem("supportsAllDrives",
+                           QVariant(supportsAllDrives).toString());
+    }
+    return args;
+}
+
+void GDrive::GDriveFileSearch::request_Search(const QUrl &url)
+{
     QNetworkRequest request(url);
     const QString tokenHeader = QString("Bearer %1").arg(mp_google->token());
     request.setRawHeader(QByteArray("Authorization"),tokenHeader.toLatin1());
@@ -55,37 +104,15 @@ void GDrive::GDriveFileSearch::request_Search(const GDrive::FileListArgs &args)
             this,&GDriveFileSearch::on_Search_ReplyFinished);
 }
 
-QUrl GDrive::GDriveFileSearch::setupUrl(const GDrive::FileListArgs &args)
+QUrl GDrive::GDriveFileSearch::buildUrl() const
 {
-    QUrlQuery query;
-    if(!args.corpora().isEmpty()){
-        query.addQueryItem("corpora",args.corpora());
-    }
-    if(!args.driveId().isEmpty()){
-        query.addQueryItem("driveId",args.driveId());
-    }
-    if(!args.fields().isEmpty()){
-        query.addQueryItem("fields",args.fields());
-    }
-    if(!args.orderBy().isEmpty()){
-        query.addQueryItem("orderBy",args.orderBy());
-    }
-    if(args.pageSize() > 0){
-        query.addQueryItem("pageSize",QString::number(args.pageSize()));
-    }
-    if(!args.pageToken().isEmpty()){
-        query.addQueryItem("pageToken",args.pageToken());
-    }
-    if(!args.q().isEmpty()){
-        query.addQueryItem("q",args.q());
-    }
-    if(!args.spaces().isEmpty()){
-        query.addQueryItem("spaces",args.spaces());
-    }
+    return QUrl("https://www.googleapis.com/drive/v3/files");
+}
 
+QUrl GDrive::GDriveFileSearch::buildUrl(QUrlQuery args) const
+{
     QUrl url("https://www.googleapis.com/drive/v3/files");
-    url.setQuery(query);
-
+    url.setQuery(args);
     return url;
 }
 
@@ -98,9 +125,7 @@ void GDrive::GDriveFileSearch::on_Search_ReplyFinished()
     }
     m_replyData = reply->readAll();
 
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
+    taskSucceeded();
     reply->deleteLater();
 }
 
@@ -116,8 +141,6 @@ void GDrive::GDriveFileSearch::on_Search_ReplyError(QNetworkReply::NetworkError)
     m_errStr += errStr;
     m_replyData = reply->readAll();
 
-    m_isFailed = true;
-    m_isComplete = true;
-    emit finished();
+    taskFailed();
     reply->deleteLater();
 }

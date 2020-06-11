@@ -18,7 +18,7 @@ namespace GDrive{
  * - 更新檔案
  * - 與Create方法相似，但是差別在URL部份使用fileID
  * - 必須使用PATCH方法發送HTTP request，而非指南中所稱的PUT
- * - Access token 必定放在最後方
+ * - Access token 參數必定放在最後方
  *
  * ## Reference 參考資料
  * - [Files: update](https://developers.google.com/drive/api/v3/reference/files/update)
@@ -29,12 +29,13 @@ class GDriveFileSimpleUpdate : public GDriveFileTask
     Q_OBJECT
 public:
     /// constructor
-    explicit GDriveFileSimpleUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                    const QString &filepath,
-                                    const QString &fileID);
-    explicit GDriveFileSimpleUpdate(QOAuth2AuthorizationCodeFlow *parent,
-                                    const QString &filepath,
-                                    const FileUpdateArgs &args);
+    explicit GDriveFileSimpleUpdate(const QString &filepath,
+                                    const QString &fileID,
+                                    QOAuth2AuthorizationCodeFlow *parent);
+    explicit GDriveFileSimpleUpdate(const QString &filepath,
+                                    const QString &fileID,
+                                    const QUrlQuery &args,
+                                    QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileSimpleUpdate() override;
     /// return File resource
@@ -42,13 +43,20 @@ public:
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 
+    static QUrlQuery buildUrlArgs(const QString &addParents,
+                                  const bool enforceSingleParent,
+                                  const bool keepRevisionForever,
+                                  const QString &ocrLanguage,
+                                  const QString &removeParents,
+                                  const bool supportsAllDrives,
+                                  const bool useContentAsIndexableText);
+
 private:
     /// send simpleupload request
     void request_UploadStart();
     /// return QUrl by fileID
-    QUrl setupUrl(const QString &fileID);
-    /// return QUrl by fileID and optional parameter
-    QUrl setupUrl(const FileUpdateArgs &args);
+    QUrl buildUrl(const QString &fileID,const QString &uploadType,const QString &access_token) const;
+    QUrl buildUrl(const QString &fileID,const QString &uploadType,const QString &access_token,QUrlQuery args) const;
     /// retry upload
     void retry();
 

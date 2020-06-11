@@ -33,11 +33,11 @@ class GDriveFileSimpleCreate : public GDriveFileTask
     Q_OBJECT
 public:
     /// constructor
-    explicit GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                    const QString &filepath);
-    explicit GDriveFileSimpleCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                    const QString &filepath,
-                                    const GDrive::FileCreateArgs &args);
+    explicit GDriveFileSimpleCreate(const QString &filepath,
+                                    QOAuth2AuthorizationCodeFlow *parent);
+    explicit GDriveFileSimpleCreate(const QString &filepath,
+                                    const QUrlQuery &args,
+                                    QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileSimpleCreate() override;
     /// return File resource
@@ -45,13 +45,17 @@ public:
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 
+    static QUrlQuery buildUrlArgs(const bool enforceSingleParent = false,
+                                  const bool ignoreDefaultVisibility = false,
+                                  const bool keepRevisionForever = false,
+                                  const QString &ocrLanguage = QString(),
+                                  const bool supportsAllDrives = false,
+                                  const bool useContentAsIndexableText = false);
 private:
     /// send simpleupload request
     void request_UploadStart();
-    /// return QUrl
-    QUrl setupUrl();
-    /// return QUrl by optional parameter
-    QUrl setupUrl(const GDrive::FileCreateArgs &args);
+    QUrl buildUrl(const QString &uploadType,const QString &access_token) const;
+    QUrl buildUrl(const QString &uploadType,const QString &access_token,QUrlQuery args) const;
     /// retry upload
     void retry();
 

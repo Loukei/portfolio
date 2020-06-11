@@ -2,7 +2,7 @@
 #define GDRIVEFILETASK_H
 
 #include <QObject>
-#include "GDriveLib/gdriveargs.h"
+//#include "GDriveLib/gdriveargs.h"
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;

@@ -23,37 +23,35 @@ class GDriveFileResumableCreate : public GDriveFileTask
 {
     Q_OBJECT
 public:
-    explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString& filepath);
-    explicit GDriveFileResumableCreate(QOAuth2AuthorizationCodeFlow *parent,
-                                       const QString& filepath,
-                                       const GDrive::FileCreateArgs &args);
+    explicit GDriveFileResumableCreate(const QString &filepath,
+                                       QOAuth2AuthorizationCodeFlow *parent);
+    explicit GDriveFileResumableCreate(const QString &filepath,
+                                       const QUrlQuery &args,
+                                       QOAuth2AuthorizationCodeFlow *parent);
     ~GDriveFileResumableCreate() override;
     GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 
+    static QUrlQuery buildUrlArgs(const bool enforceSingleParent = false,
+                                  const bool ignoreDefaultVisibility = false,
+                                  const bool keepRevisionForever = false,
+                                  const QString &ocrLanguage = QString(),
+                                  const bool supportsAllDrives = false,
+                                  const bool useContentAsIndexableText = false);
+
 private:
     /// Start resumable upload session, first step to get session Uri
     void request_InitialSession();
     /// return QUrl for Initial request
-    QUrl setupInitialUrl();
-    /// return QUrl for Initial request
-    QUrl setupInitialUrl(const GDrive::FileCreateArgs &args);
+    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/) const;
+    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/,QUrlQuery args) const;
     /// After receive Session Uri, send upload request by Single request method
     void request_UploadStart();
     /// Upload interrupt, asking google server for upload status
     void request_AskUploadStatus();
     /// Resume upload when interrupt form offset position
     void request_UploadResume(const qint64 offset);
-
-//    enum State{
-//        NONE = 0,
-//        RESTARTUPLOAD = 5,
-//        FAIL = 6,
-//        COMPLETE = 7
-//    };
-//    void setState(State s);
 
 private slots:
     /// process request_InitialSession reply finished

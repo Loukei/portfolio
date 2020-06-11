@@ -102,17 +102,17 @@ private:
     void accountAbout();
 
     /// GDriveService upload(Create) file Simple method
-    void fileSimpleUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
+    void fileSimpleUpload(const QString &filepath,const QUrlQuery &args);
     /// GDriveService upload(Create) file Multipart method
-    void fileMultipartUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
+    void fileMultipartUpload(const QString &filepath,const QUrlQuery &args);
     /// GDriveService upload(Create) file Resumable method
-    void fileResumableUpload(const QString &filepath,const GDrive::FileCreateArgs &args);
+    void fileResumableUpload(const QString &filepath,const QUrlQuery &args);
     /// GDriveService upload(Update) file Simple method
-    void fileSimpleUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
+    void fileSimpleUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// GDriveService upload(Update) file Multipart method
-    void fileMultipartUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
+    void fileMultipartUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// GDriveService upload(Update) file Resumable method
-    void fileResumableUpdate(const QString &filepath,const GDrive::FileUpdateArgs &args);
+    void fileResumableUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
 
