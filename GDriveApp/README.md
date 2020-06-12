@@ -6,7 +6,7 @@
 
 目前Google Drive Api並沒有官方支援的C++ Lib，雖然網路上也有一些不錯的專案比如[googleQt][]或是[o2][]等...。
 
-一方面我們不能滿足於都用別人寫好的工具，另一方面我也想透過這個專案學習親手操作網路Api。
+一方面我們不能滿足於都用別人寫好的工具，另一方面我也想透過這個專案學習親手操作網路API。
 
 透過Qt OAuth2模組，利用Socket操作google drive api對本地上傳或下載檔案。
 
@@ -34,13 +34,13 @@
 
 <img src = "https://raw.githubusercontent.com/Loukei/portfolio/master/GDriveApp/Demo_Image/Demo_SearchFile.gif" width="400" height="300" />
 
-## 自行編譯 Building App
+## 安裝環境
 
-1. 下載程式碼(src)
-2. 安裝Qt5.13或更高版本，建議使用Qt creater
-3. 請先確保Qt的網路模組可順利執行，您應該在步驟2中安裝[Qt WebEngine][]與[Qt NetWork Authorization][]模組
-4. 要開發OAuth 2 App，您應該[向google申請自己的一組App][Enable the Drive API]，並在[Google Api Console][]下載Client_secret.json
-5. 將`src/GDriveLib`資料夾加入你的專案
+1. 安裝Qt5.13或更高版本
+2. 確保Qt的網路模組可順利執行，安裝[Qt WebEngine][]與[Qt NetWork Authorization][]模組
+3. 要開發Google OAuth 2 App，您應該[向google申請自己的一組App][Enable the Drive API]，並在[Google Api Console][]下載Client_secret.json
+4. 將`src/GDriveLib`資料夾加入你的專案
+
 [可選] 要使用OAuth，必須提供Client_secret.json中的參數，請將參數填入[oauthglobal.h][]，用來初始化
 
 參數名稱(.json)     | 對應函數(.h)          | 說明
@@ -49,173 +49,196 @@ client_id           | keyClientId()         | 提供google辨識請求App
 client_secret       | keyClientSecert()     | 
 redirect_uris       | keyRedirectUri()      | 網頁重新導向的路徑位址
 
-## 如何使用 How to Use
+## 如何使用GDriveLib How to Use library
 
-專案的主要目的是開發可操作Google Drive的C++庫，因此介面的設計較為簡單，讓使用者更易理解類別的操作方式。
+### 範例 Example
 
-要在您的程式中使用GDrive Api，將GDriveLib加入專案中，按照[編譯](#自行編譯  Building App)的內容添加`oauthglobal.h`。
+1. 在你的專案內加入必要的模組`QT += core gui network networkauth`
+2. 將`src/GDriveLib`資料夾加入專案
 
-### 宣告類別實體
+``` C++
+#include "GDriveLib/googledriveservice.h"
 
-- 為了使用GDrive Api,在你的MainWindow中添加`GDrive::GDriveService class`
-- 創建一個`GDriveService`實體，它會立即依照`OAuth::keyRedirectPort()`監聽對應的port，並在執行使用者登入的時候打開瀏覽器。
-
-``` c++
-// mainwindow.h
-class MainWindow{
-private:
-    GDrive::GDriveService *m_Drive;
-}
-// mainwindow.cpp
-MainWindow::MainWindow(QWidget *parent){
-    m_Drive = new GDriveService(this);
-}
-```
-
-### 執行認證
-
-``` c++
-// Step1: 建立一個取得認證後的slot函數
-void MainWindow::onGDrive_granted(){
-    const QString token = m_Drive->token(); //回傳token
-    const QString refreshToken = m_Drive->refreshToken(); //回傳Refresh token
-    // 其他UI操作...
-}
-// Step2: 連接GDriveService::granted() signal
-connect(m_Drive,&GDriveService::granted,
-        this,&MainWindow::onGDrive_granted);
-// Step3: 在適當時機使用GDriveService::start()，觸發GDriveService::granted() signal
-m_Drive->start();
-```
-
-### 取得使用者名稱
-
-``` c++
-// 1.使用getAbout()取得使用者資訊
-GDriveAbout* userAbout = m_Drive->getAbout(QString("user"));
-// 2.發出命令後，等待GDriveAbout發出received信號
-connect(userAbout,&GDriveAbout::received,
-        [userAbout,this](bool success){
-    if(success){
-        // 3.透過GDriveAbout取得實際內容
-        GDriveAboutResource resource = userAbout->getResource();
-        const QString displayName = resource.user_displayName();
-        const QString emailAddress = resource.user_emailAddress();
-        const QString photoLink = resource.user_photoLink();
-        // 3.2. 你也可以使用getReplyString()取得完整的Json回傳，自行處理
-        QByteArray reply = userAbout->getReplyString();
-    }else {
-        ui->plainTextEdit->appendPlainText("About message Error.\n");
-    }
-    // 4. 使用deleteLater()刪除任務
-    userAbout->deleteLater();
-});
-```
-
-### 上傳檔案
-
-1.透過fileXXXCreate來執行上傳任務，這個指令會在雲端開新檔案
-
-``` c++
-GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath);
-GDriveFileMultipartCreate *GDriveService::fileMultipartCreate(const QString &filepath);
-GDriveFileResumableCreate *GDriveService::fileResumableCreate(const QString &filepath);
-```
-
-以上三個回傳都使用`GDriveFileTask`作為父類別
-
-2.`GDriveFileTask`物件一旦生成就會開始執行檔案相關的任務
-
-``` c++
-/// GDriveFileTask class
-public:
-    QString errorString() const;    ///回傳可讀的錯誤訊息
-    bool isComplete() const;        ///查詢任務是否完成，預設為false
-    bool isFailed() const;          ///查詢任務是否失敗，預設為false
-signals:
-    void finished(); ///任務完成或失敗時都會發出signal
-```
-
-3.以`getResource()`方法取得檔案上傳後的matadata，`GDriveFileResource`是ㄧ個純資料的類別
-
-``` c++
-GDriveFileResource getResource() const;
-```
-
-4.`GDriveFileTask`物件完成任務後，請在對應的slot使用`deleteLater()`刪除
-
-#### 上傳範例
-
-``` c++
-void MainWindow::fileSimpleUpload(const QString &filepath)
+ExampleDialog::ExampleDialog(QWidget *parent)
+    : QDialog(parent),m_currentOAuthToken(QString())
 {
+    m_Drive = new GDriveService(
+        OAuth::keyAuthUri(),
+        OAuth::keyTokenUri(),
+        OAuth::keyClientId(),
+        OAuth::keyClientSecert(),
+        OAuth::keyScope(),
+        OAuth::keyRedirectPort(),
+        this);
+    connect(m_Drive,&GDriveService::granted,
+            this,&ExampleDialog::onGDrive_granted);
+    connect(m_Drive,&GDriveService::error,
+            this,&ExampleDialog::onGDrive_error);
+    connect(m_Drive,&GDriveService::tokenChanged,
+            this,&ExampleDialog::onGDrive_tokenChanged);
+    // setup UI...
+}
+// login user
+void ExampleDialog::login()
+{
+    m_Drive->grant();
+}
+// logout
+void ExampleDialog::logout()
+{
+    m_Drive->logout();
+}
+// simple upload local file
+void ExampleDialog::uploadFile()
+{
+    const QString filepath = "D:/Download/testdata/soviet example.txt";
     auto task = m_Drive->fileSimpleCreate(filepath);
-    auto onUploadreceive = [task,filepath](){
+    auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
-            qDebug() << filepath + " Simple Upload Success.\n";
+            qDebug() << filepath + " Simple Upload Success.";
         }else {
             qDebug() << filepath + " Simple Upload error:" + task->errorString();
         }
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
-            this,onUploadreceive);
+    connect(task,&GDriveFileTask::finished,this,onUploadreceive);
 }
-```
-
-### 下載檔案
-
-Google Drive Api對檔案的辨識不是依靠檔名或路徑，而是依靠fileId參數。
-要取得fileId最簡單的做法是選取欲下載的檔案>點選右鍵>取得檔案共用連結>選擇URL中id="..."的部份
-
-1.創建`QFile`實體並指定本地端儲存路徑
-
-2.使用`fileDownload()`方法下載檔案
-
-``` c++
-GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, QSharedPointer<QFile> file)
-```
-
-`fileID`表示指定的雲端檔案。
-`fields`表示接受的回傳元資料，例如"id,name"表示回傳fileID與檔名。
-`file`表示下載的檔案，使用`QSharedPointer`傳入
-
-3.等待`GDriveFileDownloader`發出`finished`信號即結束下載。
-
-#### 下載範例
-
-``` c++
-void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fileId)
+void ExampleDialog::onGDrive_granted()
 {
-    QSharedPointer<QFile> writeFile(new QFile(downloadFilePath,this),&QFile::deleteLater);
-    auto task = m_Drive->fileDownload(fileId,"id,name",writeFile);
-    connect(task,&GDriveFileTask::finished,
-            this,[task,downloadFilePath](){
-        if(task->isComplete() && !task->isFailed()){
-            qDebug() << downloadFilePath + " Download complete.\n";
-        }else {
-            qDebug() << downloadFilePath + " Download error:" + task->errorString();
-        }
-        task->deleteLater();
-    });
+    qDebug() << "Token: " << m_Drive->token()
+            << "Refresh token:" << m_Drive->refreshToken();
+}
+void ExampleDialog::onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri)
+{
+    /* handle error here */
+    QVariantMap info;
+    info.insert(QStringLiteral("Error"),error);
+    info.insert(QStringLiteral("Description"),errorDescription);
+    info.insert(QStringLiteral("Uri"),uri);
+    qDebug() << info;
+}
+void ExampleDialog::onGDrive_tokenChanged(const QString &token)
+{
+    /* m_currentOAuthToken = {}, token = "..." => login
+     * m_currentOAuthToken = "a...", token = "b..." => refresh token or switch account
+     * m_currentOAuthToken = "...", token = {} => logout */
+    if(token.isEmpty()){
+        qDebug() << "token isEmpty -> logout";
+    }else if (m_currentOAuthToken.isEmpty()) {
+        qDebug() << "m_currentOAuthToken isEmpty() && token !isEmpty() -> login";
+    }else if (token != m_currentOAuthToken) {
+        qDebug() << "token != m_currentOAuthToken -> refresh or switch account";
+    }
+    m_currentOAuthToken = token; /*change current token*/
 }
 ```
 
-### 搜尋檔案&資料夾
+### 說明
 
-對應Google Drive Api的`Files: list`方法
+#### 設定OAuth api
 
-1. 使用`GDriveFileSearch *GDriveService::fileList(QString &q, QString &pageToken)`搜尋檔案。
+建立一個`GDriveService`物件需要以下幾個參數:
 
-參數名稱    | 用途
-------------|:-------------------------------------------
-q           | 過濾搜尋的內容
-pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內容
+``` c++
+QUrl authorizationUrl
+QUrl accessTokenUrl
+QString clientIdentifier
+QString clientIdentifierSharedKey
+QString scope
+quint16 port
+```
+
+可以從你的google api設定裡填入，或是使用[oauthglobal.h][]幫助你
+
+#### 登入
+
+``` c++
+void GDriveService::grant();
+```
+
+#### 登出
+
+``` c++
+void GDriveService::logout();
+```
+
+#### 上傳檔案
+
+``` c++
+GDriveFileSimpleCreate *GDriveService::fileSimpleCreate(const QString &filepath)
+```
+
+API使用任務導向操作，物件內部會發出http socket、處理上傳流程與回傳結果
+
+``` c++
+auto task = m_Drive->fileSimpleCreate(filepath);
+```
+
+連接`finished()`信號，準備接收回傳結果，當任務完成或失敗都會產生信號
+
+``` c++
+connect(task,&GDriveFileTask::finished,this,onUploadreceive);
+```
+
+準備一個函式負責處理task的結果
+
+`isComplete()`表示任務是否完成
+
+`isFailed()`表示任務是否失敗
+
+使用`QByteArray getReplyString()`接收回傳內容
+> 當任務完成後，使用`QObject::deleteLater()`刪除資料，不要使用`delete`
+
+``` c++
+auto onUploadreceive = [task,this,filepath](){
+    if(task->isComplete() && !task->isFailed()){
+        qDebug() << filepath + " Simple Upload Success.";
+    }else {
+        qDebug() << filepath + " Simple Upload error:" + task->errorString();
+    }
+    task->deleteLater();
+};
+```
+
+#### 信號處理
+
+- 當認證流程成功或者access token更新，`GDriveService::granted()`會發出，用來確認可以執行OAuth操作。
+
+- 發生認證問題時使用`GDriveService::error(const QString &error, const QString &errorDescription, const QUrl &uri)`信號處裡。
+
+- 利用`GDriveService::tokenChanged(const QString &token)`處理access token的變化。
+
+- `GDriveService`相關的信號說明可以參照[QOAuth2AuthorizationCodeFlow][]
+
+#### 偵測登入/登出/更新Token
+
+OAuth 2並沒有設定登出的機制，實際上要取消登入只要刪除本地端的Refresh token與access token即可。
+
+開發者不會希望在沒有access token的情況下呼叫網路作業，這會導致往程式錯誤甚至崩潰。
+
+我們可以使用`GDriveService::tokenChanged()`以及紀錄前一個token的內容來開啟/關閉網路操作。
+
+當token改變時，通過與前一個token之間的比較我們可以了解目前的狀態
+
+- token = {}, 則為logout，關閉相關的網路操作，並開啟login選項。
+- token != {} 且 current_token != {}，代表token更新
+- token != {} 且 current_token = {}，代表現在已登入，關閉login選項
+
+> 不要使用`GDriveService::granted()`判定是否登入，因為更新access token時也會觸發此信號
+
+#### 保存使用者帳號，簡化登入操作
+
+為了方便APP使用者無須重複登入google取得授權，你可以選擇保存[refresh token][]在本地端並加密內容，下一次程式開啟時載入refresh token，並呼叫`GDriveService::refreshAccessToken()`取得access token，完成登入操作。
+
+``` c++
+m_Drive->setRefreshToken(refreshToken);
+m_Drive->refreshAccessToken(); // use refresh token to login
+```
 
 ## 編譯環境 My compile environment
 
 - C++ ver: C++ 11
-- Qt kits: Qt5.13.0 MinGW 32bit
+- Qt kits: Qt5.13.2 MinGW 32bit
 - OS: win7 32bit
 
 ## Credit
@@ -249,3 +272,7 @@ pageToken   | 如果搜尋內容過多，會以此參數顯示下一筆搜尋內
 [Google Api Console]: https://console.developers.google.com/apis
 
 [oauthglobal.h]: https://github.com/Loukei/portfolio/blob/master/GDriveApp/oauthglobal.h
+
+[QOAuth2AuthorizationCodeFlow]: https://doc.qt.io/qt-5/qoauth2authorizationcodeflow.html
+
+[refresh token]: https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient

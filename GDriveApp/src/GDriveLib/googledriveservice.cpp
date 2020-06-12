@@ -173,8 +173,7 @@ GDriveFileResumableUpdate *GDriveService::fileResumableUpdate(const QString &fil
     return new GDriveFileResumableUpdate(filepath,fileID,args,m_google);
 }
 
-GDriveFileGet *GDriveService::fileGet(const QString &fileId,
-                                      const QUrlQuery &args)
+GDriveFileGet *GDriveService::fileGet(const QString &fileId,const QUrlQuery &args)
 {
     return new GDriveFileGet(fileId,args,m_google);
 }

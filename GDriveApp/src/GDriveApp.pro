@@ -28,7 +28,6 @@ SOURCES += \
         Ecrypt/simplecrypt.cpp \
         GDriveLib/gdriveabout.cpp \
         GDriveLib/gdriveaboutresource.cpp \
-        GDriveLib/gdriveargs.cpp \
         GDriveLib/gdriveerrorformat.cpp \
         GDriveLib/gdrivefiledownloader.cpp \
         GDriveLib/gdrivefileget.cpp \
@@ -58,7 +57,6 @@ HEADERS += \
         Ecrypt/simplecrypt.h \
         GDriveLib/gdriveabout.h \
         GDriveLib/gdriveaboutresource.h \
-        GDriveLib/gdriveargs.h \
         GDriveLib/gdriveerrorformat.h \
         GDriveLib/gdrivefiledownloader.h \
         GDriveLib/gdrivefileget.h \

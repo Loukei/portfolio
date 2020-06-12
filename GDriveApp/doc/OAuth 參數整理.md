@@ -3,12 +3,12 @@
 ## Files: create
 
 - Creates a new file.
-- class GDriveFileSimpleCreate
-- class GDriveFileMultipartCreate
-- class GDriveFileResumableCreate
+- `class GDriveFileSimpleCreate`
+- `class GDriveFileMultipartCreate`
+- `class GDriveFileResumableCreate`
 
-**Required query parameters**
--------------------------------------------------
+**Required query parameters** 
+--------------------------------------------------
 uploadType 					string	(value: 'media','multipart','resumable')
 -------------------------------------------------
 **OAuth query parameters**
@@ -27,9 +27,9 @@ useContentAsIndexableText 	boolean  (Default: false)
 ## Files: update
 
 - Updates a file's metadata and/or content with patch semantics.
-- GDriveFileSimpleUpdate
-- GDriveFileMultipartUpdate
-- GDriveFileResumableUpdate
+- `GDriveFileSimpleUpdate`
+- `GDriveFileMultipartUpdate`
+- `GDriveFileResumableUpdate`
 
 **Path parameters**
 ------------------------------------------------
@@ -56,8 +56,8 @@ useContentAsIndexableText 	boolean  (Default: false)
 ## Files: get
 
 - 下載檔案/取得目標檔案的matadata
-- class GDriveFileGet(取得mata)
-- class GDriveFileDownloader(下載檔案)
+- `class GDriveFileGet`(取得mata)
+- `class GDriveFileDownloader`(下載檔案)
 - Note: 只有下載檔案需要 acknowledgeAbuse 及 alt=media 參數
 
 **Path parameters**
@@ -81,7 +81,7 @@ supportsAllDrives 			boolean (Default: false)
 ## Files: list
 
 - Lists or searches files.
-- class GDriveFileSearch
+- `class GDriveFileSearch`
 - string類的參數輸入值有範圍限制
 
 **Optional query parameters**
