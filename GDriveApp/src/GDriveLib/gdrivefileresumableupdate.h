@@ -3,7 +3,6 @@
 
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-#include "gdrivefileresource.h"
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
@@ -40,8 +39,6 @@ public:
                                        QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileResumableUpdate() override;
-    /// return File resource
-    GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 
@@ -89,10 +86,6 @@ private:
     void state_RestartUpload();
     /// State to Resume Upload
     void state_ResumeUpload();
-    /// State to emit finished() signal and return Fail upload
-    void state_FailedUpload();
-    /// State to emit finished() signal and return Success upload
-    void state_CompleteUpload();
 
 private:
     /// An member of upload file,use to upload on Google Drive.

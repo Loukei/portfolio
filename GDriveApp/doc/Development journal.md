@@ -100,10 +100,9 @@ static QUrlQuery buildUrlArgs(const bool enforceSingleParent = false,
 
 ## Todo
 
-* 使用login/logot signal取代 tokenchanged
 * 對任務提供progress/abort/pause 方法
-* 把Dialog裡的treeview結合到MainWindow裡
-* 考慮將task模組化:建構Url、建構request、處理reply、
+* 所有的dialog要檢查必填參數項才能通過
+* 考慮將task模組化:建構Url、建構request、處理reply、解析回傳值、檢查字串輸入
 * 考慮提供[sync方法](https://www.devbean.net/2013/11/qt-study-road-2-access-network-4/)
 * Login的按鈕在等待認證時應該暫時鎖住，直到認證通過/不通過才回復，觀察一下是否有對應的signal
 

@@ -17,23 +17,21 @@ class DownloadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit DownloadDialog(QWidget *parent = nullptr,
-                            const QString &caption = QString(),
-                            const QString &downloadPath = QString(),
-                            const QString &fileID = QString());
+    explicit DownloadDialog(QWidget *parent = nullptr);
     ~DownloadDialog() override;
-    /// return Download path form lineEdit_DownloadPath
+
     QString getDownloadFilePath() const;
-    /// return fileID form lineEdit_FileID
+    void setDownloadFilePath(const QString &downloadPath = QStringLiteral("C:/"));
+
     QString getFileId() const;
+    void setFileId(const QString &fileID = QString());
 
-signals:
-    /// return download path and fileId to mainWindow
-    void downloadParam(QString downloadFilePath,QString fileId);
+    bool getAcknowledgeAbuse() const;
+    bool getSupportsAllDrives() const;
 
-public slots:
-    /// override accept(), emit downloadParam(...)
-    virtual void accept() override;
+// TODO: check input
+//public slots:
+//    virtual void accept() override;
 
 private slots:
     /// open file dialog to choose download path
@@ -41,6 +39,7 @@ private slots:
 
 private:
     Ui::DownloadDialog *ui;
+    static const QString instructions_String;
 };
 
 #endif // GDRIVEFILEDOWNLOADDIALOG_H

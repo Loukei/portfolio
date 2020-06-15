@@ -20,8 +20,9 @@ void NetworkImgLoader::requestResource(const QUrl &url)
     connect(reply,&QNetworkReply::finished,
             this,&NetworkImgLoader::on_networkreply_finished);
     connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-         [=](QNetworkReply::NetworkError code){
-        qWarning("Network error...");
+            this,[reply](){
+        const QString info = QString("Network error: %1").arg(reply->errorString());
+        qWarning("%s",qUtf8Printable(info));
     });
 }
 

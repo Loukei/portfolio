@@ -2,8 +2,6 @@
 #define GDRIVEFILERESUMABLECREATE_H
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-#include "gdrivefileresource.h"
-
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
@@ -29,7 +27,6 @@ public:
                                        const QUrlQuery &args,
                                        QOAuth2AuthorizationCodeFlow *parent);
     ~GDriveFileResumableCreate() override;
-    GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 

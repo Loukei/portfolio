@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     //! set Application
     QCoreApplication::setOrganizationName("Loukei Soft");
     QCoreApplication::setApplicationName("GDriveApp");
-    QCoreApplication::setApplicationVersion("1.0.0");
+    QCoreApplication::setApplicationVersion("1.0.1");
     //! set debug message pattern
     qSetMessagePattern("[%{type}] %{appname} (%{file}:%{line}) - %{message}");
     MainWindow w;

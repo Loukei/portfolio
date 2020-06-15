@@ -82,15 +82,14 @@ QAbstractOAuth::ModifyParametersFunction GDriveService::buildModifyParametersFun
     };
 }
 
-void GDriveService::logout()
-{
-    m_google->setToken(QString());
-    m_google->setRefreshToken(QString());
-}
-
 QString GDriveService::token() const
 {
     return m_google->token();
+}
+
+void GDriveService::setToken(const QString &token)
+{
+    return m_google->setToken(token);
 }
 
 QString GDriveService::refreshToken() const
@@ -108,7 +107,7 @@ QNetworkAccessManager *GDriveService::networkAccessManager() const
     return m_google->networkAccessManager();
 }
 
-GDriveAbout *GDriveService::getAbout(const QString &fields)
+GDriveAbout *GDriveService::about(const QString &fields)
 {
     return new GDriveAbout(m_google,fields);
 }

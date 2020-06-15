@@ -61,46 +61,38 @@ private:
 private slots:
     /// Click menu Login
     void on_action_Login_triggered();
-    /// when m_Drive grant succeed, show info and allow other operation
+    /// when m_Drive granted
     void onGDrive_granted();
+    /// change UI when token changed
+    void onGDrive_tokenChanged(const QString &token);
+    /// return authorization error
+    void onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri);
     /// Click menu Logout
     void on_action_Logout_triggered();
     /// click menu Refersh token
     void on_action_Refresh_Token_triggered();
-    /// change UI when token changed
-    void onGDrive_tokenChanged(const QString &token);
-    ///
-    void onGDrive_error(const QString &error, const QString &errorDescription, const QUrl &uri);
     /// Click menu Account About
     void on_action_About_User_triggered();
     /// Click menu Download file
     void on_action_Download_file_triggered();
     /// Click menu Search file&folder
     void on_action_Search_file_folder_triggered();
-    /// Receive SearchDialog::query, then return search result to m_DialogSearch
-    void onSearchDialog_query(const QString &corpora,
-                              const QString &driveId,
-                              const QString &fields,
-                              const QString &orderBy,
-                              int pageSize,
-                              const QString &pageToken,
-                              const QString &q,
-                              const QString &spaces);
     /// Click menu Get file matadata
     void on_action_Get_file_matadata_triggered();
-    /// Receive FileMataDataDialog::query, then return GDriveFileGet to m_dialogFileMataData
-    void onFileMataDataDialog_query(const QString &fileID,const QString &fields);
     /// open update file dialog
     void on_action_Update_file_triggered();
     /// open upload file dialog
     void on_action_Upload_File_triggered();
 
 private:
-    /// request User about message and refresh the UI
+    /// If user has login, hide login menu, show GDrive actions
+    /// If user logout, open login menu, close GDrive actions
+    void setUiEnable(bool enable);
+    /// UI has login. Update Account icon,email,names
     void updateAccountActs();
-    /// GDriveService Account get About message
-    void accountAbout();
 
+    /// GDriveService Account get About message
+    void aboutGet();
     /// GDriveService upload(Create) file Simple method
     void fileSimpleUpload(const QString &filepath,const QUrlQuery &args);
     /// GDriveService upload(Create) file Multipart method
@@ -115,6 +107,10 @@ private:
     void fileResumableUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args);
     /// GDriveService Download(Get) file
     void fileDownload(const QString &downloadFilePath,const QString &fileId);
+    /// GDriveService Search file
+    void fileSearch(const QUrlQuery &args);
+    /// GDriveService get file matadata
+    void fileGetMatadata(const QString &fileId,const QUrlQuery &args);
 
     /// write settings to ini file
     void writeSettings();
@@ -122,7 +118,13 @@ private:
     /// If refersh token exist,then set Refersh token and request access token
     /// If No refersh token doesnt exist, then do nothing
     void loadUserAccount(const QSettings &settings);
+
     /// claer Json model, used for UI update treeView
     void clearModel();
+
+    /// append error message to ui->plainTextEdit
+    void consoleError(const QString &errStr) const;
+    /// append message to ui->plainTextEdit
+    void consoleInfo(const QString &info) const;
 };
 #endif // MAINWINDOW_H

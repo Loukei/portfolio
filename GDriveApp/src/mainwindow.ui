@@ -22,7 +22,7 @@
     <item>
      <widget class="QLabel" name="label_CurrentReply">
       <property name="text">
-       <string>Current reply</string>
+       <string>Current json reply</string>
       </property>
      </widget>
     </item>

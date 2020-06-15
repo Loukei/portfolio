@@ -6,11 +6,10 @@
 #include <QHttpMultiPart>
 #include <QFileInfo>
 #include <QTimer>
-#include <QJsonParseError>
-#include <QJsonDocument>
 
 GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &filepath,
-                                                             const QString &fileID, QOAuth2AuthorizationCodeFlow *parent):
+                                                             const QString &fileID,
+                                                             QOAuth2AuthorizationCodeFlow *parent):
     GDriveFileTask (parent)
 {
     //! check file exist
@@ -28,8 +27,10 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &file
     request_UploadStart();
 }
 
-GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &filepath, const QString &fileID,
-                                                             const QUrlQuery &args, QOAuth2AuthorizationCodeFlow *parent)
+GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &filepath,
+                                                             const QString &fileID,
+                                                             const QUrlQuery &args,
+                                                             QOAuth2AuthorizationCodeFlow *parent)
     :GDriveFileTask (parent)
 {
     //! check file exist
@@ -50,17 +51,6 @@ GDrive::GDriveFileMultipartUpdate::GDriveFileMultipartUpdate(const QString &file
 GDrive::GDriveFileMultipartUpdate::~GDriveFileMultipartUpdate()
 {
 
-}
-
-GDrive::GDriveFileResource GDrive::GDriveFileMultipartUpdate::getResource() const
-{
-    QJsonParseError jsonErr;
-    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveFileResource();
-    }
-    return GDriveFileResource(doc);
 }
 
 QByteArray GDrive::GDriveFileMultipartUpdate::getReplyString() const

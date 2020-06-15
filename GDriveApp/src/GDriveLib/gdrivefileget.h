@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QNetworkReply>
-#include <QVariantMap>
 #include "gdrivefiletask.h"
 
 QT_BEGIN_NAMESPACE

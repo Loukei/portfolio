@@ -31,17 +31,6 @@ GDrive::GDriveFileDownloader::~GDriveFileDownloader()
     mp_file->close();
 }
 
-//GDrive::GDriveFileResource GDrive::GDriveFileDownloader::getResource() const
-//{
-//    QJsonParseError jsonErr;
-//    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
-//    if(jsonErr.error != QJsonParseError::NoError){
-//        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-//        return GDriveFileResource();
-//    }
-//    return GDriveFileResource(doc);
-//}
-
 QByteArray GDrive::GDriveFileDownloader::getReplyString() const
 {
     return m_replyData;
@@ -150,8 +139,6 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyError(QNetworkReply::Network
     qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
     m_errStr += getErrorMessage(reply);
-    m_isFailed = true;
-    m_isComplete = true;
-    emit finished();
+    taskFailed();
     reply->deleteLater();
 }

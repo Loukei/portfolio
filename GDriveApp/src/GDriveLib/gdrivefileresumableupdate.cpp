@@ -5,8 +5,6 @@
 #include <QMimeDatabase>
 #include <QUrlQuery>
 #include <QRegularExpression>
-#include <QJsonParseError>
-#include <QJsonDocument>
 
 GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(const QString &filepath,
                                                              const QString &fileID,
@@ -52,17 +50,6 @@ GDrive::GDriveFileResumableUpdate::GDriveFileResumableUpdate(const QString &file
 GDrive::GDriveFileResumableUpdate::~GDriveFileResumableUpdate()
 {
 
-}
-
-GDrive::GDriveFileResource GDrive::GDriveFileResumableUpdate::getResource() const
-{
-    QJsonParseError jsonErr;
-    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveFileResource();
-    }
-    return GDriveFileResource(doc);
 }
 
 QByteArray GDrive::GDriveFileResumableUpdate::getReplyString() const
@@ -370,18 +357,4 @@ void GDrive::GDriveFileResumableUpdate::state_RestartUpload()
 void GDrive::GDriveFileResumableUpdate::state_ResumeUpload()
 {
     request_AskUploadStatus();
-}
-
-void GDrive::GDriveFileResumableUpdate::state_FailedUpload()
-{
-    m_isFailed = true;
-    m_isComplete = true;
-    emit finished();
-}
-
-void GDrive::GDriveFileResumableUpdate::state_CompleteUpload()
-{
-    m_isFailed = false;
-    m_isComplete = true;
-    emit finished();
 }

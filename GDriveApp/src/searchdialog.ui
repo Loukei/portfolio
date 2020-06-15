@@ -6,74 +6,93 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
-    <height>497</height>
+    <width>600</width>
+    <height>377</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Search file or folder</string>
   </property>
   <property name="whatsThis">
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the drive api to search file or folder.&lt;/p&gt;&lt;p&gt;Follow instruction here:&lt;a href=&quot;https://developers.google.com/drive/api/v3/search-files&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Search for files and folders&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" stretch="7,0">
-   <item>
-    <widget class="QTreeView" name="treeView"/>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Parameter</string>
+      <string>Query parameter</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
        <widget class="QLabel" name="label_corpora">
         <property name="text">
          <string>corpora</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_corpora</cstring>
+        </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit_corpora"/>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEdit_corpora">
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QLabel" name="label_driveId">
         <property name="text">
          <string>driveId</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_driveId</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1">
        <widget class="QLineEdit" name="lineEdit_driveId"/>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QLabel" name="label_fields">
         <property name="text">
          <string>fields</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_fields</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="1">
        <widget class="QLineEdit" name="lineEdit_fields"/>
       </item>
-      <item>
+      <item row="4" column="0">
        <widget class="QLabel" name="label_orderBy">
         <property name="text">
          <string>orderBy</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_orderBy</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="4" column="1">
        <widget class="QLineEdit" name="lineEdit_orderBy"/>
       </item>
-      <item>
+      <item row="5" column="0">
        <widget class="QLabel" name="label_pageSize">
         <property name="text">
          <string>pageSize</string>
         </property>
+        <property name="buddy">
+         <cstring>spinBox_pageSize</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="5" column="1">
        <widget class="QSpinBox" name="spinBox_pageSize">
         <property name="minimum">
          <number>1</number>
@@ -86,7 +105,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="6" column="0">
        <widget class="QLabel" name="label_pageToken">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -97,12 +116,15 @@
         <property name="text">
          <string>pageToken</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_pageToken</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="6" column="1">
        <widget class="QLineEdit" name="lineEdit_pageToken"/>
       </item>
-      <item>
+      <item row="7" column="0">
        <widget class="QLabel" name="label_Q">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -113,37 +135,124 @@
         <property name="text">
          <string>q</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_Q</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="7" column="1">
        <widget class="QLineEdit" name="lineEdit_Q">
         <property name="text">
          <string>name = 'Untitled'</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="8" column="0">
        <widget class="QLabel" name="label_spaces">
         <property name="text">
          <string>spaces</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_spaces</cstring>
+        </property>
        </widget>
       </item>
-      <item>
+      <item row="8" column="1">
        <widget class="QLineEdit" name="lineEdit_spaces"/>
       </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_search">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_includeItemsFromAllDrives">
         <property name="text">
-         <string>Search</string>
+         <string>includeItemsFromAllDrives</string>
         </property>
+        <property name="buddy">
+         <cstring>comboBox_includeItemsFromAllDrives</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="comboBox_includeItemsFromAllDrives">
+        <item>
+         <property name="text">
+          <string>false</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>true</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_supportsAllDrives">
+        <property name="text">
+         <string>supportsAllDrives</string>
+        </property>
+        <property name="buddy">
+         <cstring>comboBox_supportsAllDrives</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QComboBox" name="comboBox_supportsAllDrives">
+        <item>
+         <property name="text">
+          <string>false</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>true</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SearchDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>298</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>430</x>
+     <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SearchDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>537</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>324</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

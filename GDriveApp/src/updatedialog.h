@@ -12,33 +12,26 @@ class UpdateDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit UpdateDialog(QWidget *parent = nullptr,
-                          const QString &fileID = QString(),
-                          const QString &filePath = QString());
+    explicit UpdateDialog(QWidget *parent = nullptr);
     ~UpdateDialog() override;
 
-    /* Required Parameter Getter */
-    /// return FileID
+    /* Required Parameter */
     QString getFileID() const;
-    /// return File Path
+    void setFileID(const QString& fileID = QString());
+
     QString getFilePath() const;
-    /// return Upload Type in int form, native combox return
+    void setFilePath(const QString& filePath  = QStringLiteral("C:/"));
+
     int getUploadType() const;
-    /// return Upload Type in String form
     QString getUploadTypeStr() const;
 
     /* Optional Parameter Getter & Setter */
-    void setAddParents(const QString &addParents = "");
     QString getAddParents() const;
-    void setEnforceSingleParent(bool enforceSingleParent = false);
     bool getEnforceSingleParent() const;
-    void setKeepRevisionForever(bool keepRevisionForever = false);
     bool getKeepRevisionForever() const;
-    void setOcrLanguage(const QString &ocrLanguage = "");
     QString getOcrLanguage() const;
-    void setRemoveParents(const QString &removeParents = "");
     QString getRemoveParents() const;
-    void setUseContentAsIndexableText(bool useContentAsIndexableText = false);
+    bool getSupportsAllDrives() const;
     bool getUseContentAsIndexableText() const;
 
 private slots:
@@ -46,10 +39,6 @@ private slots:
 
 private:
     Ui::UpdateDialog *ui;
-    /// Convert Boolean value to String
-    QString formBool(bool value);
-    /// Convert String value to Boolean
-    bool formString(const QString &value);
 };
 
 #endif // UPDATEDIALOG_H

@@ -40,6 +40,17 @@ public:
 signals:
     /// emit when error occured or task complete
     void finished();
+    /// This signal is emitted to indicate the progress of the download part of this network request,
+    /// if there's any.
+    /// If there's no download associated with this request,
+    /// this signal will be emitted once with 0 as the value of both bytesReceived and bytesTotal.
+    /// see [QNetworkReply Class](https://doc.qt.io/qt-5/qnetworkreply.html#downloadProgress)
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    /// This signal is emitted to indicate the progress of the upload part of this network request,
+    /// if there's any.
+    /// If there's no upload associated with this request, this signal will not be emitted.
+    /// see [QNetworkReply Class](https://doc.qt.io/qt-5/qnetworkreply.html#uploadProgress)
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
 
 protected:
     /// An instance to manage Oauth request, and Token resource, no need to delete
@@ -58,6 +69,8 @@ protected:
     void taskSucceeded();
     /// Task complete and failed
     void taskFailed();
+    /// Set m_isComplete to true, m_isFailed = success
+    void taskFinish(bool success);
 };
 }
 #endif // GDRIVEFILETASK_H

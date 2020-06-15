@@ -31,31 +31,31 @@ inline QRect MainWindow_Geometry(const QSettings *settings){
 }
 
 inline QString Upload_FilePath(const QSettings *settings){
-    return settings->value(key_Upload_FilePath,QStringLiteral("/home")).toString();
+    return settings->value(key_Upload_FilePath).toString();
 }
 
 inline QString Download_FilePath(const QSettings *settings){
-    return settings->value(key_Download_FilePath,QStringLiteral("/home")).toString();
+    return settings->value(key_Download_FilePath).toString();
 }
 
 inline QString Download_FileID(const QSettings *settings){
-    return settings->value(key_Download_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
+    return settings->value(key_Download_FileID).toString();
 }
 
 inline QString FileGet_FileID(const QSettings *settings){
-    return settings->value(key_FileGet_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
+    return settings->value(key_FileGet_FileID).toString();
 }
 
 inline QString FileGet_Fields(const QSettings *settings){
-    return settings->value(key_FileGet_Fields,QStringLiteral("YOUR_FILE_ID")).toString();
+    return settings->value(key_FileGet_Fields).toString();
 }
 
 inline QString Update_FilePath(const QSettings *settings){
-    return settings->value(key_Update_FilePath,QStringLiteral("/home")).toString();
+    return settings->value(key_Update_FilePath).toString();
 }
 
 inline QString Update_FileID(const QSettings *settings){
-    return settings->value(key_Update_FileID,QStringLiteral("YOUR_FILE_ID")).toString();
+    return settings->value(key_Update_FileID).toString();
 }
 
 inline QString OAuth_UserID(const QSettings *settings){
@@ -67,7 +67,7 @@ inline QString OAuth_RefreshToken(const QSettings *settings){
 }
 
 inline bool OAuth_IsRememberMe(const QSettings *settings){
-    return settings->value(key_OAuth_IsRememberMe,QVariant(false)).toBool();
+    return settings->value(key_OAuth_IsRememberMe,bool(false)).toBool();
 }
 } // Settings
 

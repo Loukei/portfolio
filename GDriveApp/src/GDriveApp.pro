@@ -37,7 +37,6 @@ SOURCES += \
         GDriveLib/gdrivefileresourcelist.cpp \
         GDriveLib/gdrivefileresumablecreate.cpp \
         GDriveLib/gdrivefileresumableupdate.cpp \
-        GDriveLib/gdrivefiles.cpp \
         GDriveLib/gdrivefilesearch.cpp \
         GDriveLib/gdrivefilesimplecreate.cpp \
         GDriveLib/gdrivefilesimpleupdate.cpp \
@@ -66,7 +65,6 @@ HEADERS += \
         GDriveLib/gdrivefileresourcelist.h \
         GDriveLib/gdrivefileresumablecreate.h \
         GDriveLib/gdrivefileresumableupdate.h \
-        GDriveLib/gdrivefiles.h \
         GDriveLib/gdrivefilesearch.h \
         GDriveLib/gdrivefilesimplecreate.h \
         GDriveLib/gdrivefilesimpleupdate.h \

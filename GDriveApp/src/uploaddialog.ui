@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>600</width>
+    <height>362</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Create new file on drive</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,2,6,1">
    <item>
@@ -20,6 +26,9 @@
       <widget class="QLabel" name="label_FilePath">
        <property name="text">
         <string>Upload File:</string>
+       </property>
+       <property name="buddy">
+        <cstring>lineEdit_FilePath</cstring>
        </property>
       </widget>
      </item>
@@ -45,6 +54,9 @@
        <widget class="QLabel" name="label_uploadType">
         <property name="text">
          <string>uploadType</string>
+        </property>
+        <property name="buddy">
+         <cstring>comboBox_uploadType</cstring>
         </property>
        </widget>
       </item>
@@ -81,6 +93,9 @@
         <property name="text">
          <string>enforceSingleParent</string>
         </property>
+        <property name="buddy">
+         <cstring>comboBox_enforceSingleParent</cstring>
+        </property>
        </widget>
       </item>
       <item row="0" column="1">
@@ -102,12 +117,32 @@
         <property name="text">
          <string>ignoreDefaultVisibility 	</string>
         </property>
+        <property name="buddy">
+         <cstring>comboBox_ignoreDefaultVisibility</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="comboBox_ignoreDefaultVisibility">
+        <item>
+         <property name="text">
+          <string>false</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>true</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_keepRevisionForever">
         <property name="text">
          <string>keepRevisionForever</string>
+        </property>
+        <property name="buddy">
+         <cstring>comboBox_keepRevisionForever</cstring>
         </property>
        </widget>
       </item>
@@ -130,16 +165,49 @@
         <property name="text">
          <string>ocrLanguage</string>
         </property>
+        <property name="buddy">
+         <cstring>lineEdit_ocrLanguage</cstring>
+        </property>
        </widget>
       </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="lineEdit_ocrLanguage"/>
+      </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="label_useContentAsIndexableText">
+       <widget class="QLabel" name="label_supportsAllDrives">
         <property name="text">
-         <string>useContentAsIndexableText</string>
+         <string>supportsAllDrives</string>
+        </property>
+        <property name="buddy">
+         <cstring>comboBox_supportsAllDrives</cstring>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
+       <widget class="QComboBox" name="comboBox_supportsAllDrives">
+        <item>
+         <property name="text">
+          <string>false</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>true</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_useContentAsIndexableText">
+        <property name="text">
+         <string>useContentAsIndexableText</string>
+        </property>
+        <property name="buddy">
+         <cstring>comboBox_useContentAsIndexableText</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
        <widget class="QComboBox" name="comboBox_useContentAsIndexableText">
         <item>
          <property name="text">
@@ -152,23 +220,6 @@
          </property>
         </item>
        </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="comboBox_ignoreDefaultVisibility">
-        <item>
-         <property name="text">
-          <string>false</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>true</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_ocrLanguage"/>
       </item>
      </layout>
     </widget>

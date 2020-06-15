@@ -5,8 +5,6 @@
 #include <QMimeDatabase>
 #include <QUrlQuery>
 #include <QRegularExpression>
-#include <QJsonParseError>
-#include <QJsonDocument>
 
 GDrive::GDriveFileResumableCreate::GDriveFileResumableCreate(const QString &filepath,
                                                              QOAuth2AuthorizationCodeFlow *parent)
@@ -50,17 +48,6 @@ GDrive::GDriveFileResumableCreate::GDriveFileResumableCreate(const QString &file
 GDrive::GDriveFileResumableCreate::~GDriveFileResumableCreate()
 {
 
-}
-
-GDrive::GDriveFileResource GDrive::GDriveFileResumableCreate::getResource() const
-{
-    QJsonParseError jsonErr;
-    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveFileResource();
-    }
-    return GDriveFileResource(doc);
 }
 
 QByteArray GDrive::GDriveFileResumableCreate::getReplyString() const

@@ -5,8 +5,6 @@
 #include <QFileInfo>
 #include <QMimeDatabase>
 #include <QTimer>
-#include <QJsonDocument>
-#include <QJsonParseError>
 
 GDrive::GDriveFileSimpleUpdate::GDriveFileSimpleUpdate(const QString &filepath,
                                                        const QString &fileID, QOAuth2AuthorizationCodeFlow *parent)
@@ -51,17 +49,6 @@ GDrive::GDriveFileSimpleUpdate::GDriveFileSimpleUpdate(const QString &filepath,
 GDrive::GDriveFileSimpleUpdate::~GDriveFileSimpleUpdate()
 {
     m_file->close();
-}
-
-GDrive::GDriveFileResource GDrive::GDriveFileSimpleUpdate::getResource() const
-{
-    QJsonParseError jsonErr;
-    QJsonDocument doc = QJsonDocument::fromJson(m_replyData,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveFileResource();
-    }
-    return GDriveFileResource(doc);
 }
 
 QByteArray GDrive::GDriveFileSimpleUpdate::getReplyString() const
@@ -167,9 +154,7 @@ void GDrive::GDriveFileSimpleUpdate::retry()
                            this,&GDriveFileSimpleUpdate::request_UploadStart);
     }else {
         m_errStr += QStringLiteral("[Error]Too many retrys.");
-        m_isFailed = true;
-        m_isComplete = true;
-        emit finished();
+        taskFailed();
     }
 }
 

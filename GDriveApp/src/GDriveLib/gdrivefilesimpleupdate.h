@@ -3,7 +3,6 @@
 #include <QObject>
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-#include "gdrivefileresource.h"
 
 QT_BEGIN_NAMESPACE
 class QFile;
@@ -38,8 +37,6 @@ public:
                                     QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileSimpleUpdate() override;
-    /// return File resource
-    GDriveFileResource getResource() const;
     /// return File resource to JSON string data format
     QByteArray getReplyString() const;
 

@@ -52,3 +52,10 @@ void GDrive::GDriveFileTask::taskFailed()
     m_isComplete = true;
     emit finished();
 }
+
+void GDrive::GDriveFileTask::taskFinish(bool success)
+{
+    m_isFailed = success;
+    m_isComplete = true;
+    emit finished();
+}

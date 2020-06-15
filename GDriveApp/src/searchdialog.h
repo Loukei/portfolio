@@ -6,11 +6,7 @@
 namespace Ui {
 class SearchDialog;
 }
-class QJsonModel;
 
-namespace GDrive {
-class FileListArgs;
-}
 /*!
  * \class SearchDialog
  * \brief The SearchDialog class is use to search drive file and show search result on QTreeView
@@ -32,6 +28,18 @@ class SearchDialog : public QDialog
 public:
     explicit SearchDialog(QWidget *parent = nullptr);
     ~SearchDialog();
+
+    QString getCorpora() const;
+    QString getDriveId() const;
+    QString getFields() const;
+    bool getIncludeItemsFromAllDrives() const;
+    QString getOrderBy() const;
+    int getPageSize() const;
+    QString getPageToken() const;
+    QString getQ() const;
+    QString getSpaces() const;
+    bool getSupportsAllDrives() const;
+
 signals:
     /// send query parameter to mainwindow
     void query(const QString &corpora,
@@ -42,17 +50,7 @@ signals:
                const QString &pageToken,
                const QString &q,
                const QString &spaces);
-public slots:
-    /// receive `GDriveFileSearch::finished` signal and save the query result to `m_model`
-    void onFileSearch_finished();
-
-private slots:
-    /// send `SearchDialog::query` signal to mainwindow
-    void on_pushButton_search_clicked();
-
 private:
     Ui::SearchDialog *ui;
-    /// saving data form search result
-    QJsonModel *m_model;
 };
 #endif // SEARCHDIALOG_H

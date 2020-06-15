@@ -42,7 +42,7 @@ namespace GDrive {
  * Qt提供有限度的參數修正，例如請求Refersh Token、更新access token等
  * - QAbstractOAuth::Status 用來表達任證的狀態，但是Qt設計上並未提供登出的選擇，
  * 所以`QAbstractOAuth::Status::NotAuthenticated`的狀態只有在grant()之前或是refreshToken()發出請求取得新token之間的空窗期
- * - 想要正確處理logout狀態，使用tokenChanged()或refreshTokenChanged()更好
+ * - 想要正確處理logout狀態，使用tokenChanged()
  *
  * ## Note
  * QNetworkreply其中readyRead()信號繼承自QIODevice類，每當有新的數據可以讀取時，都會發射該信號；
@@ -74,6 +74,8 @@ public:
     QDateTime expirationAt() const;
     /// return m_google token
     QString token() const;
+    /// Sets the token used to sign authenticated requests to token.
+    void setToken(const QString &token);
     /// Gets the current refresh token.
     QString refreshToken() const;
     /// Sets the new refresh token refreshToken to be used.
@@ -83,7 +85,7 @@ public:
     QNetworkAccessManager* networkAccessManager() const;
 
     /// send request to get About resource
-    GDrive::GDriveAbout* getAbout(const QString &fields);
+    GDrive::GDriveAbout* about(const QString &fields);
     /// simple upload create file
     GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath);
     GDriveFileSimpleCreate* fileSimpleCreate(const QString &filepath,const QUrlQuery &args);
@@ -114,8 +116,6 @@ public:
 public slots:
     /// Starts the authentication flow as described in The OAuth 2.0 Authorization Framework
     void grant();
-    /// logout account (depercated)
-    void logout();
     /// Call this function to refresh the token.
     /// Access tokens are not permanent.
     /// After a time specified along with the access token when it was obtained, the access token will become invalid.
@@ -132,7 +132,7 @@ signals:
     void error(const QString &error, const QString &errorDescription, const QUrl &uri);
     /// emit when refreshToken changed
     void refreshTokenChanged(const QString &refreshToken);
-
+    /// emit when access token changed
     void tokenChanged(const QString &token);
 
 protected:

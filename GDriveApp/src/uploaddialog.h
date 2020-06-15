@@ -12,30 +12,20 @@ class UploadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit UploadDialog(QWidget *parent = nullptr,
-                          const QString &caption = QString(),
-                          const QString &filePath = QString());
+    explicit UploadDialog(QWidget *parent = nullptr);
     ~UploadDialog() override;
 
     QString getFilePath() const;
+    void setFilePath(const QString &filepath = QStringLiteral("C:/"));
 
     int getUploadType() const;
-    QString getUploadTypeStr() const;
 
     bool getEnforceSingleParent() const;
-    void setEnforceSingleParent(bool enforceSingleParent);
-
     bool getIgnoreDefaultVisibility() const;
-    void setIgnoreDefaultVisibility(bool ignoreDefaultVisibility);
-
     bool getKeepRevisionForever() const;
-    void setKeepRevisionForever(bool keepRevisionForever);
-
     QString getOcrLanguage() const;
-    void setOcrLanguage(const QString &ocrLanguage);
-
+    bool getSupportsAllDrives() const;
     bool getUseContentAsIndexableText() const;
-    void setUseContentAsIndexableText(bool useContentAsIndexableText);
 
 private slots:
     void on_pushButton_FilePath_clicked();

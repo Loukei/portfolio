@@ -1,26 +1,22 @@
 #include "searchdialog.h"
 #include "ui_searchdialog.h"
-#include "GDriveLib/googledriveservice.h"
-#include "QJsonModel/qjsonmodel.h"
 
 SearchDialog::SearchDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SearchDialog)
 {
     ui->setupUi(this);
-    m_model = new QJsonModel(this);
-    ui->treeView->setModel(m_model);
-    m_model->loadJson("{ \"kind\": \"drive#fileList\","
-                      " \"incompleteSearch\": false,"
-                      " \"files\": [  "
-                      "{   "
-                      "\"kind\": \"drive#file\","
-                      "   \"id\": \"EXAMPLE_FILE_ID\","
-                      "   \"name\": \"Untitled\","
-                      "   \"mimeType\": \"text/plain\"  "
-                      "} "
-                      "]"
-                      "}");
+//    m_model->loadJson("{ \"kind\": \"drive#fileList\","
+//                      " \"incompleteSearch\": false,"
+//                      " \"files\": [  "
+//                      "{   "
+//                      "\"kind\": \"drive#file\","
+//                      "   \"id\": \"EXAMPLE_FILE_ID\","
+//                      "   \"name\": \"Untitled\","
+//                      "   \"mimeType\": \"text/plain\"  "
+//                      "} "
+//                      "]"
+//                      "}");
 }
 
 SearchDialog::~SearchDialog()
@@ -28,29 +24,52 @@ SearchDialog::~SearchDialog()
     delete ui;
 }
 
-void SearchDialog::onFileSearch_finished()
+QString SearchDialog::getCorpora() const
 {
-    qInfo() << Q_FUNC_INFO;
-    auto task = qobject_cast<GDrive::GDriveFileSearch*>(sender());
-    if(task->isComplete() && !task->isFailed()){
-        //! update treeView to show message
-        m_model->loadJson(task->getReplyString());
-    }else {
-        m_model->loadJson(task->getReplyString());
-    }
-    task->deleteLater();
+    return ui->lineEdit_corpora->text();
 }
 
-
-void SearchDialog::on_pushButton_search_clicked()
+QString SearchDialog::getDriveId() const
 {
-    qInfo() << Q_FUNC_INFO;
-    emit query(ui->lineEdit_corpora->text(),
-               ui->lineEdit_driveId->text(),
-               ui->lineEdit_fields->text(),
-               ui->lineEdit_orderBy->text(),
-               ui->spinBox_pageSize->value(),
-               ui->lineEdit_pageToken->text(),
-               ui->lineEdit_Q->text(),
-               ui->lineEdit_spaces->text());
+    return ui->lineEdit_driveId->text();
+}
+
+QString SearchDialog::getFields() const
+{
+    return ui->lineEdit_fields->text();
+}
+
+bool SearchDialog::getIncludeItemsFromAllDrives() const
+{
+    return ui->comboBox_includeItemsFromAllDrives->currentIndex();
+}
+
+QString SearchDialog::getOrderBy() const
+{
+    return ui->lineEdit_orderBy->text();
+}
+
+int SearchDialog::getPageSize() const
+{
+    return ui->spinBox_pageSize->value();
+}
+
+QString SearchDialog::getPageToken() const
+{
+    return ui->lineEdit_pageToken->text();
+}
+
+QString SearchDialog::getQ() const
+{
+    return ui->lineEdit_Q->text();
+}
+
+QString SearchDialog::getSpaces() const
+{
+    return ui->lineEdit_spaces->text();
+}
+
+bool SearchDialog::getSupportsAllDrives() const
+{
+    return ui->comboBox_supportsAllDrives->currentIndex();
 }
