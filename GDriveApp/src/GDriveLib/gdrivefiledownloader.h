@@ -41,6 +41,8 @@ public:
     static QUrlQuery buildUrlArgs(bool acknowledgeAbuse = false,
                                   const QString &fields = QString(),
                                   bool supportsAllDrives = false);
+public slots:
+    void abort();
 
 private:
     /// pointer to Shared QFile ready to write,DELETE by owner
@@ -64,6 +66,8 @@ private slots:
     void on_Download_ReplyFinished();
     /// Solt for `QNetworkReply::error` in `request_Download()`
     void on_Download_ReplyError(QNetworkReply::NetworkError);
+
+    void on_Download_readyRead();
 };
 }
 #endif // GDRIVEFILEDOWNLOADER_H

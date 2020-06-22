@@ -48,6 +48,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         networkimgloader.cpp \
+        networkprogressdialog.cpp \
         searchdialog.cpp \
         updatedialog.cpp \
         uploaddialog.cpp
@@ -78,6 +79,7 @@ HEADERS += \
         mainwindow.h \
         mainwindow_settings.h \
         networkimgloader.h \
+        networkprogressdialog.h \
         searchdialog.h \
         updatedialog.h \
         uploaddialog.h

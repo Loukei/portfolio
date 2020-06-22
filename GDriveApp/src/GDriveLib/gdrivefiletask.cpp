@@ -3,7 +3,7 @@
 #include <QRandomGenerator>
 
 GDrive::GDriveFileTask::GDriveFileTask(QOAuth2AuthorizationCodeFlow *parent)
-    :QObject (parent),mp_google(parent),m_errStr(""),m_isFailed(false),m_isComplete(false)
+    :QObject (parent),mp_google(parent),m_currentReply(nullptr),m_errStr(""),m_isFailed(false),m_isComplete(false)
 {
 
 }
@@ -55,7 +55,7 @@ void GDrive::GDriveFileTask::taskFailed()
 
 void GDrive::GDriveFileTask::taskFinish(bool success)
 {
-    m_isFailed = success;
+    m_isFailed = !success;
     m_isComplete = true;
     emit finished();
 }

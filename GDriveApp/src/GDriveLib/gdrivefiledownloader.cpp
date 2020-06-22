@@ -51,16 +51,30 @@ QUrlQuery GDrive::GDriveFileDownloader::buildUrlArgs(bool acknowledgeAbuse, cons
     return args;
 }
 
+void GDrive::GDriveFileDownloader::abort()
+{
+    if(m_currentReply && m_currentReply->isRunning()){
+        m_currentReply->abort();
+    }else {
+        qWarning() << Q_FUNC_INFO << "No network request is running";
+    }
+}
+
 void GDrive::GDriveFileDownloader::request_Download(const QUrl &url)
 {
     QNetworkRequest request(url);
     request.setRawHeader("Authorization",
                          QByteArray("Bearer " + mp_google->token().toLatin1()));
     auto reply = mp_google->networkAccessManager()->get(request);
+    m_currentReply = reply;
     connect(reply,&QNetworkReply::finished,
             this,&GDriveFileDownloader::on_Download_ReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,&GDriveFileDownloader::on_Download_ReplyError);
+    connect(reply,&QNetworkReply::readyRead,
+            this,&GDriveFileDownloader::on_Download_readyRead);
+    connect(reply,&QNetworkReply::downloadProgress,
+            this,&GDriveFileDownloader::downloadProgress);
 }
 
 QUrl GDrive::GDriveFileDownloader::buildUrl(const QString &fileId,
@@ -128,10 +142,12 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
         return;
     }
     //! write reply content to mp_file, return false if write failed
-    m_isFailed = !writeFile(reply);
-    m_isComplete = true;
-    emit finished();
+//    const bool success = writeFile(reply);
+//    taskFinish(success);
+    mp_file->close();
+    taskSucceeded();
     reply->deleteLater();
+    m_currentReply = nullptr;
 }
 
 void GDrive::GDriveFileDownloader::on_Download_ReplyError(QNetworkReply::NetworkError)
@@ -141,4 +157,11 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyError(QNetworkReply::Network
     m_errStr += getErrorMessage(reply);
     taskFailed();
     reply->deleteLater();
+}
+
+void GDrive::GDriveFileDownloader::on_Download_readyRead()
+{
+    auto reply = qobject_cast<QNetworkReply*>(sender());
+    if(mp_file && mp_file->isWritable())
+        mp_file->write(reply->readAll());
 }

@@ -206,34 +206,6 @@ void GDrive::GDriveFileResumableCreate::request_UploadResume(const qint64 offset
             this,&GDriveFileResumableCreate::on_UploadResume_ReplyError);
 }
 
-//void GDrive::GDriveFileResumableCreate::setState(GDrive::GDriveFileResumableCreate::State s)
-//{
-//    if(mp_reply != nullptr){
-//        qWarning() << "has Reply not finished";
-//        return;
-//    }
-//    if(s == State::RESTARTUPLOAD){
-//        m_sessionUri.clear();
-//        m_isFailed = true;
-//        m_isComplete = false;
-//        mp_reply = nullptr;
-//        request_UploadStart();
-//        return;
-//    }
-//    if(s == State::FAIL){
-//        m_isFailed = true;
-//        m_isComplete = true;
-//        emit finished();
-//        return;
-//    }
-//    if(s == State::COMPLETE){
-//        m_isFailed = false;
-//        m_isComplete = true;
-//        emit finished();
-//        return;
-//    }
-//}
-
 void GDrive::GDriveFileResumableCreate::on_InitialSession_ReplyFinished()
 {
     qInfo() << Q_FUNC_INFO;

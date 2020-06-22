@@ -7,6 +7,7 @@
 #include "searchdialog.h"
 #include "filematadatadialog.h"
 #include "updatedialog.h"
+#include "networkprogressdialog.h" /* open dialog to show download/upload progress */
 
 #include "Secret/oauthglobal.h" /* Oauth parameter */
 #include "GDriveLib/googledriveservice.h"
@@ -58,7 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
                                 OAuth::keyClientId(),
                                 OAuth::keyClientSecert(),
                                 OAuth::keyScope(),
-                                OAuth::keyRedirectPort(),this);
+                                OAuth::keyRedirectPort(),
+                                this);
     loadUserAccount(*m_settings);
     connect(m_Drive,&GDriveService::granted,
             this,&MainWindow::onGDrive_granted);
@@ -228,16 +230,29 @@ void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fi
 {
     QSharedPointer<QFile> writeFile(new QFile(downloadFilePath,this),&QFile::deleteLater);
     auto task = m_Drive->fileDownload(fileId,"id,name",writeFile);
-    connect(task,&GDriveFileTask::finished,
-            this,[task,this,downloadFilePath](){
+    auto onDownloadFinish = [task,this,downloadFilePath](){
         if(task->isComplete() && !task->isFailed()){
             consoleInfo(tr("Download success: %11").arg(downloadFilePath));
         }else {
             consoleError(downloadFilePath + tr(" Download error:") + task->errorString());
+            QFile::remove(downloadFilePath); // delete failed download on desk
         }
-        m_model->loadJson(task->getReplyString());
+        // no reply need to show
         task->deleteLater();
-    });
+    };
+    connect(task,&GDriveFileDownloader::finished,
+            this,onDownloadFinish);
+
+//    NetworkProgressDialog *dialog
+//            = new NetworkProgressDialog(tr("Downloading %1").arg(downloadFilePath),this);
+//    dialog->setWindowFlag(WA_D);
+//    connect(task,&GDriveFileDownloader::downloadProgress,
+//            dialog,&NetworkProgressDialog::networkProgress);
+//    connect(task,&GDriveFileDownloader::finished,
+//            dialog,&NetworkProgressDialog::hide);
+//    connect(dialog,&NetworkProgressDialog::canceled,
+//            task,&GDriveFileDownloader::abort);
+//    dialog->show();
 }
 
 void MainWindow::fileSearch(const QUrlQuery &args)
@@ -484,5 +499,3 @@ void MainWindow::on_action_Upload_File_triggered()
         consoleInfo(tr("Upload cancled."));
     }
 }
-
-

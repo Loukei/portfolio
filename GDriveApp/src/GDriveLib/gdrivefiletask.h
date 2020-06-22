@@ -5,6 +5,7 @@
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
+class QNetworkReply;
 QT_END_NAMESPACE
 
 namespace GDrive {
@@ -38,8 +39,10 @@ public:
     bool isFailed() const;
 
 signals:
-    /// emit when error occured or task complete
+    /// emit when error occurred or task complete
     void finished();
+    /// emit when error occurred
+    void errorOccurred();
     /// This signal is emitted to indicate the progress of the download part of this network request,
     /// if there's any.
     /// If there's no download associated with this request,
@@ -55,22 +58,27 @@ signals:
 protected:
     /// An instance to manage Oauth request, and Token resource, no need to delete
     QOAuth2AuthorizationCodeFlow * const mp_google;
+    /// The current reply has been execute,
+    /// if task has failed before any networkrequest, contains nullptr
+    QNetworkReply *m_currentReply;
     /// Human readable error string
     QString m_errStr = QString();
-    /// Does task failed? True means task fail, False means task success
-    bool m_isFailed = false;
-    /// Does task complete
-    bool m_isComplete = false;
 
 protected:
     /// calculate exponential backoff sleep time,return -1 if collisions > maxretry
     int getExpBackoffSleepTime(int collisions,int slottime,int maxretry) const;
-    /// Task complete and not failed
+    /// Task complete and not failed, emit finish signal
     void taskSucceeded();
     /// Task complete and failed
     void taskFailed();
     /// Set m_isComplete to true, m_isFailed = success
     void taskFinish(bool success);
+
+private:
+    /// Does task failed? True means task fail, False means task success
+    bool m_isFailed = false;
+    /// Does task complete
+    bool m_isComplete = false;
 };
 }
 #endif // GDRIVEFILETASK_H
