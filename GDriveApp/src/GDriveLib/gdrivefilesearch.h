@@ -56,8 +56,8 @@ private:
     QUrl buildUrl(QUrlQuery args) const;
 
 private slots:
-    void on_Search_ReplyFinished();
-    void on_Search_ReplyError(QNetworkReply::NetworkError);
+    void onSearchReplyFinished();
+    void onSearchReplyError(QNetworkReply::NetworkError);
 
 private:
     QByteArray m_replyData = QByteArray();

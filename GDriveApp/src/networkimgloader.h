@@ -19,7 +19,7 @@ protected:
     void requestResource(const QUrl &url);
 
 protected slots:
-    void on_networkreply_finished();
+    void onNetworkreplyFinished();
 
 private:
     QNetworkAccessManager *m_manager;

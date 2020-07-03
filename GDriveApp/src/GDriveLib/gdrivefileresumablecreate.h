@@ -2,16 +2,13 @@
 #define GDRIVEFILERESUMABLECREATE_H
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-
-QT_BEGIN_NAMESPACE
-class QOAuth2AuthorizationCodeFlow;
-class QFile;
-QT_END_NAMESPACE
+#include <QFile>
 
 namespace GDrive {
 /*!
  * \class GDriveFileResumableCreate
  * \brief Creates a new file with Resumable upload.
+ * \details
  *
  * ## Reference
  * - [Files: create](https://developers.google.com/drive/api/v3/reference/files/create)
@@ -37,52 +34,75 @@ public:
                                   const bool supportsAllDrives = false,
                                   const bool useContentAsIndexableText = false);
 
-private:
-    /// Start resumable upload session, first step to get session Uri
-    void request_InitialSession();
-    /// return QUrl for Initial request
-    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/) const;
-    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/,QUrlQuery args) const;
-    /// After receive Session Uri, send upload request by Single request method
-    void request_UploadStart();
-    /// Upload interrupt, asking google server for upload status
-    void request_AskUploadStatus();
-    /// Resume upload when interrupt form offset position
-    void request_UploadResume(const qint64 offset);
+    enum UploadStatus{
+        Initial = 0,                    /* Initial status, user doesn't call start() */
+        RequestInitialSessionURI = 1,   /* step1: request google for Initial Session URI and send file matadata */
+        RequestStartUpload = 2,         /* step2: Start upload file content with single chunk */
+        RequestUploadprogress = 3,      /* step3: If upload has paused or step2 upload error,asking server for upload progress */
+        RequestResumeUpload = 4,        /* step4: after setp3 receive upload progress, resume upload */
+        Paused = 5,                     /* Task has been paused by user */
+        Success = 6,                    /* Task has been Successfull finished */
+        Error = 7                       /* Task has been unrecoverable error */
+    };
 
-private slots:
-    /// process request_InitialSession reply finished
-    void on_InitialSession_ReplyFinished();
-    /// process request_InitialSession reply error
-    void on_InitialSession_ReplyError(QNetworkReply::NetworkError);
-    /// process request_UploadStart reply finished
-    void on_UploadStart_ReplyFinished();
-    /// process request_UploadStart reply error
-    void on_UploadStart_ReplyError(QNetworkReply::NetworkError);
-    /// process request_AskUploadStatus reply finished
-    void on_AskUploadStatus_ReplyFinished();
-    /// process request_AskUploadStatus reply error
-    void on_AskUploadStatus_ReplyError(QNetworkReply::NetworkError);
-    /// process request_UploadResume reply finished
-    void on_UploadResume_ReplyFinished();
-    /// process request_UploadResume reply error
-    void on_UploadResume_ReplyError(QNetworkReply::NetworkError);
+    bool start();
+
+public slots:
+    void abort();
+    void pause();
+    void resume();
+
+signals:
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
 
 private:
-    /// State to Restart Upload
-    void state_RestartUpload();
-    /// State to Resume Upload
-    void state_ResumeUpload();
-
-private:
+    /// save input parameters
+    QUrl m_initialUrl;
     /// An member of upload file,use to upload on Google Drive.
-    QFile *m_file = nullptr;
-    /// The Url for request initial session
-    QUrl m_iniUrl;
+    QFile m_file;
     /// save session uri
     QUrl m_sessionUri = QUrl();
+    /// record upload progress has sent to server
+    qint64 m_offset;
     /// Save network reply after upload finished
     QByteArray m_replyData = QByteArray();
-};
+    /// Record the upload status
+    UploadStatus m_status;
+
+private:
+    QUrl buildUrl(const QString &uploadType) const;
+    QUrl buildUrl(const QString &uploadType,QUrlQuery args) const;
+
+    QNetworkReply* requaetInitialSession(const QUrl &url);
+    QNetworkReply* requestStartUpload(const QUrl &sessionUrl);
+    QNetworkReply* requestUploadProgress(const QUrl &sessionUrl);
+    /// offset means the value form reply header "Range: bytes=0-XX"
+    QNetworkReply* requestResumeUpload(const QUrl &sessionUrl,const qint64 offset);
+
+    /// get upload status form reply, if match failed, return -1
+    qint64 getContentRangeMax(const QNetworkReply* reply) const;
+    /// restart whole upload task, this usually happen when server return 404 error.
+    /// [Doc](https://developers.google.com/drive/api/v3/manage-uploads#errors)
+    void restart();
+
+    void nextStep(UploadStatus status);
+
+    inline void taskFailed();
+    inline void taskSucceeded();
+
+private slots:
+    void onInitialSession_ReplyFinished();
+    void onInitialSession_ReplyError(QNetworkReply::NetworkError code);
+
+    void onStartUpload_ReplyFinished();
+    void onStartUpload_ReplyError(QNetworkReply::NetworkError code);
+
+    void onUploadProgress_ReplyFinished();
+    void onUploadProgress_ReplyError(QNetworkReply::NetworkError code);
+
+    void onResumeUpload_ReplyFinished();
+    void onResumeUpload_ReplyError(QNetworkReply::NetworkError code);
+    inline void onResumeUpload_uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+}; // GDriveFileResumableCreate
 }
 #endif // GDRIVEFILERESUMABLECREATE_H

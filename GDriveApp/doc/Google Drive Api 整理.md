@@ -2,6 +2,27 @@
 
 ## 參數整理
 
+### About::get
+
+- Gets information about the user, the user's Drive, and system capabilities.
+- HTTP request : `GET https://www.googleapis.com/drive/v3/about`
+- [Doc](https://developers.google.com/drive/api/v3/reference/about/get)
+
+| name                          | type    | value                                    |
+| ----------------------------- | ------- | ---------------------------------------- |
+| **Required query parameters** |         |                                          |
+| fields                        | string  |                                          |
+
+``` http
+GET https://www.googleapis.com/drive/v3/about?fields=user(displayName,photoLink,emailAddress) HTTP/1.1
+Host: www.googleapis.com
+User-Agent: QtOAuth/1.0 (+https://www.qt.io)
+Authorization: Bearer ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+```
+
 ### Files: create
 
 - Creates a new file.
@@ -23,6 +44,22 @@
 | ocrLanguage                   | string  |                                          |
 | supportsAllDrives             | boolean | (Default: false)                         |
 | useContentAsIndexableText     | boolean | (Default: false)                         |
+
+#### Simple upload request example
+
+``` http
+POST https://www.googleapis.com/upload/drive/v3/files?uploadType=media&access_token=ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-BDR9muvlAxuN9b4BRDErDs6_ZZg2EjsCc2E5TUEsHbtP7iO1aRMU2wmAfmt2o45mf1t-1r_qkCrEpcQPXllq0FEWpwLHDsiZCZy3J1uo HTTP/1.1
+Host: www.googleapis.com
+Content-Type: text/plain
+Authorization: : Bearer ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-BDR9muvlAxuN9b4BRDErDs6_ZZg2EjsCc2E5TUEsHbtP7iO1aRMU2wmAfmt2o45mf1t-1r_qkCrEpcQPXllq0FEWpwLHDsiZCZy3J1uo
+Content-Length: 1064
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+
+"file body"
+```
 
 ### Files: update
 

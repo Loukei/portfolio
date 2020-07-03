@@ -110,8 +110,8 @@ public:
     /// Lists or searches files
     GDriveFileSearch* fileList(const QUrlQuery &args);
     /// Get File download by fileID
-    GDriveFileDownloader* fileDownload(const QString &fileId,const QString &fields,QSharedPointer<QFile> file);
-    GDriveFileDownloader* fileDownload(const QString &fileId,const QUrlQuery &args,QSharedPointer<QFile> file);
+    GDriveFileDownloader* fileDownload(const QString &fileId,const QString &fields,const QString &filepath);
+    GDriveFileDownloader* fileDownload(const QString &fileId,const QUrlQuery &args,const QString &filepath);
 
 public slots:
     /// Starts the authentication flow as described in The OAuth 2.0 Authorization Framework

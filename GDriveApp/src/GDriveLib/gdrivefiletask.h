@@ -2,10 +2,11 @@
 #define GDRIVEFILETASK_H
 
 #include <QObject>
+#include <QPointer>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 class QOAuth2AuthorizationCodeFlow;
-class QNetworkReply;
 QT_END_NAMESPACE
 
 namespace GDrive {
@@ -41,26 +42,13 @@ public:
 signals:
     /// emit when error occurred or task complete
     void finished();
-    /// emit when error occurred
-    void errorOccurred();
-    /// This signal is emitted to indicate the progress of the download part of this network request,
-    /// if there's any.
-    /// If there's no download associated with this request,
-    /// this signal will be emitted once with 0 as the value of both bytesReceived and bytesTotal.
-    /// see [QNetworkReply Class](https://doc.qt.io/qt-5/qnetworkreply.html#downloadProgress)
-    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
-    /// This signal is emitted to indicate the progress of the upload part of this network request,
-    /// if there's any.
-    /// If there's no upload associated with this request, this signal will not be emitted.
-    /// see [QNetworkReply Class](https://doc.qt.io/qt-5/qnetworkreply.html#uploadProgress)
-    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
 
 protected:
     /// An instance to manage Oauth request, and Token resource, no need to delete
     QOAuth2AuthorizationCodeFlow * const mp_google;
     /// The current reply has been execute,
     /// if task has failed before any networkrequest, contains nullptr
-    QNetworkReply *m_currentReply;
+    QPointer<QNetworkReply> m_currentReply;
     /// Human readable error string
     QString m_errStr = QString();
 

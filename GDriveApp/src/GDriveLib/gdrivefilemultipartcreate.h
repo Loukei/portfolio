@@ -1,12 +1,10 @@
 #ifndef GDRIVEFILEMULTIPARTCREATE_H
 #define GDRIVEFILEMULTIPARTCREATE_H
+
 #include <QObject>
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-
-QT_BEGIN_NAMESPACE
-class QFile;
-QT_END_NAMESPACE
+#include <QFile>
 
 namespace GDrive {
 /*!
@@ -26,6 +24,7 @@ namespace GDrive {
  */
 class GDriveFileMultipartCreate : public GDriveFileTask
 {
+    Q_OBJECT
 public:
     /// constructor
     explicit GDriveFileMultipartCreate(const QString &filepath,
@@ -44,25 +43,35 @@ public:
                                   const QString &ocrLanguage = QString(),
                                   const bool supportsAllDrives = false,
                                   const bool useContentAsIndexableText = false);
+    bool start();
+public slots:
+    void abort();
+
+signals:
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
 
 private:
     /// send Multipart upload request
-    void request_UploadStart();
-    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/) const;
-    QUrl buildUrl(const QString &uploadType/*,const QString &access_token*/,QUrlQuery args) const;
+    QNetworkReply* requestUploadStart(const QNetworkRequest &request,QHttpMultiPart *multiPart);
+    QNetworkRequest buildRequest(const QUrl &url) const;
+    QHttpMultiPart* buildRequestBody(QFile *file);
+    QUrl buildUrl(const QString &uploadType) const;
+    QUrl buildUrl(const QString &uploadType,QUrlQuery args) const;
     /// retry upload
     void retry();
 
 private slots:
     /// Solt for `QNetworkReply::finished` in `request_UploadStart()`
-    void on_UploadStart_ReplyFinished();
+    void onUploadStartReplyFinished();
     /// Solt for `QNetworkReply::error` in `request_UploadStart()`
-    void on_UploadStart_ReplyError(QNetworkReply::NetworkError);
+    void onUploadStartReplyError(QNetworkReply::NetworkError code);
 
 private:
     /// An member of upload file,use to upload on Google Drive.
-    QFile *m_file = nullptr;
-    ///
+    QFile m_file;
+    /// the request body part includeing upload file
+    QHttpMultiPart *m_httpMultiPart;
+    /// the request Url
     QUrl m_url;
     /// Save network reply after upload finished
     QByteArray m_replyData = QByteArray();

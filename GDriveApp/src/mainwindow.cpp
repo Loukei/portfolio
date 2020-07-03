@@ -100,7 +100,7 @@ void MainWindow::updateAccountActs()
     GDriveAbout* userAbout = m_Drive->about(QStringLiteral("user"));
     auto onAboutFinished = [userAbout,this](){
         if(userAbout->isComplete() && !userAbout->isFailed()){
-            GDriveAboutResource resource = userAbout->getResource();
+            GDriveAboutResource resource(userAbout->getReplyString());
             m_accountActs->updateUi(resource.user_displayName(),
                                     resource.user_emailAddress(),
                                     resource.user_photoLink(),
@@ -135,15 +135,28 @@ void MainWindow::fileSimpleUpload(const QString &filepath, const QUrlQuery &args
     auto task = m_Drive->fileSimpleCreate(filepath,args);
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){ // 上傳任務成功必須(1)完成且(2)沒有失敗
-            consoleInfo(tr("Simple Upload success: %1.").arg(filepath));
+            consoleInfo(tr("%1 simple upload success.").arg(filepath));
         }else {
-            consoleError(filepath + tr(" Simple Upload error:") + task->errorString());
+            consoleError(tr("%1 simple upload error:%2").arg(filepath,task->errorString()));
         }
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileSimpleCreate::finished,
             this,onUploadreceive);
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Uploading %1.").arg(filepath),this);
+        connect(task,&GDriveFileSimpleCreate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileSimpleCreate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileSimpleCreate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileMultipartUpload(const QString &filepath, const QUrlQuery &args)
@@ -158,8 +171,22 @@ void MainWindow::fileMultipartUpload(const QString &filepath, const QUrlQuery &a
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileMultipartCreate::finished,
             this,onUploadreceive);
+
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Uploading %1.").arg(filepath),this);
+        connect(task,&GDriveFileMultipartCreate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileMultipartCreate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileMultipartCreate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileResumableUpload(const QString &filepath, const QUrlQuery &args)
@@ -174,8 +201,22 @@ void MainWindow::fileResumableUpload(const QString &filepath, const QUrlQuery &a
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileResumableCreate::finished,
             this,onUploadreceive);
+
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Uploading %1.").arg(filepath),this);
+        connect(task,&GDriveFileResumableCreate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileResumableCreate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileResumableCreate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
@@ -190,8 +231,22 @@ void MainWindow::fileSimpleUpdate(const QString &filepath, const QString &fileID
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileSimpleUpdate::finished,
             this,onUpdatereceive);
+
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Update %1.").arg(filepath),this);
+        connect(task,&GDriveFileSimpleUpdate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileSimpleUpdate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileSimpleUpdate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileMultipartUpdate(const QString &filepath,const QString &fileID,const QUrlQuery &args)
@@ -206,8 +261,22 @@ void MainWindow::fileMultipartUpdate(const QString &filepath,const QString &file
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileMultipartUpdate::finished,
             this,onUpdatereceive);
+
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Update %1.").arg(filepath),this);
+        connect(task,&GDriveFileMultipartUpdate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileMultipartUpdate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileMultipartUpdate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fileID, const QUrlQuery &args)
@@ -222,37 +291,50 @@ void MainWindow::fileResumableUpdate(const QString &filepath, const QString &fil
         m_model->loadJson(task->getReplyString());
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,
+    connect(task,&GDriveFileResumableUpdate::finished,
             this,onUploadreceive);
+
+    if(task->start()){
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Update %1.").arg(filepath),this);
+        connect(task,&GDriveFileResumableUpdate::uploadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileResumableUpdate::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileResumableUpdate::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
+        task->deleteLater();
+    }
 }
 
 void MainWindow::fileDownload(const QString &downloadFilePath, const QString &fileId)
 {
-    QSharedPointer<QFile> writeFile(new QFile(downloadFilePath,this),&QFile::deleteLater);
-    auto task = m_Drive->fileDownload(fileId,"id,name",writeFile);
-    auto onDownloadFinish = [task,this,downloadFilePath](){
-        if(task->isComplete() && !task->isFailed()){
-            consoleInfo(tr("Download success: %11").arg(downloadFilePath));
-        }else {
-            consoleError(downloadFilePath + tr(" Download error:") + task->errorString());
-            QFile::remove(downloadFilePath); // delete failed download on desk
-        }
-        // no reply need to show
+    auto task = m_Drive->fileDownload(fileId,"id,name",downloadFilePath);
+    if(task->start()){
+        auto onDownloadFinish = [task,this,downloadFilePath](){
+            if(task->isComplete() && !task->isFailed()){
+                consoleInfo(tr("Download %1 .").arg(downloadFilePath));
+            }else {
+                consoleError(tr("Download %1 error: %2.").arg(downloadFilePath,task->errorString()));
+                QFile::remove(downloadFilePath); // delete failed download on desk
+            }
+            task->deleteLater();
+        };
+        connect(task,&GDriveFileDownloader::finished,this,onDownloadFinish);
+        NetworkProgressDialog *dialog = new NetworkProgressDialog(tr("Downloading %1.").arg(downloadFilePath),this);
+        connect(task,&GDriveFileDownloader::downloadProgress,
+                dialog,&NetworkProgressDialog::networkProgress);
+        connect(task,&GDriveFileDownloader::finished,
+                dialog,&NetworkProgressDialog::closeAndBlockSignal);
+        connect(dialog,&NetworkProgressDialog::canceled,
+                task,&GDriveFileDownloader::abort);
+        dialog->show();
+    }else {
+        consoleInfo(task->errorString());
         task->deleteLater();
-    };
-    connect(task,&GDriveFileDownloader::finished,
-            this,onDownloadFinish);
-
-//    NetworkProgressDialog *dialog
-//            = new NetworkProgressDialog(tr("Downloading %1").arg(downloadFilePath),this);
-//    dialog->setWindowFlag(WA_D);
-//    connect(task,&GDriveFileDownloader::downloadProgress,
-//            dialog,&NetworkProgressDialog::networkProgress);
-//    connect(task,&GDriveFileDownloader::finished,
-//            dialog,&NetworkProgressDialog::hide);
-//    connect(dialog,&NetworkProgressDialog::canceled,
-//            task,&GDriveFileDownloader::abort);
-//    dialog->show();
+    }
 }
 
 void MainWindow::fileSearch(const QUrlQuery &args)
@@ -347,7 +429,7 @@ void MainWindow::onGDrive_granted()
 {
     qDebug() << Q_FUNC_INFO;
     const QString info = QString("Token: %1\nRefresh token: %2")
-            .arg(m_Drive->token()).arg(m_Drive->refreshToken());
+            .arg(m_Drive->token(),m_Drive->refreshToken());
     consoleInfo(info);
     this->statusBar()->showMessage(tr("Access Token received."));
 }

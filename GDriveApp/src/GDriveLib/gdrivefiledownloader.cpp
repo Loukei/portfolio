@@ -1,34 +1,42 @@
 #include "gdrivefiledownloader.h"
 #include <QOAuth2AuthorizationCodeFlow>
 #include <QUrlQuery>
-#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QTimer>
 
 GDrive::GDriveFileDownloader::GDriveFileDownloader(const QString &fileId,
                                                    const QString &fields,
-                                                   QSharedPointer<QFile> file,
+                                                   const QString &filepath,
                                                    QOAuth2AuthorizationCodeFlow *parent)
-    :GDriveFileTask (parent),mp_file(file)
+    :GDriveFileTask (parent),m_file(filepath,this)
 {
-    QUrl url = buildUrl(fileId,fields,mp_google->clientIdentifierSharedKey());
-    request_Download(url);
+    m_requestUrl = buildUrl(fileId,fields,mp_google->clientIdentifierSharedKey());
 }
 
 GDrive::GDriveFileDownloader::GDriveFileDownloader(const QString &fileId,
                                                    const QUrlQuery &args,
-                                                   QSharedPointer<QFile> file,
+                                                   const QString &filepath,
                                                    QOAuth2AuthorizationCodeFlow *parent)
-    :GDriveFileTask (parent),mp_file(file)
+    :GDriveFileTask (parent),m_file(filepath,this)
 {
-    QUrl url = buildUrl(fileId,"media",mp_google->clientIdentifierSharedKey(),args);
-    request_Download(url);
+    m_requestUrl = buildUrl(fileId,"media",mp_google->clientIdentifierSharedKey(),args);
 }
 
 GDrive::GDriveFileDownloader::~GDriveFileDownloader()
 {
-    qInfo() << Q_FUNC_INFO << this;
-    mp_file->close();
+    m_file.commit();
+}
+
+bool GDrive::GDriveFileDownloader::start()
+{
+    if(!m_file.open(QIODevice::WriteOnly)){
+        m_errStr += QString("%1 open fail: %2").arg(m_file.fileName(),m_file.errorString());
+        taskFailed();
+        return false;
+    }
+    m_currentReply = requestDownload(buildRequest(m_requestUrl));
+    return true;
 }
 
 QByteArray GDrive::GDriveFileDownloader::getReplyString() const
@@ -53,28 +61,41 @@ QUrlQuery GDrive::GDriveFileDownloader::buildUrlArgs(bool acknowledgeAbuse, cons
 
 void GDrive::GDriveFileDownloader::abort()
 {
-    if(m_currentReply && m_currentReply->isRunning()){
+    qInfo() << Q_FUNC_INFO;
+    if(m_currentReply){
+        m_currentReply->disconnect();
         m_currentReply->abort();
+        m_currentReply->deleteLater();
     }else {
-        qWarning() << Q_FUNC_INFO << "No network request is running";
+        qInfo() << "No network request is running";
     }
+    m_file.cancelWriting();
+    m_file.commit();
+    m_errStr += "User download cancled.";
+    taskFailed();
 }
 
-void GDrive::GDriveFileDownloader::request_Download(const QUrl &url)
+bool GDrive::GDriveFileDownloader::checkAndOpenFile()
 {
-    QNetworkRequest request(url);
-    request.setRawHeader("Authorization",
-                         QByteArray("Bearer " + mp_google->token().toLatin1()));
+    if(!m_file.open(QIODevice::WriteOnly)){
+        m_errStr += QString("%1 open fail: %2").arg(m_file.fileName(),m_file.errorString());
+        return false;
+    }
+    return true;
+}
+
+QNetworkReply *GDrive::GDriveFileDownloader::requestDownload(const QNetworkRequest &request)
+{
     auto reply = mp_google->networkAccessManager()->get(request);
-    m_currentReply = reply;
     connect(reply,&QNetworkReply::finished,
-            this,&GDriveFileDownloader::on_Download_ReplyFinished);
+            this,&GDriveFileDownloader::onDownloadReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-            this,&GDriveFileDownloader::on_Download_ReplyError);
+            this,&GDriveFileDownloader::onDownloadReplyError);
     connect(reply,&QNetworkReply::readyRead,
-            this,&GDriveFileDownloader::on_Download_readyRead);
+            this,&GDriveFileDownloader::onDownloadReadyread);
     connect(reply,&QNetworkReply::downloadProgress,
             this,&GDriveFileDownloader::downloadProgress);
+    return reply;
 }
 
 QUrl GDrive::GDriveFileDownloader::buildUrl(const QString &fileId,
@@ -104,20 +125,12 @@ QUrl GDrive::GDriveFileDownloader::buildUrl(const QString &fileId,
     return url;
 }
 
-bool GDrive::GDriveFileDownloader::writeFile(QNetworkReply *reply)
+QNetworkRequest GDrive::GDriveFileDownloader::buildRequest(const QUrl &url) const
 {
-    //! open file
-    if(!mp_file->open(QIODevice::WriteOnly)){
-        m_errStr += mp_file->errorString();
-        return false;
-    }
-    //! write reply content to file
-    qint64 writebyte = mp_file->write(reply->readAll());
-    if(writebyte == -1){ //! write error
-        m_errStr += mp_file->errorString();
-        return false;
-    }
-    return true;
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization",
+                         QByteArray("Bearer " + mp_google->token().toLatin1()));
+    return request;
 }
 
 QString GDrive::GDriveFileDownloader::getErrorMessage(QNetworkReply *reply)
@@ -133,7 +146,7 @@ QString GDrive::GDriveFileDownloader::getErrorMessage(QNetworkReply *reply)
     return errMsg;
 }
 
-void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
+void GDrive::GDriveFileDownloader::onDownloadReplyFinished()
 {
     qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
@@ -142,26 +155,28 @@ void GDrive::GDriveFileDownloader::on_Download_ReplyFinished()
         return;
     }
     //! write reply content to mp_file, return false if write failed
-//    const bool success = writeFile(reply);
-//    taskFinish(success);
-    mp_file->close();
-    taskSucceeded();
-    reply->deleteLater();
-    m_currentReply = nullptr;
+    if(m_file.commit()){
+        reply->deleteLater();
+        taskSucceeded();
+    }else {
+        reply->deleteLater();
+        m_errStr += QString("File commit %1").arg(m_file.errorString());
+        taskFailed();
+    }
 }
 
-void GDrive::GDriveFileDownloader::on_Download_ReplyError(QNetworkReply::NetworkError)
+void GDrive::GDriveFileDownloader::onDownloadReplyError(QNetworkReply::NetworkError)
 {
-    qInfo() << Q_FUNC_INFO;
     auto reply = qobject_cast<QNetworkReply*>(sender());
     m_errStr += getErrorMessage(reply);
-    taskFailed();
+    m_file.cancelWriting();
+    m_file.commit();
     reply->deleteLater();
+    taskFailed();
 }
 
-void GDrive::GDriveFileDownloader::on_Download_readyRead()
+void GDrive::GDriveFileDownloader::onDownloadReadyread()
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
-    if(mp_file && mp_file->isWritable())
-        mp_file->write(reply->readAll());
+    m_file.write(reply->readAll());
 }

@@ -4,16 +4,16 @@
 #include <QJsonArray>
 #include <QDebug>
 
-//GDrive::GDriveAboutResource::GDriveAboutResource(const QByteArray &data)
-//{
-//    QJsonParseError jsonErr;
-//    //! m_data return null if parse error
-//    m_data = QJsonDocument::fromJson(data,&jsonErr);
-//    if(jsonErr.error != QJsonParseError::NoError){
-//        m_errorString = jsonErr.errorString();
-//    }
-//    qInfo() << Q_FUNC_INFO << this;
-//}
+GDrive::GDriveAboutResource::GDriveAboutResource(const QByteArray &data)
+{
+    QJsonParseError jsonErr;
+    //! m_data return null if parse error
+    QJsonDocument doc = QJsonDocument::fromJson(data,&jsonErr);
+    if(jsonErr.error != QJsonParseError::NoError){
+        qWarning() << jsonErr.errorString();
+    }
+    m_object = doc.object();
+}
 
 GDrive::GDriveAboutResource::GDriveAboutResource(const QJsonDocument &doc)
     :m_object(doc.object())

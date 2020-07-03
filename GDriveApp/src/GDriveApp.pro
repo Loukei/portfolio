@@ -102,3 +102,5 @@ QT += network networkauth
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES +=

@@ -3,10 +3,7 @@
 #include <QObject>
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-
-QT_BEGIN_NAMESPACE
-class QFile;
-QT_END_NAMESPACE
+#include <QFile>
 
 namespace GDrive{
 /*!
@@ -17,7 +14,7 @@ namespace GDrive{
  * - 更新檔案
  * - 與Create方法相似，但是差別在URL部份使用fileID
  * - 必須使用PATCH方法發送HTTP request，而非指南中所稱的PUT
- * - Access token 參數必定放在最後方
+ * - Access token 參數必定放在URL最後方
  *
  * ## Reference 參考資料
  * - [Files: update](https://developers.google.com/drive/api/v3/reference/files/update)
@@ -48,9 +45,18 @@ public:
                                   const bool supportsAllDrives,
                                   const bool useContentAsIndexableText);
 
+    bool start();
+
+public slots:
+    void abort();
+
+signals:
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+
 private:
     /// send simpleupload request
-    void request_UploadStart();
+    QNetworkReply* requestUploadStart(const QNetworkRequest &request);
+    QNetworkRequest buildRequest(const QUrl &url) const;
     /// return QUrl by fileID
     QUrl buildUrl(const QString &fileID,const QString &uploadType,const QString &access_token) const;
     QUrl buildUrl(const QString &fileID,const QString &uploadType,const QString &access_token,QUrlQuery args) const;
@@ -58,12 +64,12 @@ private:
     void retry();
 
 private slots:
-    void on_UploadStart_ReplyFinished();
-    void on_UploadStart_ReplyError(QNetworkReply::NetworkError);
+    void onUploadStartReplyFinished();
+    void onUploadStartReplyError(QNetworkReply::NetworkError);
 
 private:
     /// An member of upload file,use to upload on Google Drive.
-    QFile *m_file = nullptr;
+    QFile m_file;
     /// The url for send request
     QUrl m_url;
     /// Save network reply after upload finished

@@ -187,12 +187,12 @@ GDriveFileSearch *GDriveService::fileList(const QUrlQuery &args)
     return new GDriveFileSearch(args,m_google);
 }
 
-GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, QSharedPointer<QFile> file)
+GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QString &fields, const QString &filepath)
 {
-    return new GDriveFileDownloader(fileId,fields,file,m_google);
+    return new GDriveFileDownloader(fileId,fields,filepath,m_google);
 }
 
-GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QUrlQuery &args, QSharedPointer<QFile> file)
+GDriveFileDownloader *GDriveService::fileDownload(const QString &fileId, const QUrlQuery &args, const QString &filepath)
 {
-    return new GDriveFileDownloader(fileId,args,file,m_google);
+    return new GDriveFileDownloader(fileId,args,filepath,m_google);
 }

@@ -18,7 +18,7 @@ void NetworkImgLoader::requestResource(const QUrl &url)
     QNetworkRequest request(url);
     QNetworkReply *reply = m_manager->get(request);
     connect(reply,&QNetworkReply::finished,
-            this,&NetworkImgLoader::on_networkreply_finished);
+            this,&NetworkImgLoader::onNetworkreplyFinished);
     connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
             this,[reply](){
         const QString info = QString("Network error: %1").arg(reply->errorString());
@@ -26,7 +26,7 @@ void NetworkImgLoader::requestResource(const QUrl &url)
     });
 }
 
-void NetworkImgLoader::on_networkreply_finished()
+void NetworkImgLoader::onNetworkreplyFinished()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error() == QNetworkReply::NetworkError::NoError){

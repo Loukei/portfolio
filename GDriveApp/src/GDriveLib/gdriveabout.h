@@ -39,8 +39,6 @@ public:
     explicit GDriveAbout(QOAuth2AuthorizationCodeFlow *parent,const QString &fields);
     /// Destructor
     virtual ~GDriveAbout() final;
-    /// return resource, if data not received, return null if parse error
-    GDriveAboutResource getResource() const;
     /// return About resource to JSON string data format
     QByteArray getReplyString() const;
     /// return true if task complete
@@ -64,7 +62,6 @@ private:
     bool m_isFailed = false;
     /// Does task complete
     bool m_isComplete = false;
-
 
 private slots:
     /// process network reply finish

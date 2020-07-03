@@ -99,9 +99,9 @@ void GDrive::GDriveFileSearch::request_Search(const QUrl &url)
 
     auto reply = mp_google->networkAccessManager()->get(request);
     connect(reply,&QNetworkReply::finished,
-            this,&GDriveFileSearch::on_Search_ReplyFinished);
+            this,&GDriveFileSearch::onSearchReplyFinished);
     connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-            this,&GDriveFileSearch::on_Search_ReplyFinished);
+            this,&GDriveFileSearch::onSearchReplyFinished);
 }
 
 QUrl GDrive::GDriveFileSearch::buildUrl() const
@@ -116,7 +116,7 @@ QUrl GDrive::GDriveFileSearch::buildUrl(QUrlQuery args) const
     return url;
 }
 
-void GDrive::GDriveFileSearch::on_Search_ReplyFinished()
+void GDrive::GDriveFileSearch::onSearchReplyFinished()
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
@@ -129,7 +129,7 @@ void GDrive::GDriveFileSearch::on_Search_ReplyFinished()
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileSearch::on_Search_ReplyError(QNetworkReply::NetworkError)
+void GDrive::GDriveFileSearch::onSearchReplyError(QNetworkReply::NetworkError)
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
     auto httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();

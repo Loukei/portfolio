@@ -8,18 +8,18 @@
  */
 namespace Settings
 {
-const QString key_AppVersion = QStringLiteral("App/Version");
-const QString key_Geometry = QStringLiteral("MainWindow/Geometry");
-const QString key_Upload_FilePath = QStringLiteral("MainWindow/DialogUpload/FilePath");
-const QString key_Download_FilePath = QStringLiteral("MainWindow/DialogDownload/FilePath");
-const QString key_Download_FileID = QStringLiteral("MainWindow/DialogDownload/FileID");
-const QString key_FileGet_FileID = QStringLiteral("MainWindow/DialogFileMataData/FileID");
-const QString key_FileGet_Fields = QStringLiteral("MainWindow/DialogFileMataData/Fields");
-const QString key_Update_FilePath = QStringLiteral("MainWindow/DialogUpdate/FilePath");
-const QString key_Update_FileID = QStringLiteral("MainWindow/DialogUpdate/FileID");
-const QString key_OAuth_UserEmail = QStringLiteral("OAuth/UserEmail");
-const QString key_OAuth_IsRememberMe = QStringLiteral("OAuth/IsRememberMe");
-const QString key_OAuth_RefreshToken = QStringLiteral("OAuth/RefreshToken");
+extern const QString key_AppVersion = QStringLiteral("App/Version");
+extern const QString key_Geometry = QStringLiteral("MainWindow/Geometry");
+extern const QString key_Upload_FilePath = QStringLiteral("MainWindow/DialogUpload/FilePath");
+extern const QString key_Download_FilePath = QStringLiteral("MainWindow/DialogDownload/FilePath");
+extern const QString key_Download_FileID = QStringLiteral("MainWindow/DialogDownload/FileID");
+extern const QString key_FileGet_FileID = QStringLiteral("MainWindow/DialogFileMataData/FileID");
+extern const QString key_FileGet_Fields = QStringLiteral("MainWindow/DialogFileMataData/Fields");
+extern const QString key_Update_FilePath = QStringLiteral("MainWindow/DialogUpdate/FilePath");
+extern const QString key_Update_FileID = QStringLiteral("MainWindow/DialogUpdate/FileID");
+extern const QString key_OAuth_UserEmail = QStringLiteral("OAuth/UserEmail");
+extern const QString key_OAuth_IsRememberMe = QStringLiteral("OAuth/IsRememberMe");
+extern const QString key_OAuth_RefreshToken = QStringLiteral("OAuth/RefreshToken");
 
 /*Settings reader function*/
 inline QString App_Version(const QSettings *settings){

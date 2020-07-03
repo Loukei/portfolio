@@ -1,6 +1,5 @@
 #include "gdrivefilesimpleupdate.h"
 #include <QOAuth2AuthorizationCodeFlow>
-#include <QFile>
 #include <QUrlQuery>
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -8,47 +7,23 @@
 
 GDrive::GDriveFileSimpleUpdate::GDriveFileSimpleUpdate(const QString &filepath,
                                                        const QString &fileID, QOAuth2AuthorizationCodeFlow *parent)
-    :GDriveFileTask (parent)
+    :GDriveFileTask (parent),m_file(filepath,this)
 {
-    //! check file exist
-    if(!QFile::exists(filepath)){
-        qWarning() << "file doesnt exist " << filepath;
-        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        taskFailed();
-        return;
-    }
-    //! Initial file
-    m_file = new QFile(filepath,this);
-    //! Setup Url
     m_url = buildUrl(fileID,"media",mp_google->token());
-    //! Upload file
-    request_UploadStart();
 }
 
 GDrive::GDriveFileSimpleUpdate::GDriveFileSimpleUpdate(const QString &filepath,
                                                        const QString &fileID,
                                                        const QUrlQuery &args,
                                                        QOAuth2AuthorizationCodeFlow *parent)
-    :GDriveFileTask (parent)
+    :GDriveFileTask (parent),m_file(filepath,this)
 {
-    //! check file exist
-    if(!QFile::exists(filepath)){
-        qWarning() << "file doesnt exist " << filepath;
-        m_errStr += QString("[Error]File not exist: %1\n").arg(filepath);
-        taskFailed();
-        return;
-    }
-    //! Initial file
-    m_file = new QFile(filepath,this);
-    //! Setup Url
     m_url = buildUrl(fileID,"media",mp_google->token(),args);
-    //! Upload file
-    request_UploadStart();
 }
 
 GDrive::GDriveFileSimpleUpdate::~GDriveFileSimpleUpdate()
 {
-    m_file->close();
+    m_file.close();
 }
 
 QByteArray GDrive::GDriveFileSimpleUpdate::getReplyString() const
@@ -65,7 +40,7 @@ QUrlQuery GDrive::GDriveFileSimpleUpdate::buildUrlArgs(const QString &addParents
                                                        const bool useContentAsIndexableText)
 {
     QUrlQuery query;
-    //! Set optional parameters
+    // Set optional parameters
     if(!addParents.isEmpty()){
         query.addQueryItem("addParents",addParents);
     }
@@ -94,30 +69,57 @@ QUrlQuery GDrive::GDriveFileSimpleUpdate::buildUrlArgs(const QString &addParents
     return query;
 }
 
-void GDrive::GDriveFileSimpleUpdate::request_UploadStart()
+bool GDrive::GDriveFileSimpleUpdate::start()
 {
-    //! open file
-    if(!m_file->open(QIODevice::ReadOnly)){
-        m_errStr += QString("[Error]File %1: %2\n")
-                .arg(m_file->fileName()).arg(m_file->errorString());
+    if(m_currentReply){
+        m_errStr += QString("[Error]Already has reply.");
         taskFailed();
-        return;
+        return false;
     }
-    //! gather file message to build simple upload request
-    QString mimeType = QMimeDatabase().mimeTypeForFile(m_file->fileName()).name();
-    QString fileSize = QString::number(m_file->size());
+    if(!m_file.isOpen() && !m_file.open(QIODevice::ReadOnly)){
+        m_errStr += QString("[Error]%1 open fail:%2").arg(m_file.fileName(),m_file.errorString());
+        taskFailed();
+        return false;
+    }
+    m_currentReply = requestUploadStart(buildRequest(m_url));
+    return true;
+}
 
-    QNetworkRequest request(m_url);
+void GDrive::GDriveFileSimpleUpdate::abort()
+{
+    qInfo() << Q_FUNC_INFO;
+    if(m_currentReply){
+        m_currentReply->disconnect();
+        m_currentReply->abort();
+        m_currentReply->deleteLater();
+    }
+    m_file.close();
+    m_errStr += QString("Abort upload.");
+    taskFailed();
+}
+
+QNetworkReply *GDrive::GDriveFileSimpleUpdate::requestUploadStart(const QNetworkRequest &request)
+{
+    // send request & connect reply handle function
+    auto reply = mp_google->networkAccessManager()->sendCustomRequest(request,"PATCH",&m_file);
+    connect(reply,&QNetworkReply::finished,
+            this,&GDriveFileSimpleUpdate::onUploadStartReplyFinished);
+    connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+            this,&GDriveFileSimpleUpdate::onUploadStartReplyError);
+    connect(reply,&QNetworkReply::uploadProgress,
+            this,&GDriveFileSimpleUpdate::uploadProgress);
+    return reply;
+}
+
+QNetworkRequest GDrive::GDriveFileSimpleUpdate::buildRequest(const QUrl &url) const
+{
+    QString mimeType = QMimeDatabase().mimeTypeForFile(m_file.fileName()).name();
+    QString fileSize = QString::number(m_file.size());
+    QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader,mimeType.toLatin1());
     request.setHeader(QNetworkRequest::ContentLengthHeader,fileSize.toLatin1());
-    request.setRawHeader("Authorization:",
-                         QByteArray("Bearer " + mp_google->token().toLatin1()));
-    //! send request & connect reply handle function
-    auto reply = mp_google->networkAccessManager()->sendCustomRequest(request,"PATCH",m_file);
-    connect(reply,&QNetworkReply::finished,
-            this,&GDriveFileSimpleUpdate::on_UploadStart_ReplyFinished);
-    connect(reply,QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-            this,&GDriveFileSimpleUpdate::on_UploadStart_ReplyError);
+    request.setRawHeader("Authorization:",QByteArray("Bearer " + mp_google->token().toLatin1()));
+    return request;
 }
 
 QUrl GDrive::GDriveFileSimpleUpdate::buildUrl(const QString &fileID,
@@ -150,41 +152,36 @@ void GDrive::GDriveFileSimpleUpdate::retry()
     int sleeptime = GDriveFileTask::getExpBackoffSleepTime(retryCount,1,10);
     if(sleeptime != -1){
         retryCount++;
-        QTimer::singleShot(sleeptime,
-                           this,&GDriveFileSimpleUpdate::request_UploadStart);
+        QTimer::singleShot(sleeptime,this,&GDriveFileSimpleUpdate::start);
     }else {
-        m_errStr += QStringLiteral("[Error]Too many retrys.");
+        m_errStr += QStringLiteral("Too many retrys.");
         taskFailed();
     }
 }
 
-void GDrive::GDriveFileSimpleUpdate::on_UploadStart_ReplyFinished()
+void GDrive::GDriveFileSimpleUpdate::onUploadStartReplyFinished()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if(reply->error()!=QNetworkReply::NoError){
-//        qWarning() << "[Error]Simple Update reply error: " + reply->errorString();
         return;
     }
-    //! QByteArray support implicit sharing
+    // QByteArray support implicit sharing
     m_replyData = reply->readAll();
     taskSucceeded();
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileSimpleUpdate::on_UploadStart_ReplyError(QNetworkReply::NetworkError)
+void GDrive::GDriveFileSimpleUpdate::onUploadStartReplyError(QNetworkReply::NetworkError)
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    auto replyErr = QString("[Error]Simple Update reply error %1: %2\n")
-            .arg(httpStatus)
-            .arg(reply->errorString());
-    qWarning() << replyErr;
-    m_errStr += replyErr;
     if(httpStatus == (500|502|503|504|403)){    //Retry upload
         retry();
     }else if (httpStatus == 404) {              //Restart upload
         retry();
     }else {                                     //Unslove error
+        m_errStr = QString("Simple Update reply error %1: %2\n").arg(QString(httpStatus),reply->errorString());
+        m_replyData = reply->readAll();
         taskFailed();
     }
     reply->deleteLater();

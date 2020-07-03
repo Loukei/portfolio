@@ -100,9 +100,6 @@ static QUrlQuery buildUrlArgs(const bool enforceSingleParent = false,
 
 ## Todo
 
-* 對任務提供progress/abort/pause/restart 方法
-  1. 
-* 所有的dialog要檢查必填參數項才能通過
 * 缺乏錯誤測試，沒有對回傳內容進行處理
 * 考慮將task模組化:建構Url、建構request、處理reply、解析回傳值、檢查字串輸入
 * 考慮提供[sync方法](https://www.devbean.net/2013/11/qt-study-road-2-access-network-4/)

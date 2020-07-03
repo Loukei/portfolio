@@ -103,25 +103,34 @@ QJsonTreeItem* QJsonTreeItem::load(const QJsonValue& value, QJsonTreeItem* paren
 
     if ( value.isObject())
     {
-
         //Get all QJsonValue childs
-        for (QString key : value.toObject().keys()){
+        for (QString &key : value.toObject().keys()){
             QJsonValue v = value.toObject().value(key);
             QJsonTreeItem * child = load(v,rootItem);
             child->setKey(key);
             child->setType(v.type());
             rootItem->appendChild(child);
-
         }
-
     }
 
     else if ( value.isArray())
     {
         //Get all QJsonValue childs
         int index = 0;
-        for (QJsonValue v : value.toArray()){
 
+        /* [Loukei] clang: detach QJsonArray with for-Ranged loop
+        for (const QJsonValue &v : value.toArray()){
+
+            QJsonTreeItem * child = load(v,rootItem);
+            child->setKey(QString::number(index));
+            child->setType(v.type());
+            rootItem->appendChild(child);
+            ++index;
+        }
+        */
+        const QJsonArray &arr = value.toArray();
+        for (auto it = arr.begin(); it!= arr.end(); ++it){
+            const QJsonValue &v = *it;
             QJsonTreeItem * child = load(v,rootItem);
             child->setKey(QString::number(index));
             child->setType(v.type());

@@ -22,18 +22,6 @@ GDriveAbout::~GDriveAbout()
 {
 }
 
-GDriveAboutResource GDriveAbout::getResource() const
-{
-    QJsonParseError jsonErr;
-    //! doc return null if parse error
-    QJsonDocument doc = QJsonDocument::fromJson(m_data,&jsonErr);
-    if(jsonErr.error != QJsonParseError::NoError){
-        qWarning() << Q_FUNC_INFO << jsonErr.errorString();
-        return GDriveAboutResource();
-    }
-    return GDriveAboutResource(doc);// RVO will work
-}
-
 QByteArray GDriveAbout::getReplyString() const
 {
     return m_data;

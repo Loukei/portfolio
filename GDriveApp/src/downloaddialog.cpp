@@ -3,7 +3,7 @@
 #include <QFileDialog>
 
 // https://developers.google.com/drive/api/v3/reference/files/get#parameters.
- const QString DownloadDialog::instructions_String =
+const QString DownloadDialog::instructions_String =
          QStringLiteral("Use fileID to specify download file in Drive.\n"
                         "Set file name and path by click Browse Button.\n");
 

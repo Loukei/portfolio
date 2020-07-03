@@ -10,7 +10,9 @@ GDrive::GDriveFileTask::GDriveFileTask(QOAuth2AuthorizationCodeFlow *parent)
 
 GDrive::GDriveFileTask::~GDriveFileTask()
 {
-
+    if(m_currentReply){
+        m_currentReply->deleteLater();
+    }
 }
 
 QString GDrive::GDriveFileTask::errorString() const

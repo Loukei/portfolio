@@ -3,10 +3,7 @@
 #include <QObject>
 #include "gdrivefiletask.h"
 #include <QNetworkReply>
-
-QT_BEGIN_NAMESPACE
-class QFile;
-QT_END_NAMESPACE
+#include <QSaveFile>
 
 namespace GDrive {
 /*!
@@ -27,14 +24,16 @@ public:
     /// GDriveFileDownloader doesnt take ownership of file
     explicit GDriveFileDownloader(const QString &fileId,
                                   const QString &fields,
-                                  QSharedPointer<QFile> file,
+                                  const QString &filepath,
                                   QOAuth2AuthorizationCodeFlow *parent);
     explicit GDriveFileDownloader(const QString &fileId,
                                   const QUrlQuery &args,
-                                  QSharedPointer<QFile> file,
+                                  const QString &filepath,
                                   QOAuth2AuthorizationCodeFlow *parent);
     /// destructor
     ~GDriveFileDownloader() override;
+    /// start download
+    bool start();
     /// return network reply
     QByteArray getReplyString() const;
 
@@ -44,30 +43,35 @@ public:
 public slots:
     void abort();
 
-private:
-    /// pointer to Shared QFile ready to write,DELETE by owner
-    QSharedPointer<QFile> mp_file;
-    /// save network reply usually file matadata
-    QByteArray m_replyData = QByteArray();
+signals:
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 private:
-    /// send download request
-    void request_Download(const QUrl &url);
+    QSaveFile m_file;
+    /// save network reply usually file matadata
+    QByteArray m_replyData = QByteArray();
+    ///
+    QUrl m_requestUrl;
+
+private:
+    bool checkAndOpenFile();
     /// Setup download url
     QUrl buildUrl(const QString &fileId,const QString &fields,const QString &key) const;
     QUrl buildUrl(const QString &fileId,const QString &alt,const QString &key,QUrlQuery args) const;
-    /// Write data to mp_file;
-    bool writeFile(QNetworkReply *reply);
+    /// setup request
+    QNetworkRequest buildRequest(const QUrl &url) const;
+    /// send download request
+    QNetworkReply* requestDownload(const QNetworkRequest &request);
     /// Parse Error message form reply
     QString getErrorMessage(QNetworkReply *reply);
 
 private slots:
     /// Solt for `QNetworkReply::finished` in `request_Download()`
-    void on_Download_ReplyFinished();
+    void onDownloadReplyFinished();
     /// Solt for `QNetworkReply::error` in `request_Download()`
-    void on_Download_ReplyError(QNetworkReply::NetworkError);
-
-    void on_Download_readyRead();
+    void onDownloadReplyError(QNetworkReply::NetworkError);
+    /// Slot for ``
+    void onDownloadReadyread();
 };
 }
 #endif // GDRIVEFILEDOWNLOADER_H

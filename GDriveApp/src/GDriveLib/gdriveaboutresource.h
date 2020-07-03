@@ -24,7 +24,7 @@ class GDriveAboutResource
 {
 public:
     /// construct by QBytearray data(deprecated)
-//    explicit GDriveAboutResource(const QByteArray &data);
+    explicit GDriveAboutResource(const QByteArray &data);
     /// construct by QJsonDocument
     explicit GDriveAboutResource(const QJsonDocument &doc);
     /// Constructs an empty GDriveAboutResource object.
