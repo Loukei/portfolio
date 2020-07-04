@@ -95,6 +95,9 @@ bool GDrive::GDriveFileMultipartUpdate::start()
 
 void GDrive::GDriveFileMultipartUpdate::abort()
 {
+    if(this->isComplete()){
+        return;
+    }
     if(m_currentReply){
         m_currentReply->disconnect();
         m_currentReply->abort();

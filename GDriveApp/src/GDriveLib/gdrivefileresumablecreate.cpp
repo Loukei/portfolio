@@ -83,10 +83,15 @@ bool GDrive::GDriveFileResumableCreate::start()
 
 void GDrive::GDriveFileResumableCreate::abort()
 {
+    if(this->isComplete()){
+        return;
+    }
     /* disconnect and abort reply, so we don't need change those slot code */
-    m_currentReply->disconnect();
-    m_currentReply->abort();
-    m_currentReply->deleteLater();
+    if(m_currentReply){
+        m_currentReply->disconnect();
+        m_currentReply->abort();
+        m_currentReply->deleteLater();
+    }
     /* close file */
     m_file.close();
     /* mark error string */

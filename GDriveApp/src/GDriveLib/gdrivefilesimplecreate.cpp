@@ -83,6 +83,9 @@ bool GDrive::GDriveFileSimpleCreate::start()
 void GDrive::GDriveFileSimpleCreate::abort()
 {
     qInfo() << Q_FUNC_INFO;
+    if(this->isComplete()){
+        return;
+    }
     if(m_currentReply){
         m_currentReply->disconnect();
         m_currentReply->abort();

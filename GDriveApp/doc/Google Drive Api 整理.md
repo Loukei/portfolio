@@ -13,11 +13,13 @@
 | **Required query parameters** |         |                                          |
 | fields                        | string  |                                          |
 
+#### About::get request example
+
 ``` http
 GET https://www.googleapis.com/drive/v3/about?fields=user(displayName,photoLink,emailAddress) HTTP/1.1
 Host: www.googleapis.com
 User-Agent: QtOAuth/1.0 (+https://www.qt.io)
-Authorization: Bearer ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-
+Authorization: Bearer [Token]
 Connection: Keep-Alive
 Accept-Encoding: gzip, deflate
 Accept-Language: zh-TW,en,*
@@ -48,17 +50,74 @@ Accept-Language: zh-TW,en,*
 #### Simple upload request example
 
 ``` http
-POST https://www.googleapis.com/upload/drive/v3/files?uploadType=media&access_token=ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-BDR9muvlAxuN9b4BRDErDs6_ZZg2EjsCc2E5TUEsHbtP7iO1aRMU2wmAfmt2o45mf1t-1r_qkCrEpcQPXllq0FEWpwLHDsiZCZy3J1uo HTTP/1.1
+POST https://www.googleapis.com/upload/drive/v3/files?uploadType=media&access_token=[Token] HTTP/1.1
 Host: www.googleapis.com
 Content-Type: text/plain
-Authorization: : Bearer ya29.a0AfH6SMBo2GcBf10IxUAAxz1Ud_5WHMh2VXm-Go0lDo6L3unQ2IFs2TUfl0-BDR9muvlAxuN9b4BRDErDs6_ZZg2EjsCc2E5TUEsHbtP7iO1aRMU2wmAfmt2o45mf1t-1r_qkCrEpcQPXllq0FEWpwLHDsiZCZy3J1uo
+Authorization: : Bearer [Token]
 Content-Length: 1064
 Connection: Keep-Alive
 Accept-Encoding: gzip, deflate
 Accept-Language: zh-TW,en,*
 User-Agent: Mozilla/5.0
 
-"file body"
+** YOUR FILE CONTENT **
+```
+
+#### Multipart upload request example
+
+``` http
+POST https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart HTTP/1.1
+Host: www.googleapis.com
+Authorization: Bearer [Token]
+Content-Type: multipart/related; boundary="foo_bar_baz"
+MIME-Version: 1.0
+Content-Length: 1217
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+
+--foo_bar_baz
+Content-Type: application/json; charset=UTF-8
+
+{"name":"soviet example"}
+--foo_bar_baz
+Content-Type: text/plain
+
+﻿
+** YOUR FILE CONTENT **
+```
+
+#### Resumable upload request example
+
+``` http
+POST https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable HTTP/1.1
+Host: www.googleapis.com
+Content-Type: application/json; charset=UTF-8
+Authorization: Bearer [Token]
+X-Upload-Content-Type: text/plain
+X-Upload-Content-Length: 1064
+Content-Length: 25
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+
+{"name":"soviet example"}
+```
+
+``` http
+PUT https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=[Session URI] HTTP/1.1
+Host: www.googleapis.com
+Content-Type: text/plain
+Content-Length: 1064
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+
+
+** YOUR FILE CONTENT **
 ```
 
 ### Files: update
@@ -86,6 +145,23 @@ User-Agent: Mozilla/5.0
 | supportsAllDrives             | boolean | (Default: false)                         |
 | useContentAsIndexableText     | boolean | (Default: false)                         |
 
+#### Files: update request example
+
+``` http
+PATCH https://www.googleapis.com/upload/drive/v3/files/[fileID]?uploadType=media&access_token=[Token] HTTP/1.1
+Host: www.googleapis.com
+Content-Type: text/plain
+Authorization: : Bearer [Token]
+Content-Length: 1064
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+
+
+** YOUR FILE CONTENT **
+```
+
 ### Files: get
 
 - 下載檔案/取得目標檔案的matadata
@@ -107,6 +183,30 @@ User-Agent: Mozilla/5.0
 | fields                        | string  |                                              |
 | supportsAllDrives             | boolean | (Default: false)                             |
 
+#### Files: get (mata) request example
+
+``` http
+GET https://www.googleapis.com/drive/v3/files/[fileID]?key=[ClientSecert] HTTP/1.1
+Host: www.googleapis.com
+Authorization: Bearer [Token]
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+```
+
+#### Files: get (media) request example
+
+``` http
+GET https://www.googleapis.com/drive/v3/files/[fileID]]?alt=media&fields=id,name&key=[ClientSecert] HTTP/1.1
+Host: www.googleapis.com
+Authorization: Bearer [Token]
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+```
+
 ### Files: list
 
 - Lists or searches files.
@@ -127,3 +227,15 @@ User-Agent: Mozilla/5.0
 | q                             | string  |                                              |
 | spaces                        | string  | (value: 'drive','appDataFolder','photos')    |
 | supportsAllDrives             | boolean | (Default: false)                             |
+
+#### Files: list request example
+
+``` http
+GET https://www.googleapis.com/drive/v3/files?pageSize=100&q=name%20%3D%20'Untitled' HTTP/1.1
+Host: www.googleapis.com
+Authorization: Bearer [Token]
+Connection: Keep-Alive
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-TW,en,*
+User-Agent: Mozilla/5.0
+```

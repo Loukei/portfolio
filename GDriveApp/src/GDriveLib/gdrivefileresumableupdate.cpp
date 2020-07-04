@@ -89,10 +89,15 @@ bool GDrive::GDriveFileResumableUpdate::start()
 
 void GDrive::GDriveFileResumableUpdate::abort()
 {
+    if(this->isComplete()){
+        return;
+    }
     /* disconnect and abort reply, so we don't need change those slot code */
-    m_currentReply->disconnect();
-    m_currentReply->abort();
-    m_currentReply->deleteLater();
+    if(m_currentReply){
+        m_currentReply->disconnect();
+        m_currentReply->abort();
+        m_currentReply->deleteLater();
+    }
     /* close file */
     m_file.close();
     /* mark error string */
@@ -291,7 +296,7 @@ void GDrive::GDriveFileResumableUpdate::onInitialSession_ReplyFinished()
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileResumableUpdate::onInitialSession_ReplyError(QNetworkReply::NetworkError code)
+void GDrive::GDriveFileResumableUpdate::onInitialSession_ReplyError(QNetworkReply::NetworkError)
 {
     qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -321,7 +326,7 @@ void GDrive::GDriveFileResumableUpdate::onStartUpload_ReplyFinished()
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileResumableUpdate::onStartUpload_ReplyError(QNetworkReply::NetworkError code)
+void GDrive::GDriveFileResumableUpdate::onStartUpload_ReplyError(QNetworkReply::NetworkError)
 {
     qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -352,7 +357,7 @@ void GDrive::GDriveFileResumableUpdate::onUploadProgress_ReplyFinished()
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileResumableUpdate::onUploadProgress_ReplyError(QNetworkReply::NetworkError code)
+void GDrive::GDriveFileResumableUpdate::onUploadProgress_ReplyError(QNetworkReply::NetworkError)
 {
     qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -388,7 +393,7 @@ void GDrive::GDriveFileResumableUpdate::onResumeUpload_ReplyFinished()
     reply->deleteLater();
 }
 
-void GDrive::GDriveFileResumableUpdate::onResumeUpload_ReplyError(QNetworkReply::NetworkError code)
+void GDrive::GDriveFileResumableUpdate::onResumeUpload_ReplyError(QNetworkReply::NetworkError)
 {
     qInfo() << Q_FUNC_INFO;
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());

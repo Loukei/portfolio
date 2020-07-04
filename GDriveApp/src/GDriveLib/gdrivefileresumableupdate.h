@@ -107,16 +107,16 @@ private:
 
 private slots:
     void onInitialSession_ReplyFinished();
-    void onInitialSession_ReplyError(QNetworkReply::NetworkError code);
+    void onInitialSession_ReplyError(QNetworkReply::NetworkError);
 
     void onStartUpload_ReplyFinished();
-    void onStartUpload_ReplyError(QNetworkReply::NetworkError code);
+    void onStartUpload_ReplyError(QNetworkReply::NetworkError);
 
     void onUploadProgress_ReplyFinished();
-    void onUploadProgress_ReplyError(QNetworkReply::NetworkError code);
+    void onUploadProgress_ReplyError(QNetworkReply::NetworkError);
 
     void onResumeUpload_ReplyFinished();
-    void onResumeUpload_ReplyError(QNetworkReply::NetworkError code);
+    void onResumeUpload_ReplyError(QNetworkReply::NetworkError);
     inline void onResumeUpload_uploadProgress(qint64 bytesSent, qint64 bytesTotal);
 }; // class GDriveFileResumableUpdate
 

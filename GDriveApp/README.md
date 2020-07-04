@@ -53,7 +53,7 @@ redirect_uris       | keyRedirectUri()      | 網頁重新導向的路徑位址
 
 ### 範例 Example
 
-1. 在你的專案內加入必要的模組`QT += core gui network networkauth`
+1. 在專案內加入必要的模組`QT += core gui network networkauth`
 2. 將`src/GDriveLib`資料夾加入專案
 
 ``` C++
@@ -86,22 +86,30 @@ void ExampleDialog::login()
 // logout
 void ExampleDialog::logout()
 {
-    m_Drive->logout();
+    m_Drive->setToken("");
+    m_Drive->setRefreshToken("");
 }
 // simple upload local file
 void ExampleDialog::uploadFile()
 {
     const QString filepath = "D:/Download/testdata/soviet example.txt";
     auto task = m_Drive->fileSimpleCreate(filepath);
+    if(!task->start()){
+        /* For upload/download/update task, use start() to check the relate file has open or not. */
+        m_textbrowser->append(filepath + " Simple Upload error:" + task->errorString());
+        task->deleteLater();
+        return;
+    }
     auto onUploadreceive = [task,this,filepath](){
         if(task->isComplete() && !task->isFailed()){
-            qDebug() << filepath + " Simple Upload Success.";
+            m_textbrowser->append(filepath + " Simple Upload Success.\n");
         }else {
-            qDebug() << filepath + " Simple Upload error:" + task->errorString();
+            m_textbrowser->append(filepath + " Simple Upload error:" + task->errorString());
         }
         task->deleteLater();
     };
-    connect(task,&GDriveFileTask::finished,this,onUploadreceive);
+    connect(task,&GDriveFileTask::finished,
+            this,onUploadreceive);
 }
 void ExampleDialog::onGDrive_granted()
 {
@@ -148,7 +156,7 @@ QString scope
 quint16 port
 ```
 
-可以從你的google api設定裡填入，或是使用[oauthglobal.h][]幫助你
+可以從你的google api設定裡填入，或是使用[oauthglobal.h][]幫助
 
 #### 登入
 
@@ -159,7 +167,9 @@ void GDriveService::grant();
 #### 登出
 
 ``` c++
-void GDriveService::logout();
+// 清除Access token與Refresh token
+GDriveService::setToken("");
+GDriveService::setRefreshToken("");
 ```
 
 #### 上傳檔案
@@ -172,6 +182,17 @@ API使用任務導向操作，物件內部會發出http socket、處理上傳流
 
 ``` c++
 auto task = m_Drive->fileSimpleCreate(filepath);
+```
+
+針對檔案上傳/下載/更新的動作需要開啟本地端檔案，為了確保在網路請求發出前做出確認，這類Task使用`bool start()`進行檢查，如果傳入的檔案路徑開啟成功就會送出請求，反之會失敗並回傳false
+
+``` c++
+if(!task->start()){
+    // 印出失敗訊息...
+    qDebug() << "file open fail";
+    task->deleteLater();
+    return;
+}
 ```
 
 連接`finished()`信號，準備接收回傳結果，當任務完成或失敗都會產生信號
@@ -200,6 +221,15 @@ auto onUploadreceive = [task,this,filepath](){
 };
 ```
 
+額外: 如果需要顯示上傳/下載進度，參考[QNetworkReply::uploadProgress][]
+
+``` c++
+void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+```
+
+以範例中的情況就是使用 `GDriveFileSimpleCreate::uploadProgress`
+
 #### 信號處理
 
 - 當認證流程成功或者access token更新，`GDriveService::granted()`會發出，用來確認可以執行OAuth操作。
@@ -216,7 +246,7 @@ OAuth 2並沒有設定登出的機制，實際上要取消登入只要刪除本�
 
 開發者不會希望在沒有access token的情況下呼叫網路作業，這會導致往程式錯誤甚至崩潰。
 
-我們可以使用`GDriveService::tokenChanged()`以及紀錄前一個token的內容來開啟/關閉網路操作。
+可以使用`GDriveService::tokenChanged()`以及紀錄前一個token的內容來開啟/關閉網路操作。
 
 當token改變時，通過與前一個token之間的比較我們可以了解目前的狀態
 
@@ -276,3 +306,5 @@ m_Drive->refreshAccessToken(); // use refresh token to login
 [QOAuth2AuthorizationCodeFlow]: https://doc.qt.io/qt-5/qoauth2authorizationcodeflow.html
 
 [refresh token]: https://developers.google.com/identity/protocols/oauth2/web-server#creatingclient
+
+[QNetworkReply::uploadProgress]: https://doc.qt.io/qt-5/qnetworkreply.html#uploadProgress

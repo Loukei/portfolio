@@ -88,6 +88,9 @@ bool GDrive::GDriveFileMultipartCreate::start()
 
 void GDrive::GDriveFileMultipartCreate::abort()
 {
+    if(this->isComplete()){
+        return;
+    }
     if(m_currentReply){
         m_currentReply->disconnect();
         m_currentReply->abort();
