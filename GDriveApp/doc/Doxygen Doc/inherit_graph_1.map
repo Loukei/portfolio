@@ -1,0 +1,8 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,107,73,133"/>
+<area shape="rect" id="node2" href="$class_download_dialog.html" title="The DownloadDialog class provide download parameter to mainwindow." alt="" coords="131,5,246,32"/>
+<area shape="rect" id="node3" href="$class_file_mata_data_dialog.html" title="The FileMataDataDialog class is UI to get file matadata." alt="" coords="121,56,256,83"/>
+<area shape="rect" id="node4" href="$class_search_dialog.html" title="The SearchDialog class is use to search drive file and show search result on QTreeView." alt="" coords="139,107,238,133"/>
+<area shape="rect" id="node5" href="$class_update_dialog.html" title=" " alt="" coords="139,157,238,184"/>
+<area shape="rect" id="node6" href="$class_upload_dialog.html" title=" " alt="" coords="139,208,238,235"/>
+</map>

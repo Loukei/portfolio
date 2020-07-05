@@ -1,0 +1,27 @@
+<map id="MainWindow::MainWindow" name="MainWindow::MainWindow">
+<area shape="rect" id="node1" title=" " alt="" coords="5,615,184,642"/>
+<area shape="rect" id="node2" href="$class_account_widget_acts.html#ae4638df309dd84959202c6d38a173838" title=" " alt="" coords="257,5,403,47"/>
+<area shape="rect" id="node3" href="$namespace_settings.html#a45a7a98e9e34af4919d59c2df0590118" title=" " alt="" coords="263,71,397,112"/>
+<area shape="rect" id="node4" href="$namespace_settings.html#ac2ad29c1cc90c8dfe4ff34332d5da346" title=" " alt="" coords="263,136,397,177"/>
+<area shape="rect" id="node5" href="$namespace_settings.html#a46e9d78eb295726d4da3d6c1ad31ba5b" title=" " alt="" coords="249,202,411,229"/>
+<area shape="rect" id="node6" href="$namespace_settings.html#a23159c5ab8f2146a5df8fc9c091a3025" title=" " alt="" coords="250,253,410,279"/>
+<area shape="rect" id="node7" href="$namespace_o_auth.html#ab43e7c885968ac3eb05c03bc9d197df6" title="auth_uri" alt="" coords="265,303,395,330"/>
+<area shape="rect" id="node8" href="$namespace_o_auth.html#a0f6ce07364da9e6aed8b2a7fd84183ed" title="client_id" alt="" coords="265,354,395,381"/>
+<area shape="rect" id="node9" href="$namespace_o_auth.html#a67f50b679d78e112cb9647b05c3c2c93" title="client_secret" alt="" coords="251,405,409,431"/>
+<area shape="rect" id="node10" href="$namespace_o_auth.html#ad6ce5a520b6b5acd72931d022a0563c6" title=" " alt="" coords="250,455,410,482"/>
+<area shape="rect" id="node12" href="$namespace_o_auth.html#a3adeeecdbc674343dc088ad63e0e7354" title="file scope only able to download file form api uploaded" alt="" coords="267,506,393,533"/>
+<area shape="rect" id="node13" href="$namespace_o_auth.html#a5d1ebbd587cf88a1926d6b2c5617c423" title="token_uri" alt="" coords="261,557,399,583"/>
+<area shape="rect" id="node14" href="$namespace_settings.html#a64f3a34cdd4b56a08113c618589679cf" title=" " alt="" coords="254,608,406,649"/>
+<area shape="rect" id="node15" href="$class_download_dialog.html#a3a5b20338b251251601b4748ead40188" title=" " alt="" coords="232,673,428,715"/>
+<area shape="rect" id="node16" href="$class_file_mata_data_dialog.html#a54bd440b0859cc29db125a5e11062936" title=" " alt="" coords="263,739,397,780"/>
+<area shape="rect" id="node17" href="$class_update_dialog.html#a4d9c2b89f85d2c3408b62de229d98dad" title=" " alt="" coords="251,805,409,831"/>
+<area shape="rect" id="node18" href="$class_file_mata_data_dialog.html#a5ef09e932defd7b75d2684fccfc3febc" title=" " alt="" coords="263,856,397,897"/>
+<area shape="rect" id="node19" href="$class_download_dialog.html#a00e1784f1f92ec577e0c0cec2985f793" title=" " alt="" coords="245,922,415,949"/>
+<area shape="rect" id="node20" href="$class_upload_dialog.html#acd9b47f913c7bb9792db5d55a831ffad" title=" " alt="" coords="244,973,416,999"/>
+<area shape="rect" id="node21" href="$class_update_dialog.html#aa1dae7944e623053279edf6cc2ef53b8" title=" " alt="" coords="243,1023,417,1050"/>
+<area shape="rect" id="node22" href="$class_account_widget_acts.html#a348bd97bfd4cbf7c8760bb0a0b277823" title="setup every QObject member to QMenu parent" alt="" coords="257,1075,403,1116"/>
+<area shape="rect" id="node23" href="$namespace_settings.html#ad3c43e031952edb96735bbd5decf2796" title=" " alt="" coords="251,1141,409,1167"/>
+<area shape="rect" id="node24" href="$namespace_settings.html#a4c01e042121380bb3b6a4fd60616e3dd" title=" " alt="" coords="243,1191,417,1218"/>
+<area shape="rect" id="node25" href="$namespace_settings.html#a2d03f9ea5c5dcc8b7edf0e2917af22a5" title=" " alt="" coords="243,1242,417,1269"/>
+<area shape="rect" id="node11" href="$namespace_o_auth.html#a252041da2cb9c8224717abc37d9b6bac" title="redirect_uris" alt="" coords="476,455,628,482"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="GDrive::GDriveFileTask" name="GDrive::GDriveFileTask">
+<area shape="rect" id="node1" title="A base class to handle all the Google Drive Api File method." alt="" coords="856,131,1043,355"/>
+<area shape="rect" id="node3" href="$class_g_drive_1_1_g_drive_file_downloader.html" title="Implement Google Drive Files: get method to download file,using fileID." alt="" coords="5,425,200,590"/>
+<area shape="rect" id="node4" href="$class_g_drive_1_1_g_drive_file_get.html" title="The GDriveFileGet class is implement Google Drive Api Files: get method." alt="" coords="225,439,373,575"/>
+<area shape="rect" id="node5" href="$class_g_drive_1_1_g_drive_file_multipart_create.html" title="Creates a new file with Multipart upload." alt="" coords="397,417,595,597"/>
+<area shape="rect" id="node6" href="$class_g_drive_1_1_g_drive_file_multipart_update.html" title="The GDriveFileMultipartUpdate class are provide Files: update method in Google Drive." alt="" coords="619,417,819,597"/>
+<area shape="rect" id="node7" href="$class_g_drive_1_1_g_drive_file_resumable_create.html" title="Creates a new file with Resumable upload." alt="" coords="843,403,1055,612"/>
+<area shape="rect" id="node8" href="$class_g_drive_1_1_g_drive_file_resumable_update.html" title="The GDriveFileResumableUpdate class are provide Files: update method in Google Drive." alt="" coords="1079,403,1294,612"/>
+<area shape="rect" id="node9" href="$class_g_drive_1_1_g_drive_file_search.html" title="GDriveFileSearch provide lists or searches files." alt="" coords="1319,432,1487,583"/>
+<area shape="rect" id="node10" href="$class_g_drive_1_1_g_drive_file_simple_create.html" title="Creates a new file with Simple upload." alt="" coords="1511,417,1697,597"/>
+<area shape="rect" id="node11" href="$class_g_drive_1_1_g_drive_file_simple_update.html" title="The GDriveFileSimpleUpdate class are provide Files: update method in Google Drive." alt="" coords="1722,417,1913,597"/>
+<area shape="rect" id="node2" title=" " alt="" coords="914,5,985,83"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="AccountWidgetActs::loadNetworkIcon" name="AccountWidgetActs::loadNetworkIcon">
+<area shape="rect" id="node1" title=" " alt="" coords="5,27,152,69"/>
+<area shape="rect" id="node2" href="$class_network_img_loader.html#a2b60aaf5ce33a14b363b8b6b343eef57" title=" " alt="" coords="200,5,363,32"/>
+<area shape="rect" id="node3" href="$class_account_widget_acts.html#ae8c471e22d40df7f14c1da2c372a3cf7" title="load pixmap from input data,then update label_UserIcon" alt="" coords="204,57,359,98"/>
+</map>

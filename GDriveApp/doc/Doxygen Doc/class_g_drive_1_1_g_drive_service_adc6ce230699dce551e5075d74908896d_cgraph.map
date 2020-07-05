@@ -1,0 +1,4 @@
+<map id="GDrive::GDriveService::setRefreshToken" name="GDrive::GDriveService::setRefreshToken">
+<area shape="rect" id="node1" title="Sets the new refresh token refreshToken to be used." alt="" coords="5,5,153,47"/>
+<area shape="rect" id="node2" href="$class_g_drive_1_1_g_drive_service.html#ace026196ccca50b1644a9e89f14826b2" title="Gets the current refresh token." alt="" coords="201,5,349,47"/>
+</map>

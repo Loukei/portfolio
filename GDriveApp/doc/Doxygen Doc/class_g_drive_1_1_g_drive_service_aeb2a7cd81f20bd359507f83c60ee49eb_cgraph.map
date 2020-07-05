@@ -1,0 +1,4 @@
+<map id="GDrive::GDriveService::setToken" name="GDrive::GDriveService::setToken">
+<area shape="rect" id="node1" title="Sets the token used to sign authenticated requests to token." alt="" coords="5,5,153,47"/>
+<area shape="rect" id="node2" href="$class_g_drive_1_1_g_drive_service.html#a42ffe06daf976c56f6acc19b9f15b518" title="return m_google token" alt="" coords="201,5,349,47"/>
+</map>

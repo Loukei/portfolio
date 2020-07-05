@@ -1,4 +1,4 @@
-# GDriveApp project
+# GDriveApp project(Archived)
 
 ###### tags: `C++11` `Qt5` `OAuth 2.0`
 
@@ -244,7 +244,7 @@ void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 OAuth 2並沒有設定登出的機制，實際上要取消登入只要刪除本地端的Refresh token與access token即可。
 
-開發者不會希望在沒有access token的情況下呼叫網路作業，這會導致往程式錯誤甚至崩潰。
+開發者不會希望在沒有access token的情況下呼叫網路作業，這會導致程式錯誤甚至崩潰。
 
 可以使用`GDriveService::tokenChanged()`以及紀錄前一個token的內容來開啟/關閉網路操作。
 

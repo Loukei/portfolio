@@ -1,0 +1,5 @@
+<map id="GDrive::GDriveFileMultipartCreate" name="GDrive::GDriveFileMultipartCreate">
+<area shape="rect" id="node1" title="Creates a new file with Multipart upload." alt="" coords="5,403,203,583"/>
+<area shape="rect" id="node2" href="$class_g_drive_1_1_g_drive_file_task.html" title="A base class to handle all the Google Drive Api File method." alt="" coords="11,131,197,355"/>
+<area shape="rect" id="node3" title=" " alt="" coords="69,5,139,83"/>
+</map>
