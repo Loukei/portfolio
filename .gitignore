@@ -48,3 +48,5 @@ GDriveApp/Doxyfile
 GDriveApp/Http Network package log/
 
 GDriveApp/build/
+GDriveApp/.vscode/c_cpp_properties.json
+GDriveApp/.vscode/settings.json
