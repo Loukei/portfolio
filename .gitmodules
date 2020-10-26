@@ -1,3 +1,6 @@
 [submodule "GDriveApp"]
 	path = GDriveApp
 	url = https://github.com/Loukei/GDriveApp.git
+[submodule "Qt-Notepad"]
+	path = Qt-Notepad
+	url = https://github.com/Loukei/Qt-Notepad.git
